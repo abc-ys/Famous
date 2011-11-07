@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+"-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
+"http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
+
+<tiles-definitions>
+	<definition name="general.definition" template="/WEB-INF/view/layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/view/header.jsp" />
+		<put-attribute name="menu" value="" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer" value="/WEB-INF/view/footer.jsp" />
+	</definition>
+	<definition name="base.definition" template="/WEB-INF/view/layout2.jsp">
+		<put-attribute name="header" value="/WEB-INF/view/header.jsp" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer" value="/WEB-INF/view/footer.jsp" />
+	</definition>
+	<definition name="iframe.definition" template="/WEB-INF/view/layout3.jsp">		
+		<put-attribute name="body" value="" />		
+	</definition>
+	
+	<!-- 一般會員與創作人Profile頁 -->
+	<definition name="creatorProfile" extends="base.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberProfile/creatorProfile.jsp" />
+	</definition>
+	<definition name="memberProfile" extends="base.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberProfile/memberProfile.jsp" />
+	</definition>
+	<definition name="queryAllAlbums" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberProfile/creatorAllAlbums.jsp" />
+	</definition>
+	<definition name="queryCreatorRecentAction" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberProfile/creatorNewActivity.jsp" />
+	</definition>
+	<definition name="queryFriendsFans" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberProfile/creatorAllFriendsFans.jsp" />
+	</definition>
+	<definition name="queryMemberRecentAction" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberProfile/memberNewActivity.jsp" />
+	</definition>
+	<definition name="queryFriendsCreators" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberProfile/memberAllFriendsCreators.jsp" />
+	</definition>
+	
+	<!-- 我的帳戶 -->
+	<definition name="queryMemberTotalData" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/myAccount/myAccount.jsp" />
+	</definition>
+	
+	<!-- 個人資料編輯 -->
+	<definition name="queryMember" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/memberData/memberData.jsp" />
+	</definition>
+	<definition name="modifyEmail" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberData/modifyEmail.jsp" />
+	</definition>
+	<definition name="saveEmail" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberData/saveEmail.jsp" />
+	</definition>
+	<definition name="modifyPassword" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberData/modifyPassword.jsp" />
+	</definition>
+	<definition name="savePassword" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberData/savePassword.jsp" />
+	</definition>
+	<definition name="uploadMemberPicture" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberData/uploadMemberPicture.jsp" />
+	</definition>
+	<definition name="handleUploadPicture" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberData/saveUploadPicture.jsp" />
+	</definition>
+	
+	<!-- 帳戶資料編輯 -->
+	<definition name="editMemberAccount" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/memberData/memberAccount.jsp" />
+	</definition>
+	<definition name="saveAccountData" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/memberData/saveMemberAccount.jsp" />
+	</definition>
+	
+	<!-- 交友圈管理-好友列表 -->
+	<definition name="queryFriend" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/friendsCreators/myFriendList.jsp" />
+	</definition>
+	<definition name="myFriendIframe" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/friendsCreators/myFriendIframe.jsp" />
+	</definition>
+	<definition name="confirmDelFriend" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/friendsCreators/confirmDelFriend.jsp" />
+	</definition>
+	<definition name="saveDelFriend" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/friendsCreators/saveDelFriend.jsp" />
+	</definition>
+	
+	<!-- 交友圈管理-喜愛作人列表 -->
+	<definition name="queryLikeCreator" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/friendsCreators/myLikeCreatorList.jsp" />
+	</definition>	
+	<definition name="confirmDelCreator" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/friendsCreators/confirmDelCreator.jsp" />
+	</definition>
+	<definition name="saveDelCreator" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/friendsCreators/saveDelCreator.jsp" />
+	</definition>
+	
+	<!-- 現金消費記錄 -->
+	<definition name="queryCashRcd" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/cashPay.jsp" />
+	</definition>
+	<definition name="cashpaydetail" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/cashPayDetail.jsp" />
+	</definition>
+	
+	<!-- 兌換記錄 -->
+	<definition name="queryExchangeRcd" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/exchangeRecord.jsp" />
+	</definition>
+	
+	<!-- 最新消息 -->
+	<definition name="queryNewsDetail" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/menuCategory.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/news/newsDetail.jsp" />
+	</definition>	
+	<definition name="addNews" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/news/addNews.jsp" />
+	</definition>
+	<definition name="previewNews" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/news/previewNews.jsp" />
+	</definition>		
+	<definition name="modifyNews" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/news/modifyNews.jsp" />
+	</definition>	
+	<definition name="queryNews" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/news/queryNews.jsp" />
+	</definition>
+	<definition name="saveUpdateNews" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/news/saveUpdateNews.jsp" />
+	</definition>
+	<!-- 線上客服 -->
+	<definition name="addQuestion" extends="base.definition">
+		<put-attribute name="body" value="/WEB-INF/view/onlineQuestion/addQuestion.jsp" />
+	</definition>	
+	<!--會員管理 -->
+	<definition name="queryMemberData" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/memberManagement/manageMember.jsp" />
+	</definition>
+	<definition name="manageMemberNote" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberManagement/manageMemberNote.jsp" />
+	</definition>
+	<definition name="queryGMemberDetail" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/memberManagement/manageGMemberDetail.jsp" />
+	</definition>
+	<definition name="modifyGMemberDetail" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/memberManagement/modifyGMemberDetail.jsp" />
+	</definition>
+	<definition name="queryCreatorDetail" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/memberManagement/manageCreatorDetail.jsp" />
+	</definition>
+	<definition name="modifyCreatorDetail" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/memberManagement/modifyCreatorDetail.jsp" />
+	</definition>
+	<definition name="addOffenseReason" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberManagement/addOffenseReason.jsp" />
+	</definition>
+	<definition name="saveOffenseReason" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberManagement/saveOffenseReason.jsp" />
+	</definition>	
+	
+	<!-- 廣告管理 -->
+	<definition name="addAdBanner" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/adBanner/addAdBanner.jsp" />
+	</definition>
+	<definition name="queryAdBanner" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/adBanner/queryAdBanner.jsp" />
+	</definition>
+	<definition name="queryAdDetail" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/adBanner/queryAdDetail.jsp" />
+	</definition>
+	<definition name="modifyAdDetail" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/adBanner/modifyAdDetail.jsp" />
+	</definition>
+	<definition name="queryUploadAdBanner" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/adBanner/queryUploadAdBanner.jsp" />
+	</definition>
+</tiles-definitions> 
