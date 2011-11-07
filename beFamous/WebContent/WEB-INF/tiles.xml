@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+"-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
+"http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
+
+<tiles-definitions>
+	<!-- 怡秀的tiles_start -->
+	<definition name="general.definition" template="/WEB-INF/view/layoutMenu/layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/view/layoutMenu/header.jsp" />
+		<put-attribute name="menu" value="" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer" value="/WEB-INF/view/layoutMenu/footer.jsp" />
+	</definition>
+	<definition name="base.definition" template="/WEB-INF/view/layoutMenu/layout2.jsp">
+		<put-attribute name="header" value="/WEB-INF/view/layoutMenu/header.jsp" />
+		<put-attribute name="body" value="" />
+		<put-attribute name="footer" value="/WEB-INF/view/layoutMenu/footer.jsp" />
+	</definition>
+	<definition name="iframe.definition" template="/WEB-INF/view/layoutMenu/layout3.jsp">
+		<put-attribute name="body" value="" />
+	</definition>
+	
+	<!-- 購物車 -->
+	<definition name="prepay" extends="base.definition">
+		<put-attribute name="body" value="/WEB-INF/view/shoppingCart/prepayOne.jsp" />
+	</definition>
+	<definition name="prepayTwo" extends="base.definition">
+		<put-attribute name="body" value="/WEB-INF/view/shoppingCart/prepayTwo.jsp" />
+	</definition>
+	<definition name="prepayThree" extends="base.definition">
+		<put-attribute name="body" value="/WEB-INF/view/shoppingCart/prepayThree.jsp" />
+	</definition>
+	<definition name="cardPay" extends="base.definition">
+		<put-attribute name="body" value="/WEB-INF/view/shoppingCart/cardPay.jsp" />
+	</definition>
+	<definition name="ATM" extends="base.definition">
+		<put-attribute name="body" value="/WEB-INF/view/shoppingCart/ATM.jsp" />
+	</definition>
+	<definition name="prepayFinal" extends="base.definition">
+		<put-attribute name="body" value="/WEB-INF/view/shoppingCart/prepayFinal.jsp" />
+	</definition>
+	<definition name="sdCard" extends="base.definition">
+		<put-attribute name="body" value="/WEB-INF/view/shoppingCart/sdCard.jsp" />
+	</definition>
+	<definition name="shoppingCartOne" extends="base.definition">
+		<put-attribute name="body" value="/WEB-INF/view/shoppingCart/shoppingCartOne.jsp" />
+	</definition>
+	<definition name="shoppingCartTwo" extends="base.definition">
+		<put-attribute name="body" value="/WEB-INF/view/shoppingCart/shoppingCartTwo.jsp" />
+	</definition>
+	<definition name="shoppingCartThree" extends="base.definition">
+		<put-attribute name="body" value="/WEB-INF/view/shoppingCart/shoppingCartThree.jsp" />
+	</definition>
+	
+	<!-- GSiMoneyGsiBonus -->
+	<definition name="incomeOutgo" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/incomeOutgo.jsp" />
+	</definition>
+	<definition name="applyExchange" extends="base.definition">
+		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/applyExchange.jsp" />
+	</definition>
+	<definition name="prePayRecord" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/prePayRecord.jsp" />
+	</definition>
+	<definition name="payRecord" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/payRecord.jsp" />
+	</definition>
+	<definition name="payDetailRecord" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/payDetailRecord.jsp" />
+	</definition>
+	<definition name="saleRecord" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/saleRecord.jsp" />
+	</definition>
+	<definition name="rewardRecord" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/rewardRecord.jsp" />
+	</definition>
+	<definition name="tempShoppingCart" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/tempShoppingCart.jsp" />
+	</definition>
+	<definition name="cashPayDetail" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/cashPayDetail.jsp" />
+	</definition>
+	<definition name="returnGoods" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/returnGoods.jsp" />
+	</definition>
+	
+	<!-- 管理排行榜和音樂類別 -->
+	<definition name="manageMusicCategory" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageCategoryRanking/manageMusicCategory.jsp" />
+	</definition>
+	<definition name="editMusicCategory" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/manageCategoryRanking/editMusicCategory.jsp" />
+	</definition>
+	<definition name="subMusicCategory" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageCategoryRanking/subMusicCategory.jsp" />
+	</definition>
+	<definition name="editMusicCategoryClose" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/manageCategoryRanking/editMusicCategoryClose.jsp" />
+	</definition>
+	
+	<!-- 訂單管理 -->
+	<definition name="manageCashOrder" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageOrder/manageCashOrder.jsp" />
+	</definition>
+	<definition name="cashOrderDetail" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageOrder/cashOrderDetail.jsp" />
+	</definition>
+	<definition name="shipRegister" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageOrder/shipRegister.jsp" />
+	</definition>
+	<definition name="manageGSiMoneyOrder" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageOrder/manageGSiMoneyOrder.jsp" />
+	</definition>
+	<definition name="gsimoneyOrderDetail" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageOrder/gsimoneyOrderDetail.jsp" />
+	</definition>
+	<definition name="gsimoneyOrderNote" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/manageOrder/gsimoneyOrderNote.jsp" />
+	</definition>
+	
+	<!-- 會計查詢 -->
+	<definition name="billRegister" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/accountingQuery/billRegister.jsp" />
+	</definition>
+	<definition name="exchangeCash" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/accountingQuery/exchangeCash.jsp" />
+	</definition>
+	
+	<!-- 商品管理 -->
+	<definition name="addProductData" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageProduct/addProductData.jsp" />
+	</definition>
+	<definition name="manageProductCategory" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageProduct/manageProductCategory.jsp" />
+	</definition>
+	<definition name="editProductCategory" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/manageProduct/editProductCategory.jsp" />
+	</definition>
+	<definition name="editProductCategoryClose" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/manageProduct/editProductCategoryClose.jsp" />
+	</definition>
+	<definition name="queryProductData" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageProduct/queryProductData.jsp" />
+	</definition>
+	<definition name="productDetailData" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageProduct/productDetailData.jsp" />
+	</definition>
+	
+	<!-- 檢舉管理 -->
+	<definition name="offenseArea" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageOffense/offenseArea.jsp" />
+	</definition>
+	<definition name="offenseSong" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/manageOffense/offenseSong.jsp" />
+	</definition>
+	<definition name="offenseAlbum" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/manageOffense/offenseAlbum.jsp" />
+	</definition>
+	<definition name="offenseReason" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/manageOffense/offenseReason.jsp" />
+	</definition>
+	<definition name="systemAutoHidden" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageOffense/systemAutoHidden.jsp" />
+	</definition>
+	<definition name="queryHiddenAlbum" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/manageOffense/hiddenAlbum.jsp" />
+	</definition>
+	<definition name="queryHiddenSong" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/manageOffense/hiddenSong.jsp" />
+	</definition>
+	<definition name="offense" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/manageOffense/offense.jsp" />
+	</definition>
+	<definition name="memberOffenseList" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/manageOffense/memberOffenseList.jsp" />
+	</definition>
+	<!-- 怡秀的tiles_end -->
+	
+	
+	<!-- kevin  -->
+	
+	<!-- 專輯Profile -->
+	<definition name="queryAlbumData" extends="base.definition">		
+		<put-attribute name="body" value="/WEB-INF/view/album/AlbumProfile.jsp" />
+	</definition>
+	
+	<definition name="querySongList" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/layoutMenu/SongList.jsp" />
+	</definition>
+	<definition name="queryOtherAlbum" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/album/OtherAlbum.jsp" />
+	</definition>
+	
+	<definition name="queryPromotionAlbum" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menuCategory.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/album/PromotionAlbum.jsp" />
+	</definition>
+	
+	<definition name="queryNewAlbum" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menuCategory.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/album/NewAlbum.jsp" />
+	</definition>
+	
+	
+	<!-- 分類頁面 -->
+	<definition name="queryNewAlbumsForMusicCategory" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menuCategory.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/album/MusicCategoryAlbums.jsp" />
+	</definition>
+	<definition name="queryHotAlbumsForMusicCategory" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menuCategory.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/album/MusicCategoryAlbums.jsp" />
+	</definition>
+	
+	
+	<!-- 排行榜 -->
+	<definition name="queryAlbumsWeekRanking" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menuCategory.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/album/Ranking.jsp" />
+	</definition>
+	
+	<definition name="querySongsWeekRanking" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/layoutMenu/SongList.jsp" />
+	</definition>
+	
+	<definition name="queryCreatorWeekRanking" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/layoutMenu/CreatorList.jsp" />
+	</definition> 
+	
+	
+	<definition name="queryAlbumsMonthRanking" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menuCategory.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/album/Ranking.jsp" />
+	</definition>
+
+	<definition name="querySongsMonthRanking" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/layoutMenu/SongList.jsp" />
+	</definition>
+	
+	<definition name="queryCreatorMonthRanking" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/layoutMenu/CreatorList.jsp" />
+	</definition>
+	
+   <!-- 關鍵字 -->
+	<definition name="queryKeyWord" extends="base.definition">		
+		<put-attribute name="body" value="/WEB-INF/view/keyword/KeyWordResult.jsp" />
+	</definition>
+	<definition name="queryKeyWordForSong" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/keyword/KeyWordResultForSong.jsp" />
+	</definition>
+	<definition name="queryKeyWordForAlbum" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/keyword/KeyWordResultForAlubm.jsp" />
+	</definition>
+	<definition name="queryKeyWordForCreator" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/keyword/KeyWordResultForCreator.jsp" />
+	</definition>
+	<definition name="queryKeyWordForNews" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/keyword/KeyWordResultForNews.jsp" />
+	</definition>
+	
+	<definition name="forwardAddBanner" extends="general.definition">
+	   <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/banner/ApplyAddBanner.jsp" />
+	</definition>
+	
+	<definition name="saveBanner" extends="general.definition">
+	  <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/banner/SaveBannerSuccess.jsp" />
+	</definition>
+	
+	<definition name="modifyMemberId" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/banner/modifyMember.jsp" />
+	</definition>
+	<definition name="modifyAddBanner" extends="general.definition">
+	  <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/banner/ApplyAddBanner.jsp" />
+	</definition>
+	
+	
+	<!-- 管理排行榜 -->
+	<definition name="queryAlbumWeekRankingForAdmin" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageRanking/WeekRankingOfAlbum.jsp" />
+	</definition>
+	<definition name="queryAlbumMonthRankingForAdmin" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageRanking/MonthRankingOfAlbum.jsp" />
+	</definition>
+	<definition name="querySongWeekRankingForAdmin" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageRanking/WeekRankingOfSong.jsp" />
+	</definition>
+	<definition name="querySongMonthRankingForAdmin" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageRanking/MonthRankingOfSong.jsp" />
+	</definition>
+	<definition name="queryCreatorWeekRankingForAdmin" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageRanking/WeekRankingOfCreator.jsp" />
+	</definition>
+	<definition name="queryCreatorMonthRankingForAdmin" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageRanking/MonthRankingOfCreator.jsp" />
+	</definition>
+	
+	
+	<!-- 管理活動 -->
+	<definition name="forwardPromotionActivity" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageActivity/AddPromotionActivity.jsp" />
+	</definition>
+	<definition name="queryAlbumById" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageActivity/AddPromotionActivity.jsp" />
+	</definition>
+	
+	
+	<!-- kevin end -->
+	
+	<!-- Lucy Start -->
+	
+	<!-- 一般會員與創作人Profile頁 -->
+	<definition name="creatorProfile" extends="base.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberProfile/creatorProfile.jsp" />
+	</definition>
+	<definition name="memberProfile" extends="base.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberProfile/memberProfile.jsp" />
+	</definition>
+	<definition name="queryAllAlbums" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberProfile/creatorAllAlbums.jsp" />
+	</definition>
+	<definition name="queryCreatorRecentAction" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberProfile/creatorNewActivity.jsp" />
+	</definition>
+	<definition name="queryFriendsFans" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberProfile/creatorAllFriendsFans.jsp" />
+	</definition>
+	<definition name="queryMemberRecentAction" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberProfile/memberNewActivity.jsp" />
+	</definition>
+	<definition name="queryFriendsCreators" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberProfile/memberAllFriendsCreators.jsp" />
+	</definition>
+	
+	<!-- 我的帳戶 -->
+	<definition name="queryMemberTotalData" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/myAccount/myAccount.jsp" />
+	</definition>
+	
+	<!-- 個人資料編輯 -->
+	<definition name="queryMember" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/memberData/memberData.jsp" />
+	</definition>
+	<definition name="modifyEmail" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberData/modifyEmail.jsp" />
+	</definition>
+	<definition name="saveEmail" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberData/saveEmail.jsp" />
+	</definition>
+	<definition name="modifyPassword" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberData/modifyPassword.jsp" />
+	</definition>
+	<definition name="savePassword" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberData/savePassword.jsp" />
+	</definition>
+	<definition name="uploadMemberPicture" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberData/uploadMemberPicture.jsp" />
+	</definition>
+	<definition name="handleUploadPicture" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberData/saveUploadPicture.jsp" />
+	</definition>
+	
+	<!-- 帳戶資料編輯 -->
+	<definition name="editMemberAccount" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/memberData/memberAccount.jsp" />
+	</definition>
+	<definition name="saveAccountData" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/memberData/saveMemberAccount.jsp" />
+	</definition>
+	
+	<!-- 交友圈管理-好友列表 -->
+	<definition name="queryFriend" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/friendsCreators/myFriendList.jsp" />
+	</definition>
+	<definition name="myFriendIframe" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/friendsCreators/myFriendIframe.jsp" />
+	</definition>
+	<definition name="confirmDelFriend" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/friendsCreators/confirmDelFriend.jsp" />
+	</definition>
+	<definition name="saveDelFriend" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/friendsCreators/saveDelFriend.jsp" />
+	</definition>
+	
+	<!-- 交友圈管理-喜愛作人列表 -->
+	<definition name="queryLikeCreator" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/friendsCreators/myLikeCreatorList.jsp" />
+	</definition>	
+	<definition name="confirmDelCreator" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/friendsCreators/confirmDelCreator.jsp" />
+	</definition>
+	<definition name="saveDelCreator" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/friendsCreators/saveDelCreator.jsp" />
+	</definition>
+	
+	<!-- 現金消費記錄 -->
+	<definition name="queryCashRcd" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/cashPay.jsp" />
+	</definition>
+	<definition name="cashpaydetail" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/cashPayDetail.jsp" />
+	</definition>
+	
+	<!-- 兌換記錄 -->
+	<definition name="queryExchangeRcd" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/exchangeRecord.jsp" />
+	</definition>
+	
+	<!-- 最新消息 -->
+	<definition name="queryNewsDetail" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/menuCategory.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/news/newsDetail.jsp" />
+	</definition>	
+	<definition name="addNews" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/news/addNews.jsp" />
+	</definition>
+	<definition name="previewNews" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/news/previewNews.jsp" />
+	</definition>		
+	<definition name="modifyNews" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/news/modifyNews.jsp" />
+	</definition>	
+	<definition name="queryNews" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/news/queryNews.jsp" />
+	</definition>
+	<definition name="saveUpdateNews" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/news/saveUpdateNews.jsp" />
+	</definition>
+	<!-- 線上客服 -->
+	<definition name="addQuestion" extends="base.definition">
+		<put-attribute name="body" value="/WEB-INF/view/onlineQuestion/addQuestion.jsp" />
+	</definition>	
+	<!--會員管理 -->
+	<definition name="queryMemberData" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/memberManagement/manageMember.jsp" />
+	</definition>
+	<definition name="manageMemberNote" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberManagement/manageMemberNote.jsp" />
+	</definition>
+	<definition name="queryGMemberDetail" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/memberManagement/manageGMemberDetail.jsp" />
+	</definition>
+	<definition name="modifyGMemberDetail" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/memberManagement/modifyGMemberDetail.jsp" />
+	</definition>
+	<definition name="queryCreatorDetail" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/memberManagement/manageCreatorDetail.jsp" />
+	</definition>
+	<definition name="modifyCreatorDetail" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/memberManagement/modifyCreatorDetail.jsp" />
+	</definition>
+	<definition name="addOffenseReason" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberManagement/addOffenseReason.jsp" />
+	</definition>
+	<definition name="saveOffenseReason" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberManagement/saveOffenseReason.jsp" />
+	</definition>	
+	
+	<!-- 廣告管理 -->
+	<definition name="addAdBanner" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/adBanner/addAdBanner.jsp" />
+	</definition>
+	<definition name="queryAdBanner" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/adBanner/queryAdBanner.jsp" />
+	</definition>
+	<definition name="queryAdDetail" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/adBanner/queryAdDetail.jsp" />
+	</definition>
+	<definition name="modifyAdDetail" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/adBanner/modifyAdDetail.jsp" />
+	</definition>
+	<definition name="queryUploadAdBanner" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/adBanner/queryUploadAdBanner.jsp" />
+	</definition>
+	<!-- Lucy end -->
+</tiles-definitions> 

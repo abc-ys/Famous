@@ -1,0 +1,98 @@
+@CHARSET "UTF-8";
+
+* {
+	padding: 0px;
+	margin: 0px;
+}
+
+body {
+	background: #FFFFFF;
+}
+
+a {
+	color: #C8DCE5;
+}
+
+h3 {
+	margin: 10px 10px 0 10px;
+	color: #FFF;
+	font: 18pt Arial, sans-serif;
+	letter-spacing: -1px;
+	font-weight: bold;
+}
+
+.boxgrid {
+	width: 100px;
+	height: 100px;
+	margin: 10px;
+	float: left;
+	background: #161613;
+	border: solid 2px #8399AF;
+	overflow: hidden;
+	position: relative;
+}
+
+.boxgrid img {
+	position: absolute;
+	top: 0;
+	left: 0;
+	border: 0;
+}
+
+.boxgrid p {
+	padding: 0 10px;
+	color: #afafaf;
+	font-weight: bold;
+	font: 10pt "Lucida Grande", Arial, sans-serif;
+}
+
+.boxgrid p .p1 {
+	position: absolute;
+	left: 0;
+}
+
+.boxgrid p .p2 {
+	position: absolute;
+	left: 50%;
+}
+.labeltext a {
+	color: #FF0000;
+	font: 10pt "Lucida Grande", Arial, sans-serif;
+}
+
+.boxcaption {
+	float: left;
+	position: absolute;
+	background: #000;
+	height: 20px;
+	width: 100%;
+	opacity: .8;
+	/* For IE 5-7 */
+	filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=70 );
+	/* For IE 8 */
+	-MS-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+}
+
+.captionfull .boxcaption {
+	position: absolute;
+	background: #FF0000;
+	top: 100%;
+	left: 0;
+}
+
+h3 a {
+	
+}
+.songTable ui,li{
+	list-style-type:none;
+}
+.songTable a{
+	color: #FF0000;
+	font: 12pt "Lucida Grande", Arial, sans-serif;
+}
+.songTable div:hover ui.owap{
+	display:block;
+}
+.songTable div .owap {
+	display:none;
+}
