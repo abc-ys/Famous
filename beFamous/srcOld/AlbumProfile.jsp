@@ -9,7 +9,7 @@
 </head>
 <body>
 
-<table border="0">
+<table  border="0">
 <tr>
 <td><img alt="" src="${profile[0].cover}">
 
