@@ -243,12 +243,36 @@ public class KeyWordController {
 	
 	
 	//怡秀 write-1107
-	//管理關鍵字
-	@RequestMapping(value = "/manageKeyWord")
-	public ModelAndView managekeyword(@RequestParam String keyWord) {
-		ModelAndView mav = new ModelAndView("manageKeyWord");
-		    
-		   
-		return mav;
-	}
+		//管理關鍵字-排除字詞組設定
+		@RequestMapping("/manageKeyWord")
+		public ModelAndView managekeyword() {
+			ModelAndView mav = new ModelAndView("manageKeyWord");
+			    
+			Keyword keyword = new Keyword();
+			keyword.setName("賽德克巴萊");
+			Keyword keyword2 = new Keyword();
+			keyword2.setName("鋼鐵擂台");
+			Keyword[] kw = {keyword,keyword2};
+			
+			mav.addObject("keyword", kw);
+			return mav;
+		}
+		
+		//管理關鍵字-排除字詞組設定-新增關鍵字
+		@RequestMapping("/addKeyWord")
+		public String addkeyword(String keyWordName) {
+			
+			System.out.println("keyWordName==>"+keyWordName);
+			
+			return "redirect:manageKeyWord.do";
+		}
+		
+		//管理關鍵字-排除字詞組設定-刪除關鍵字
+		@RequestMapping("/deleteKeyWord")
+		public String deletekeyword() {
+			
+			System.out.println("刪除關鍵字");
+			
+			return "redirect:manageKeyWord.do";
+		}
 }
