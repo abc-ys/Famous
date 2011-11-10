@@ -208,7 +208,7 @@
 	</definition>
 	
 	<!-- 關鍵字管理 -->
-	<definition name="offenseArea" extends="general.definition">
+	<definition name="manageKeyWord" extends="general.definition">
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/keyword/manageKeyWord.jsp" />
 	</definition>
