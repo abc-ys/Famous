@@ -20,14 +20,14 @@
 		<td width="200" >加入日期:&nbsp ${creatorDetail[0].createDate}</td>
 		<td width="200" >好友數:&nbsp ${creatorDetail[2]}</td><tr>
 		<td width="200" >地區:&nbsp ${creatorDetail[0].location}</td>
-		<td width="200" >專輯數:&nbsp <a href="">${creatorDetail[3]}</a></td><tr>	
+		<td width="200" >專輯數:&nbsp <a href="${pageContext.request.contextPath}/queryAlbum.do">${creatorDetail[3]}</a></td><tr>	
 		<c:if test="${creatorDetail[0].memberStatus.statusName == '正常'}">				
 				<td width="200" >狀態:&nbsp	${creatorDetail[0].memberStatus.statusName}</td>			
 		</c:if>
 		<c:if test="${creatorDetail[0].memberStatus.statusName == '停權'}">				
 				<td width="200" >狀態:&nbsp	${creatorDetail[0].memberStatus.statusName}</td>
 		</c:if>		
-		<td width="200" >歌曲數:&nbsp <a href="">${creatorDetail[4]}</a></td><tr>		
+		<td width="200" >歌曲數:&nbsp <a href="${pageContext.request.contextPath}/querySong.do">${creatorDetail[4]}</a></td><tr>		
 		<td width="200" ><font color="red">
 			<c:if test="${creatorDetail[0].memberStatus.statusName == '停權'}">				
 				${creatorDetail[0].memberStatus.statusReason}			

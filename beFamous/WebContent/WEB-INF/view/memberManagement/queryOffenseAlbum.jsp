@@ -88,7 +88,6 @@ function album(albumId) {
 	window.open("${pageContext.request.contextPath}/queryAlbumData.do?albumid="+albumId);
 }
 function offReason(id) {
-	alert("aaaaaaa");
 	window.open("${pageContext.request.contextPath}/offenseReason.do?id="+id);
 }
 </script>
