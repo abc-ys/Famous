@@ -38,12 +38,12 @@
 	<input type="radio" name="status" id="status" value="公開" <c:if test="${album.status == '公開'}"> checked </c:if>/>公開
 	<input type="radio" name="status" id="status" value="隱藏" <c:if test="${album.status == '隱藏'}"> checked </c:if>/>隱藏<br><br>
 	公開發表後，為確保消費者權益，設定收費的作品內容及資訊將只能變更<b>專輯介紹、標籤、專輯狀態、試聽長度、作詞人、作曲人、製作人和曲序</b>。<br><br>
-	<center><input type="submit" value="完成" onclick="saveAlbum()"></center>
+	<center><input type="submit" value="完成" onclick="saveAlbumInfo()"></center>
 </form>
 </body>
 <script>
-function saveAlbum(){
-	document.form.action="${pageContext.request.contextPath}/saveAlbum.do";
+function saveAlbumInfo(){
+	document.form.action="${pageContext.request.contextPath}/saveAlbumInfo.do";
 	document.form.submit();	
 }
 </script>

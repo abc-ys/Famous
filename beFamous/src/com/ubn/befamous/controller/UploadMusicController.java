@@ -1,9 +1,19 @@
 package com.ubn.befamous.controller;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadBase;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -211,9 +221,117 @@ public class UploadMusicController {
 	}
 	
 	//音樂管理-編輯專輯-編輯專輯資訊
-	@RequestMapping("/saveAlbum")
-	public String savealbum(String albumID, String albumType, String name, String date, String brand, String musicCategory, String tag, String cover, String cover2, String introduction, String status){
-				
+	@RequestMapping("/saveAlbumInfo")
+	public String savealbuminfo(HttpServletRequest request) throws Exception {
+		
+		String albumID = "";
+		String albumType = "";
+		String name = "";
+		String date = "";
+		String brand = "";
+		String musicCategory = "";
+		String tag = "";
+		String cover = "";
+		String cover2 = "";
+		String introduction = "";
+		String status = "";
+		String value = "";
+		String fileName = "";
+		
+		int yourMaxMemorySize = 500 * 500* 1024;
+		File yourTempDirectory = new File("/tmp");
+		int yourMaxRequestSize = 500 * 500* 1024;
+		boolean writeToFile = true;
+		String allowedFileTypes = ".jpg .png .gif .jpeg";
+
+		String saveDirectory = "D:/gitTest/befamousWeb/WebContent/file";  //存放的路徑
+
+		// Check that we have a file upload request
+		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+		System.out.println("isMultipart=" + isMultipart + "<br>");
+
+		// Create a factory for disk-based file items
+		DiskFileItemFactory factory = new DiskFileItemFactory(yourMaxMemorySize, yourTempDirectory);
+		
+		// Create a new file upload handler
+		ServletFileUpload upload = new ServletFileUpload(factory);
+
+		// Set overall request size constraint
+		upload.setSizeMax(yourMaxRequestSize);
+
+		try {
+			// Parse the request
+			List items = upload.parseRequest(request);
+
+			// Process the uploaded items
+			Iterator iter = items.iterator();
+			while (iter.hasNext()) {
+				FileItem item = (FileItem) iter.next();
+
+				if (item.isFormField()) {
+					// Process a regular form field	
+					//processFormField(item);		
+					String name2 = item.getFieldName();
+					value = item.getString("UTF-8");
+					System.out.println(name2 + "=" + value + "<br />");
+					if(name2.equals("albumID")){albumID=value;}
+					if(name2.equals("albumType")){albumType=value;}
+					if(name2.equals("name")){name=value;}
+					if(name2.equals("date")){date=value;}
+					if(name2.equals("brand")){brand=value;}
+					if(name2.equals("musicCategory")){musicCategory=value;}
+					if(name2.equals("tag")){tag=value;}
+					if(name2.equals("cover2")){cover2=value;}
+					if(name2.equals("introduction")){introduction=value;}
+					if(name2.equals("status")){status=value;}
+				} else {
+					// Process a file upload
+					//processUploadedFile(item);	
+					String fieldName = item.getFieldName();
+					fileName = item.getName();
+					String contentType = item.getContentType();
+					boolean isInMemory = item.isInMemory();
+					long sizeInBytes = item.getSize();
+					System.out.println("fieldName=" + fieldName + "<br />");
+					System.out.println("fileName=" + fileName + "<br />");
+					System.out.println("contentType=" + contentType + "<br />");
+					System.out.println("isInMemory=" + isInMemory + "<br />");
+					System.out.println("sizeInBytes=" + sizeInBytes + "<br />");
+					
+				      
+					if (fileName != null && !"".equals(fileName)) {
+						if (writeToFile) {
+							// 副檔名
+							String formatName = fileName.substring(fileName.length() - 4,fileName.length());
+						    fileName = (albumID + formatName).toLowerCase();
+							//fileName = FilenameUtils.getName(fileName);
+						      
+							cover=fileName;
+							
+							System.out.println("fileName to be saved=" + fileName + "<br />");
+							String extension = FilenameUtils.getExtension(fileName);
+							if (allowedFileTypes.indexOf(extension.toLowerCase()) != -1) {
+							    File uploadedFile = new File(saveDirectory,	fileName);						
+							    item.write(uploadedFile);
+							} else {
+								System.out.println("上傳的檔案不能是" + extension + "<br />");
+							}
+						} else {
+							//InputStream uploadedStream = item.getInputStream();
+							//...
+							//uploadedStream.close();
+							// Process a file upload in memory
+							byte[] data = item.get();
+							System.out.println("data size=" + data.length + "<br />");
+						}
+					}
+				}
+			}
+		} catch (FileUploadBase.SizeLimitExceededException ex1) {
+			System.out.println("上傳檔案超過最大檔案允許大小" + yourMaxRequestSize / (1024 * 1024) + "MB !");
+		}
+		
+
 		System.out.println("albumID==>"+albumID);
 		System.out.println("albumType==>"+albumType);
 		System.out.println("name==>"+name);
@@ -224,9 +342,9 @@ public class UploadMusicController {
 		System.out.println("cover==>"+cover);
 		System.out.println("cover2==>"+cover2);
 		System.out.println("introduction==>"+introduction);
-		System.out.println("status==>"+status);							
-			
-				
+		System.out.println("status==>"+status);	
+		
+		
 		return "redirect:editAlbumData.do";
 	}
 }
