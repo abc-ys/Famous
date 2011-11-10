@@ -807,5 +807,125 @@ public class MemberController {
 		System.out.println("    memberId="+memberId+", adminId="+adminId+", statusName="+statusName+", accountName="+accountName+", bankName="+bankName+", bankBranch="+bankBranch+", accountNO="+accountNO+", userName="+userName+", identityNO="+identityNO+", address="+address+", cellPhone="+cellPhone+", tel="+tel);
 		return "redirect:/manageCreatorDetail/modify/"+adminId+"/"+memberId+".do";
 	}
+	
+	//創作人被檢舉清單(專輯)
+		@RequestMapping("/queryOffenseAlbum")
+		public ModelAndView queryOffenseAlbum(String adminId,String memberId, Model model) {						
+			System.out.println("queryOffenseAlbum==>");		
+			System.out.println("    memberId="+memberId+", adminId="+adminId);
+			
+			ArrayList a = new ArrayList();
+			ArrayList b = new ArrayList();
+			ArrayList c = new ArrayList();
+			ArrayList d = new ArrayList();
+			
+			Creator creator = new Creator();
+			creator.setMemberId(1111111);
+					
+			Album a1 = new Album();
+			a1.setAlbumID(123);
+			a1.setName("peace");
+			a1.setCreator(creator);
+			a1.setStatus("公開");
+			int number1 = 12;
+			a.add(a1);
+			a.add(number1);
+			
+			Album a2 = new Album();
+			a2.setAlbumID(456);
+			a2.setName("peace");
+			a2.setCreator(creator);
+			a2.setStatus("隱藏");
+			int number2 = 33;
+			b.add(a2);
+			b.add(number2);
+			
+			Song s1 = new Song();
+			s1.setSongID(1234);
+			s1.setAlbum(a1);
+			s1.setName("in your eyes");
+			int number3 = 12;
+			c.add(s1);
+			c.add(number3);
+			
+			Song s2 = new Song();
+			s2.setSongID(4567);
+			s2.setAlbum(a2);
+			s2.setName("happy");
+			int number4 = 33;
+			d.add(s2);
+			d.add(number4);
+			
+			ArrayList offenseAlbums = new ArrayList();
+			offenseAlbums.add(a);
+			offenseAlbums.add(b);
+			ArrayList offenseSongs = new ArrayList();
+			offenseSongs.add(c);
+			offenseSongs.add(d);
+			
+			model.addAttribute("offenseAlbums", offenseAlbums);
+			model.addAttribute("offenseSongs", offenseSongs);
+			return new ModelAndView("queryOffenseAlbum");
+		}	
+		
+		//創作人被檢舉清單(歌曲)
+		@RequestMapping("/queryOffenseSong")
+		public ModelAndView queryOffenseSong(String adminId,String memberId, Model model) {						
+			System.out.println("queryOffenseSong==>");		
+			System.out.println("    memberId="+memberId+", adminId="+adminId);
+			
+			ArrayList a = new ArrayList();
+			ArrayList b = new ArrayList();
+			ArrayList c = new ArrayList();
+			ArrayList d = new ArrayList();
+			
+			Creator creator = new Creator();
+			creator.setMemberId(1111111);
+					
+			Album a1 = new Album();
+			a1.setAlbumID(123);
+			a1.setName("peace");
+			a1.setCreator(creator);
+			a1.setStatus("公開");
+			int number1 = 12;
+			a.add(a1);
+			a.add(number1);
+			
+			Album a2 = new Album();
+			a2.setAlbumID(456);
+			a2.setName("peace");
+			a2.setCreator(creator);
+			a2.setStatus("隱藏");
+			int number2 = 33;
+			b.add(a2);
+			b.add(number2);
+			
+			Song s1 = new Song();
+			s1.setSongID(1234);
+			s1.setAlbum(a1);
+			s1.setName("in your eyes");
+			int number3 = 12;
+			c.add(s1);
+			c.add(number3);
+			
+			Song s2 = new Song();
+			s2.setSongID(4567);
+			s2.setAlbum(a2);
+			s2.setName("happy");
+			int number4 = 33;
+			d.add(s2);
+			d.add(number4);
+			
+			ArrayList offenseAlbums = new ArrayList();
+			offenseAlbums.add(a);
+			offenseAlbums.add(b);
+			ArrayList offenseSongs = new ArrayList();
+			offenseSongs.add(c);
+			offenseSongs.add(d);
+			
+			model.addAttribute("offenseAlbums", offenseAlbums);
+			model.addAttribute("offenseSongs", offenseSongs);		
+			return new ModelAndView("queryOffenseSong");
+		}	
 }
 
