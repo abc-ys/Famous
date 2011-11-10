@@ -50,7 +50,13 @@ pageEncoding="UTF-8"%>
   <tr> 
   <td>
     <h4>關鍵字管理</h4>
-    <a href="${pageContext.request.contextPath}/addAdBanner.do">排除字詞組設定</a><br>
+    <a href="${pageContext.request.contextPath}/manageKeyWord.do">排除字詞組設定</a><br>
+  </td>
+  <tr> 
+  <td>
+    <h4>音樂管理</h4>
+    <a href="${pageContext.request.contextPath}/queryAlbum.do">查詢專輯</a><br>
+    <a href="${pageContext.request.contextPath}/querySong.do">查詢歌曲</a><br>
   </td>
 </table>
 </body>
