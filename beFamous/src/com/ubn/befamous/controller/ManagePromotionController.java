@@ -45,7 +45,7 @@ public class ManagePromotionController {
 		System.out.println("111==>"+activity.getTitle());
 		//傳入專輯ID
 		
-	    return "redirect:forwardPromotionActivity.do";
+	    return "redirect:forwardRecommendActivity.do";
 	
 	}
 	
@@ -55,7 +55,7 @@ public class ManagePromotionController {
 		System.out.println("222==>"+activity.getTitle());
 		//傳入歌曲ID
 		
-	    return "redirect:forwardPromotionActivity.do";
+	    return "redirect:forwardRecommendActivity.do";
 	
 	}
 	
@@ -200,7 +200,14 @@ public class ManagePromotionController {
 	@RequestMapping(value = "/queryJoinAlbumForRec")
 	public ModelAndView queryJoinAlbumForRec(String activityID) {
 		
-		ModelAndView mav = new ModelAndView("queryJoinMemberForRec");
+		ModelAndView mav = new ModelAndView("queryJoinAlbumForRec");
+		
+		
+		Creator creator = new Creator();
+		creator.setAccountName("kevin");
+		creator.setAccountNO("12345678");
+		creator.setUserName("kevin");
+		creator.setMemberId(123456);
 		
 		RecommendActivity activity = new RecommendActivity();
 		Album album = new Album();
@@ -213,7 +220,7 @@ public class ManagePromotionController {
 		album.setDate("2011/10/25");
 		album.setIntroduction("This is very good album!");
 		
-		
+		return mav;
 		
 	    
 	}
