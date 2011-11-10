@@ -355,17 +355,21 @@
 	
 	
 	<!-- 管理活動 -->
-	<definition name="forwardPromotionActivity" extends="general.definition">
+	<definition name="forwardRecommendActivity" extends="general.definition">
 		<put-attribute name="title" value="Contact Manager" />
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
-		<put-attribute name="body" value="/WEB-INF/view/manageActivity/AddPromotionActivity.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageActivity/AddRecommendActivity.jsp" />
 	</definition>
-	<definition name="queryAlbumById" extends="general.definition">
+    <definition name="queryRecommendActivity" extends="general.definition">
 		<put-attribute name="title" value="Contact Manager" />
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
-		<put-attribute name="body" value="/WEB-INF/view/manageActivity/AddPromotionActivity.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageActivity/RecommendActivityResult.jsp" />
 	</definition>
-	
+	<definition name="queryJoinMemberForRec" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageActivity/JoinMembersOfRec.jsp" />
+	</definition>
 	
 	<!-- kevin end -->
 	
