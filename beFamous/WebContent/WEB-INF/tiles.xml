@@ -578,6 +578,18 @@
 	<definition name="queryOffenseSong" extends="general.definition">
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/memberManagement/queryOffenseSong.jsp" />
+	</definition>
+	<definition name="queryPrePayRecord" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/memberManagement/queryPrePayRecord.jsp" />
+	</definition>
+	<definition name="queryPayDetailRecord" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/memberManagement/queryPayDetailRecord.jsp" />
+	</definition>
+	<definition name="queryRewardRecord" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/memberManagement/queryRewardRecord.jsp" />
 	</definition>	
 	
 	<!-- 廣告管理 -->
