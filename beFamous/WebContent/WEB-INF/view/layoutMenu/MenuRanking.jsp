@@ -17,7 +17,7 @@
 <a href="${pageContext.request.contextPath}/queryCreatorMonthRankingForAdmin.do">修改創作人月榜</a><br>
 
 編輯推薦管理
-<a href="${pageContext.request.contextPath}/forwardPromotionActivity.do">新增推薦專輯</a><br>
-<a href="${pageContext.request.contextPath}/queryCreatorMonthRankingForAdmin.do">推薦專輯列表</a><br>
+<a href="${pageContext.request.contextPath}/forwardRecommendActivity.do">新增推薦專輯</a><br>
+<a href="${pageContext.request.contextPath}/queryRecommendActivity.do">推薦專輯列表</a><br>
 </body>
 </html>
