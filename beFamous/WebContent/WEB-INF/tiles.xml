@@ -335,24 +335,19 @@
 		<put-attribute name="body" value="/WEB-INF/view/keyword/KeyWordResultForNews.jsp" />
 	</definition>
 	
+	<!-- 廣告管理 -->
 	<definition name="forwardAddBanner" extends="general.definition">
 	   <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
-		<put-attribute name="body" value="/WEB-INF/view/banner/ApplyAddBanner.jsp" />
-	</definition>
-	
+		<put-attribute name="body" value="/WEB-INF/view/adBanner/ApplyAddBanner.jsp" />
+	</definition>	
 	<definition name="saveBanner" extends="general.definition">
 	  <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
-		<put-attribute name="body" value="/WEB-INF/view/banner/SaveBannerSuccess.jsp" />
-	</definition>
-	
-	<definition name="modifyMemberId" extends="iframe.definition">
-		<put-attribute name="body" value="/WEB-INF/view/banner/modifyMember.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/adBanner/SaveBannerSuccess.jsp" />
 	</definition>
 	<definition name="modifyAddBanner" extends="general.definition">
 	  <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
-		<put-attribute name="body" value="/WEB-INF/view/banner/ApplyAddBanner.jsp" />
-	</definition>
-	
+		<put-attribute name="body" value="/WEB-INF/view/adBanner/ApplyAddBanner.jsp" />
+	</definition>	
 	
 	<!-- 管理排行榜 -->
 	<definition name="queryAlbumWeekRankingForAdmin" extends="general.definition">
@@ -516,7 +511,7 @@
 	
 	<!-- 最新消息 -->
 	<definition name="queryNewsDetail" extends="general.definition">
-		<put-attribute name="menu" value="/WEB-INF/view/menuCategory.jsp" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menuCategory.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/news/newsDetail.jsp" />
 	</definition>	
 	<definition name="addNews" extends="general.definition">
@@ -592,5 +587,29 @@
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/adBanner/queryUploadAdBanner.jsp" />
 	</definition>
+	<definition name="queryUploadAdDetail" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/adBanner/queryUploadAdDetail.jsp" />
+	</definition>
+	<definition name="addCheckReason" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/adBanner/addCheckReason.jsp" />
+	</definition>
+	<definition name="saveCheckReason" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/adBanner/saveCheckReason.jsp" />
+	</definition>
+	<!-- 上傳音樂 -->
+	<definition name="addAlbum" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/uploadMusic/addAlbum.jsp" />
+	</definition>
+	<definition name="addSong" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/uploadMusic/addSong.jsp" />
+	</definition>	
+	<definition name="addSongData" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/uploadMusic/addSongData.jsp" />
+	</definition>
+	
 	<!-- Lucy end -->
 </tiles-definitions> 
