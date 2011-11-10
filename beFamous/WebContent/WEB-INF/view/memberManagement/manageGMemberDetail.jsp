@@ -31,9 +31,9 @@
 		<td width="200" ><font color="red">
 			<c:if test="${memberDetail[0].memberStatus.statusName == '停權'}">				
 				${memberDetail[0].memberStatus.statusReason}			
-			</c:if></font></td><td width="200" >被檢舉歌曲數:&nbsp <a href="">${memberDetail[5]}</a></td><tr>	
-		<td width="200" ></td><td width="200" >被檢舉專輯數:&nbsp <a href="">${memberDetail[6]}</a></td><tr>	
-		<td width="200" ></td><td width="200" >檢舉次數:&nbsp <a href="">${memberDetail[7]}</a></td><tr>	
+			</c:if></font></td><td width="200" >被檢舉歌曲數:&nbsp <a href="${pageContext.request.contextPath}/queryOffenseSong.do">${memberDetail[5]}</a></td><tr>	
+		<td width="200" ></td><td width="200" >被檢舉專輯數:&nbsp <a href="${pageContext.request.contextPath}/queryOffenseAlbum.do">${memberDetail[6]}</a></td><tr>	
+		<td width="200" ></td><td width="200" >檢舉次數:&nbsp <a href="${pageContext.request.contextPath}/memberOffenseList.do">${memberDetail[7]}</a></td><tr>	
 		<td width="200" ><input type="button" value="修改會員資料" onclick="modifyMemberDetail('${admin}','${memberDetail[0].memberId}')"></td>
 	</form>
 </table>
