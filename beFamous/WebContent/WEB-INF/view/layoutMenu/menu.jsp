@@ -22,12 +22,11 @@ pageEncoding="UTF-8"%>
     <a href="${pageContext.request.contextPath}/rewardRecord.do">贈送點數記錄</a><br>
   </td>  
   <tr>
-  <!--
   <td>
     <h4>音樂管理</h4>
-    <a href="">新增專輯</a><br>
-    <a href="">編輯專輯</a><br>
-  </td> -->
+    <a href="${pageContext.request.contextPath}/">新增專輯</a><br>
+    <a href="${pageContext.request.contextPath}/editAlbum.do">編輯專輯</a><br>
+  </td> 
   <tr>
   <td>
     <h4>交友圈管理</h4>
