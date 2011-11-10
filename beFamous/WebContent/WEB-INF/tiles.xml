@@ -212,6 +212,39 @@
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/keyword/manageKeyWord.jsp" />
 	</definition>
+	
+	<!-- 管理音樂上傳 -->
+	<definition name="queryAlbum" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageMusic/manageMusicForAlbum.jsp" />
+	</definition>
+	<definition name="hiddenForAlbum" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/manageMusic/hiddenReason.jsp" />
+	</definition>
+	<definition name="querySong" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageMusic/manageMusicForSong.jsp" />
+	</definition>
+	<definition name="showLyrics" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/manageMusic/lyrics.jsp" />
+	</definition>
+	
+	<!-- 上傳音樂 -->
+	<definition name="editAlbum" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/uploadMusic/editAlbum.jsp" />
+	</definition>
+	<definition name="editAlbumContent" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/uploadMusic/editAlbumContent.jsp" />
+	</definition>
+	<definition name="editSongData" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/uploadMusic/editSongData.jsp" />
+	</definition>
+	<definition name="editAlbumData" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/uploadMusic/editAlbumData.jsp" />
+	</definition>
 	<!-- 怡秀的tiles_end -->
 	
 	
