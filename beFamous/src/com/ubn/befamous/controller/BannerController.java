@@ -315,7 +315,7 @@ public class BannerController {
 		a.setActivityName("萬聖節");
 		a.setActivityStartDate("2011-11-10");
 		a.setActivityEndDate("2011-11-20");
-		a.setCreator("管理者一號");
+		a.setAdminCreator("管理者一號");
 		a.setOnDate("2011-11-10");
 		a.setOffDate("2011-11-20");
 		a.setOnStatus("刊登中");
@@ -330,7 +330,7 @@ public class BannerController {
 		a2.setActivityName("聖誕節");
 		a2.setActivityStartDate("2011-11-11");
 		a2.setActivityEndDate("2011-11-21");
-		a2.setCreator("管理者二號");
+		a2.setAdminCreator("管理者二號");
 		a2.setOnDate("2011-11-11");
 		a2.setOffDate("2011-11-21");
 		a2.setOnStatus("未刊登");
@@ -364,7 +364,7 @@ public class BannerController {
 		a.setPicture("image/memberPicture/111111.jpg");
 		a.setActivityStartDate("2011-11-10");
 		a.setActivityEndDate("2011-11-20");
-		a.setCreator("管理者一號");
+		a.setAdminCreator("管理者一號");
 		a.setCreateDate("2011-11-09");
 		a.setOnDate("2011-11-10");
 		a.setOffDate("2011-11-20");
