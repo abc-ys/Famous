@@ -12,22 +12,22 @@
 		<tr>
 		<td colspan=2 ><h4>會員詳細資料</h4></td><tr>		
 		<td width="200" >帳號:&nbsp ${memberDetail[0].email}</td>
-		<td width="200" >GSiMoney:&nbsp <a href= "${pageContext.request.contextPath}/prePayRecord.do">${memberDetail[0].gsiMoney.balance}</a></td><tr>
+		<td width="200" >GSiMoney:&nbsp <a href= "${pageContext.request.contextPath}/queryPrePayRecord.do">${memberDetail[0].gsiMoney.balance}</a></td><tr>
 		<td width="200" >ID:&nbsp ${memberDetail[0].memberId}</td>
-		<td width="200" >GSiBonus:&nbsp <a href="${pageContext.request.contextPath}/rewardRecord.do">${memberDetail[0].gsiBonus.balance}</a></td><tr>
+		<td width="200" >GSiBonus:&nbsp <a href="${pageContext.request.contextPath}/queryRewardRecord.do">${memberDetail[0].gsiBonus.balance}</a></td><tr>
 		<td width="200" >身分:&nbsp ${memberDetail[0].identityName}</td>
 		<td width="200" >粉絲數:&nbsp ${memberDetail[1]}</td><tr>
 		<td width="200" >加入日期:&nbsp ${memberDetail[0].createDate}</td>
 		<td width="200" >好友數:&nbsp ${memberDetail[2]}</td><tr>
 		<td width="200" >地區:&nbsp ${memberDetail[0].location}</td>
-		<td width="200" >專輯數:&nbsp <a href="${pageContext.request.contextPath}/queryAlbum.do">${memberDetail[3]}</a></td><tr>			
+		<td width="200" >專輯數:&nbsp <a href="">${memberDetail[3]}</a></td><tr>			
 		<c:if test="${memberDetail[0].memberStatus.statusName == '正常'}">				
 				<td width="200" >狀態:&nbsp	${memberDetail[0].memberStatus.statusName}</td>			
 		</c:if>
 		<c:if test="${memberDetail[0].memberStatus.statusName == '停權'}">				
 				<td width="200" >狀態:&nbsp	${memberDetail[0].memberStatus.statusName}</td>
 		</c:if>		
-		<td width="200" >歌曲數:&nbsp <a href="${pageContext.request.contextPath}/querySong.do">${memberDetail[4]}</a></td><tr>		
+		<td width="200" >歌曲數:&nbsp <a href="">${memberDetail[4]}</a></td><tr>		
 		<td width="200" ><font color="red">
 			<c:if test="${memberDetail[0].memberStatus.statusName == '停權'}">				
 				${memberDetail[0].memberStatus.statusReason}			

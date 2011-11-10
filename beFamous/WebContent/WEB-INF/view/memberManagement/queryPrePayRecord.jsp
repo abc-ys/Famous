@@ -36,14 +36,14 @@
 	<td valign="top" Width="100"><font size="2">入帳時間</font></td>
 	<td valign="top" Width="100"><font size="2">發票</font></td>
 	<td valign="top" Width="100"><font size="2">備註</font></td></tr>
-<tr><td Width="100" Height="30" valign="top"><font size="2"><a href="${pageContext.request.contextPath}/payDetailRecord.do">${orderDetail.order.orderRid}</a></font></td>
+<tr><td Width="100" Height="30" valign="top"><font size="2"><a href="${pageContext.request.contextPath}/queryPayDetailRecord.do">${orderDetail.order.orderRid}</a></font></td>
 	<td valign="top" Width="100"><font size="2">${orderDetail.order.purchaseDate}</font></td>
 	<td valign="top" Width="100"><font size="2">${orderDetail.gsiMoney.prepaid}</font></td>
 	<td valign="top" Width="100"><font size="2">${orderDetail2.order.payMethod}</font></td>
 	<td valign="top" Width="100"><font size="2">${orderDetail.order.payDate}</font></td>
 	<td valign="top" Width="140"><font size="2">${orderDetail.order.billStatus}</font></td>
 	<td valign="top" Width="140"><font size="2">${orderDetail.gsiMoney.memo}</font></td></tr>
-<tr><td Width="100" Height="30" valign="top"><font size="2"><a href="${pageContext.request.contextPath}/payDetailRecord.do">${orderDetail2.order.orderRid}</a></font></td>
+<tr><td Width="100" Height="30" valign="top"><font size="2"><a href="${pageContext.request.contextPath}/queryPayDetailRecord.do">${orderDetail2.order.orderRid}</a></font></td>
 	<td valign="top" Width="100"><font size="2">${orderDetail2.order.purchaseDate}</font></td>
 	<td valign="top" Width="100"><font size="2">${orderDetail2.gsiMoney.prepaid}</font></td>
 	<td valign="top" Width="100"><font size="2">${orderDetail2.order.payMethod}</font></td>
@@ -55,7 +55,7 @@
 </body>
 <script>
 function query(){
-     document.fm.action="${pageContext.request.contextPath}/prePayRecord.do";
+     document.fm.action="${pageContext.request.contextPath}/queryPrePayRecord.do";
      document.fm.submit();
 }
 </script>

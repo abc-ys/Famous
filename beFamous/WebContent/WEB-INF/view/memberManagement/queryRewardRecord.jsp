@@ -23,7 +23,7 @@
 	<td valign="top" Width="100"><font size="2">失效</font></td>
 	<td valign="top" Width="100"><font size="2">生效日期</font></td>
 	<td valign="top" Width="100"><font size="2">到期日期</font></td></tr>
-<tr><td Width="100" Height="30" valign="top"><font size="2"><a href="${pageContext.request.contextPath}/payDetailRecord.do">${orderDetail.order.orderRid}</a></font></td>
+<tr><td Width="100" Height="30" valign="top"><font size="2"><a href="${pageContext.request.contextPath}/queryPayDetailRecord.do">${orderDetail.order.orderRid}</a></font></td>
 	<td valign="top" Width="100"><font size="2">test</font></td>
 	<td valign="top" Width="100"><font size="2">${waitOnBonus}</font></td>
 	<td valign="top" Width="100"><font size="2">${OnBonus}</font></td>
