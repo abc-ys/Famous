@@ -565,6 +565,14 @@
 	<definition name="saveOffenseReason" extends="iframe.definition">
 		<put-attribute name="body" value="/WEB-INF/view/memberManagement/saveOffenseReason.jsp" />
 	</definition>	
+		<definition name="queryOffenseAlbum" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/memberManagement/queryOffenseAlbum.jsp" />
+	</definition>	
+	<definition name="queryOffenseSong" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/memberManagement/queryOffenseSong.jsp" />
+	</definition>	
 	
 	<!-- 廣告管理 -->
 	<definition name="addAdBanner" extends="general.definition">
