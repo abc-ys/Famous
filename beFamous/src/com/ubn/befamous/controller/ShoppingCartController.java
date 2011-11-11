@@ -15,7 +15,7 @@ import com.ubn.befamous.entity.SDCard;
 import com.ubn.befamous.entity.SDCardPrice;
 import com.ubn.befamous.entity.Song;
 import com.ubn.befamous.entity.SongPrice;
-import com.ubn.befamous.entity.prePaid;
+import com.ubn.befamous.entity.PrePaid;
 
 @Controller
 public class ShoppingCartController {
@@ -24,26 +24,26 @@ public class ShoppingCartController {
 	@RequestMapping("/prepay")
 	public ModelAndView prepay() {
 		PrePaidPrice price = new PrePaidPrice();
-		prePaid prePaid = new prePaid();
+		PrePaid prePaid = new PrePaid();
 		prePaid.setName("儲值100");
 		price.setpPrice("100");
 		PrePaidPrice price2 = new PrePaidPrice();
-		prePaid prePaid2 = new prePaid();
+		PrePaid prePaid2 = new PrePaid();
 		prePaid2.setName("儲值300");
 		price2.setpPrice("300");
 		PrePaidPrice price3 = new PrePaidPrice();
-		prePaid prePaid3 = new prePaid();
+		PrePaid prePaid3 = new PrePaid();
 		prePaid3.setName("儲值500");
 		price3.setpPrice("500");
 		PrePaidPrice price4 = new PrePaidPrice();
-		prePaid prePaid4 = new prePaid();
+		PrePaid prePaid4 = new PrePaid();
 		prePaid4.setName("儲值800");
 		price4.setpPrice("800");
 		PrePaidPrice price5 = new PrePaidPrice();
-		prePaid prePaid5 = new prePaid();
+		PrePaid prePaid5 = new PrePaid();
 		prePaid5.setName("儲值1000");
 		price5.setpPrice("1000");
-		prePaid[] pre = {prePaid,prePaid2,prePaid3,prePaid4,prePaid5};
+		PrePaid[] pre = {prePaid,prePaid2,prePaid3,prePaid4,prePaid5};
 		PrePaidPrice[] prIce = {price,price2,price3,price4,price5};
 		ArrayList list = new ArrayList();
 		list.add(pre);

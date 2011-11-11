@@ -15,12 +15,12 @@ import com.ubn.befamous.entity.Member;
 import com.ubn.befamous.entity.MusicCategory;
 import com.ubn.befamous.entity.Order;
 import com.ubn.befamous.entity.OrderDetail;
+import com.ubn.befamous.entity.PrePaid;
 import com.ubn.befamous.entity.ProductionCategory;
 import com.ubn.befamous.entity.SDCard;
 import com.ubn.befamous.entity.SDCardPrice;
 import com.ubn.befamous.entity.Song;
 import com.ubn.befamous.entity.SongPrice;
-import com.ubn.befamous.entity.prePaid;
 
 
 @Controller
@@ -68,7 +68,7 @@ public class ManageOrderController {
 		member2.setIdentityName("樂團");
 		long u2 =123;
 		member2.setMemberId(u2);
-		prePaid prePaid = new prePaid();
+		PrePaid prePaid = new PrePaid();
 		prePaid.setName("儲值GSiMoney 300元");
 		ProductionCategory productionCategory2 = new ProductionCategory();
 		productionCategory2.setPrePaid(prePaid);
