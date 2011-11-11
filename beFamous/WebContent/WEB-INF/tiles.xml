@@ -570,8 +570,33 @@
 	</definition>
 	<!-- 線上客服 -->
 	<definition name="addQuestion" extends="base.definition">
-		<put-attribute name="body" value="/WEB-INF/view/onlineQuestion/addQuestion.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/onlineQuestion/addQuestion.jsp" />		
 	</definition>	
+	<definition name="manageQuestion" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/onlineQuestion/manageQuestion.jsp" />
+	</definition>
+	<definition name="queryQuestionList" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/onlineQuestion/manageQuestion.jsp" />
+	</definition>
+	<definition name="queryQuestionDetail" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/onlineQuestion/queryQuestionDetail.jsp" />
+	</definition>
+	<definition name="addAnswer" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/onlineQuestion/addAnswer.jsp" />
+	</definition>
+	<definition name="addNote" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/onlineQuestion/addNote.jsp" />
+	</definition>
+	<definition name="saveAnswer" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/onlineQuestion/saveAnswer.jsp" />
+	</definition>
+	<definition name="saveNote" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/onlineQuestion/saveNote.jsp" />
+	
+	
 	<!--會員管理 -->
 	<definition name="queryMemberData" extends="general.definition">
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
@@ -668,5 +693,22 @@
 		<put-attribute name="body" value="/WEB-INF/view/uploadMusic/addSongData.jsp" />
 	</definition>
 	
+	<!-- 會員註冊與登入 -->
+	<definition name="registerOne" extends="base.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberRegisterLogin/registerOne.jsp" />
+	</definition>
+	<definition name="registerTwo" extends="base.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberRegisterLogin/registerTwo.jsp" />
+	</definition>
+	<definition name="registerThree" extends="base.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberRegisterLogin/registerThree.jsp" />
+	</definition>
+	<definition name="login" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberRegisterLogin/login.jsp" />
+	</definition>
+	<definition name="forgetPassword" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/memberRegisterLogin/forgetPassword.jsp" />
+	</definition>	
+	<!-- Lucy end -->
 	<!-- Lucy end -->
 </tiles-definitions> 
