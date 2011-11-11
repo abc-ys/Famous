@@ -16,6 +16,7 @@ import com.ubn.befamous.entity.Album;
 import com.ubn.befamous.entity.Creator;
 import com.ubn.befamous.entity.Member;
 import com.ubn.befamous.entity.MemberStatus;
+import com.ubn.befamous.entity.PromotionActivity;
 import com.ubn.befamous.entity.RecommendActivity;
 import com.ubn.befamous.entity.Song;
 import com.ubn.befamous.entity.SongPrice;
@@ -220,9 +221,124 @@ public class ManagePromotionController {
 		album.setDate("2011/10/25");
 		album.setIntroduction("This is very good album!");
 		
-		return mav;
+		Album[] arAlbum = {album};
+		mav.addObject("arAlbum", arAlbum);
+		mav.addObject("purchaseCount", 33);
+		mav.addObject("totalCount", 66);
 		
-	    
+		return mav;
+		 
 	}
+	
+	
+	
+	@RequestMapping(value = "/forwardPromotionActivity")
+	public ModelAndView forwardPromotionActivity() {
+		
+		ModelAndView mav = new ModelAndView("forwardPromotionActivity");
+	    return mav;
+	
+	}
+	
+	
+	//儲存行銷活動
+	@RequestMapping(value = "/savePromotionActivity")
+	public String savePromotionActivity(String[] albumID,String[] songID,String prepaidMoney,String prepaidCount,PromotionActivity activity) {
+		if(albumID !=null)
+		System.out.println("111albumID==>"+albumID[0]);
+		if(songID !=null)
+		System.out.println("222songID==>"+songID[0]);
+		
+		System.out.println("111title==>"+activity.getTitle());
+		System.out.println("111Condition==>"+activity.getCondition());	
+		System.out.println("111ContentCondition==>"+activity.getContentCondition());
+		System.out.println("111prepaidMoney==>"+prepaidMoney);
+		System.out.println("111prepaidCount==>"+prepaidCount);
+		//傳入專輯ID
+		
+	    return "redirect:forwardPromotionActivity.do";
+	
+	}
+	
+	
+	
+	
+	
+	    //查詢活動列表
+		@RequestMapping(value = "/queryPromotionActivity")
+		public ModelAndView queryPromotionActivity(String year,String Month) {
+			
+			ModelAndView mav = new ModelAndView("queryPromotionActivity");
+			
+			Creator creator = new Creator();
+			creator.setAccountName("kevin");
+			creator.setAccountNO("12345678");
+			creator.setUserName("kevin");
+			creator.setMemberId(123456);
+			
+			PromotionActivity activity = new PromotionActivity();
+			Album album = new Album();
+			album.setName("bird");
+			album.setAlbumID(1234567);
+			album.setCreator(creator);
+			album.setBrand("UBN");
+			album.setCover("images/album.png");
+			album.setType("MP3");
+			album.setDate("2011/10/25");
+			album.setIntroduction("This is very good album!");
+			
+			Album album2 = new Album();
+			album2.setName("bird");
+			album2.setAlbumID(1234567);
+			album2.setCreator(creator);
+			album2.setBrand("UBN");
+			album2.setCover("images/album.png");
+			album2.setType("MP3");
+			album2.setDate("2011/10/25");
+			album2.setIntroduction("This is very good album!");
+			Set<Album> albumSet = new HashSet();
+			albumSet.add(album);
+			albumSet.add(album2);
+			
+			activity.setTitle("萬聖節搞什麼鬼");
+			activity.setStartDate("2011/11/08");
+			activity.setEndDate("2011/11/10");
+			activity.setAlbumSet(albumSet);
+			activity.setStatus("1");
+			activity.setActivityID(123456);
+			activity.setContentCondition("1");
+			activity.setRewardCondition("1");
+			activity.setReward("20");
+			PromotionActivity[] arActivity = {activity};
+			
+			mav.addObject("arActivity", arActivity);
+			
+		    return mav;
+		
+		}
+	
+	
+		//查詢參加會員(行銷活動)
+		@RequestMapping(value = "/queryJoinMemberForPro")
+		public ModelAndView queryJoinMemberForPro(String activityID) {
+			
+			ModelAndView mav = new ModelAndView("queryJoinMemberForPro");
+			
+			System.out.println("activityID==>"+activityID);
+			
+			Member member = new Member();
+			member.setMemberId(1234567);
+			member.setEmail("123@ubn.net");
+			member.setIdentityName("一般會員");
+			member.setCreateDate("2010/06/10");
+			
+			Member[] arMember = {member};
+			
+			mav.addObject("arMember", arMember);
+			
+			return mav;
+			
+		}
+	
 	
 }

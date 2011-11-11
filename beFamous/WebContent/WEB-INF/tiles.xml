@@ -403,7 +403,26 @@
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/manageActivity/JoinMembersOfRec.jsp" />
 	</definition>
-	
+	<definition name="queryJoinAlbumForRec" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageActivity/JoinAlbumsOfRec.jsp" />
+	</definition>
+	<definition name="forwardPromotionActivity" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageActivity/AddPromotionActivity.jsp" />
+	</definition>
+	<definition name="queryPromotionActivity" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageActivity/PromotionActivityResult.jsp" />
+	</definition>
+	<definition name="queryJoinMemberForPro" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageActivity/JoinMembersOfPro.jsp" />
+	</definition>
 	<!-- kevin end -->
 	
 	<!-- Lucy Start -->
