@@ -6,7 +6,10 @@ pageEncoding="UTF-8"%>
 <table>
   <tr>
   <td>
+    <h4>音樂管理</h4>
     <a href="${pageContext.request.contextPath}/manageMusicCategory.do">音樂類別管理</a><br>
+    <a href="${pageContext.request.contextPath}/queryAlbum.do">查詢專輯</a><br>
+    <a href="${pageContext.request.contextPath}/querySong.do">查詢歌曲</a><br>
   </td>
   <tr>
   <td>
@@ -54,9 +57,8 @@ pageEncoding="UTF-8"%>
   </td>
   <tr> 
   <td>
-    <h4>音樂管理</h4>
-    <a href="${pageContext.request.contextPath}/queryAlbum.do">查詢專輯</a><br>
-    <a href="${pageContext.request.contextPath}/querySong.do">查詢歌曲</a><br>
+    <h4>線上客服</h4>
+    <a href="${pageContext.request.contextPath}/manageQuestion.do">問題管理</a><br>
   </td>
 </table>
 </body>
