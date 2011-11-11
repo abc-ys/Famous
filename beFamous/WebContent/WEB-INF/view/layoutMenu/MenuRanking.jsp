@@ -16,8 +16,12 @@
 <a href="${pageContext.request.contextPath}/querySongMonthRankingForAdmin.do">修改歌曲月榜</a><br>
 <a href="${pageContext.request.contextPath}/queryCreatorMonthRankingForAdmin.do">修改創作人月榜</a><br>
 
-編輯推薦管理
+編輯推薦管理<br>
 <a href="${pageContext.request.contextPath}/forwardRecommendActivity.do">新增推薦專輯</a><br>
 <a href="${pageContext.request.contextPath}/queryRecommendActivity.do">推薦專輯列表</a><br>
+
+行銷活動管理<br>
+<a href="${pageContext.request.contextPath}/forwardPromotionActivity.do">新增活動</a><br>
+<a href="${pageContext.request.contextPath}/queryPromotionActivity.do">活動列表</a><br>
 </body>
 </html>
