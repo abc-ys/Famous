@@ -37,7 +37,6 @@
 	<td valign="top" Width="100"><font size="2">付款方式</font></td>
 	<td valign="top" Width="100"><font size="2">訂購日期</font></td>
 	<td valign="top" Width="100"><font size="2">商品內容</font></td>
-	<td valign="top" Width="100"><font size="2">付款狀態</font></td>
 	<td valign="top" Width="100"><font size="2">處理狀態</font></td>
 	<td valign="top" Width="100"><font size="2">備註</font></td></tr>
 	
@@ -49,8 +48,7 @@
 	<c:forEach var="hm2" items="${orders[0].orderDetail}">
 	<td valign="top" Width="100"><font size="2">${hm2.productionCategory.sdCard.name}</font></td>
 	</c:forEach> 
-	<td valign="top" Width="100"><font size="2">${orders[0].payStatus}</font></td>
-	<td valign="top" Width="100"><font size="2">${orders[0].handleStatus}</font></td>
+	<td valign="top" Width="100"><font size="2">${orders[0].payStatus}<br>${orders[0].handleStatus}</font></td>
 	<td valign="top" Width="100"><font size="2">${orders[0].memo2}</font></td><tr>
 	
     <td Width="140" Height="35" valign="top"><font size="2"><a href="${pageContext.request.contextPath}/cashOrderDetail.do">${orders[1].orderRid}</a></font></td>
@@ -61,8 +59,7 @@
 	<c:forEach var="hm3" items="${orders[1].orderDetail}">
 	<td valign="top" Width="100"><font size="2">${hm3.productionCategory.prePaid.name}</font></td>
 	</c:forEach> 
-	<td valign="top" Width="100"><font size="2">${orders[1].payStatus}</font></td>
-	<td valign="top" Width="100"><font size="2">${orders[1].handleStatus}</font></td>
+	<td valign="top" Width="100"><font size="2">${orders[1].payStatus}<br>${orders[1].handleStatus}</font></td>
 	<td valign="top" Width="100"><font size="2">${orders[1].memo2}</font></td><tr>
 </table>
 </form>
