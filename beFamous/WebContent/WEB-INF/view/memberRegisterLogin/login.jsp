@@ -16,10 +16,12 @@
 	<a href="${pageContext.request.contextPath}/forgetPassword.do">忘記密碼</a>
 	還不是會員?<a href="${pageContext.request.contextPath}/registerOne.do">我要加入</a>
 </form>
+${errorLogin}
 </body>
 <script>
 function login(){	
-	alert("成功登入");   
+	document.fm.action="${pageContext.request.contextPath}/login.do";
+	document.fm.submit(); 
 }
 </script>
 </html>

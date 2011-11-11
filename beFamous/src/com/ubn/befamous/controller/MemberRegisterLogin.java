@@ -160,10 +160,22 @@ public class MemberRegisterLogin {
 	
 	//登入
 	@RequestMapping("/login")
-	public ModelAndView login()
+	public ModelAndView login(String email,String password,Model model)
 	{
+		Member member = new Member();
+		member.setEmail("kevin@ubn.net");
+		member.setPassword("6yhn6yhn");
+		if( email !=null && !"".equals(email)){
+			if(!password.equals(member.getPassword()) || !email.equals(member.getEmail())){
+				model.addAttribute("errorLogin", "帳號或密碼錯誤!");
+				return new ModelAndView("login");
+			}else{
+				return new ModelAndView("forwardRecommendActivity");
+			}
+		}
 		System.out.println("login==>");		
-		
+		System.out.println("email==>"+email);	
+		System.out.println("password==>"+password);	
 		return new ModelAndView("login");
 	}
 	//忘記密碼
