@@ -20,7 +20,7 @@
 
 <c:forEach var="arMember" varStatus="status" items="${arMember}" >
 <td>${status.count}</td>
-<td><a href="${pageContext.request.contextPath}/queryAlbumData.do?albumid=${arMember.memberId}">${arMember.email }</a></td>
+<td>${arMember.email }</td>
 <td>${arMember.memberId }</td>
 <td>${arMember.identityName }</td>
 <td>${arMember.createDate }</td>

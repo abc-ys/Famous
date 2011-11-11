@@ -37,12 +37,12 @@
     <c:if test="${arActivity.status==2}">結束</c:if>
     <c:if test="${arActivity.status==3}">隱藏(可編輯)</c:if>
 </td>
-<td><input type="button" name="222" value="顯示內容" onclick="onSubmit();"><br>
-    <c:if test="${arActivity.status==3}"><input type="button" name="333" value="編輯內容" onclick="onSubmit();"></c:if>
+<td><input type="button" name="222" value="顯示內容" onclick="showContent('${arActivity.activityID}');"><br>
+    <c:if test="${arActivity.status==3}"><input type="button" name="333" value="編輯內容" onclick="onEdit('${arActivity.activityID}');"></c:if>
 </td>
 <td><input type="button" name="444" value="參加會員" onclick="queryMember('${arActivity.activityID}');"><br>
     
-    <input type="button" name="555" value="購買專輯總數" onclick="onSubmit();">
+    <input type="button" name="555" value="購買專輯總數" onclick="queryAlbum('${arActivity.activityID}');">
 </td>
 </tr>
 </c:forEach>
@@ -51,12 +51,34 @@
 </body>
 
 <script type="text/javascript">
+
+
+function onEdit(activityID){
+	document.qForm.activityID.value=activityID;
+	document.qForm.action="${pageContext.request.contextPath}/forwardUpdateRecommendActivity/"+activityID+".do";
+	document.qForm.submit();
+}
+
+
+function showContent(activityID){
+	document.qForm.activityID.value=activityID;
+	document.qForm.action="${pageContext.request.contextPath}/queryRecommendActivity/"+activityID+".do";
+	document.qForm.submit();
+}
+
+
+
 function queryMember(activityID){
 	document.qForm.activityID.value=activityID;
 	document.qForm.action="${pageContext.request.contextPath}"+"/queryJoinMemberForRec.do";
 	document.qForm.submit();
 }
 
+function queryAlbum(activityID){
+	document.qForm.activityID.value=activityID;
+	document.qForm.action="${pageContext.request.contextPath}"+"/queryJoinAlbumForRec.do";
+	document.qForm.submit();
+}
 </script>
 
 

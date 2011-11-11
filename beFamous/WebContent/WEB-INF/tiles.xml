@@ -406,10 +406,15 @@
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/manageActivity/AddRecommendActivity.jsp" />
 	</definition>
-    <definition name="queryRecommendActivity" extends="general.definition">
+    <definition name="queryRecommendActivitys" extends="general.definition">
 		<put-attribute name="title" value="Contact Manager" />
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/manageActivity/RecommendActivityResult.jsp" />
+	</definition>
+	 <definition name="queryRecommendActivity" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageActivity/RecommendActivity.jsp" />
 	</definition>
 	<definition name="queryJoinMemberForRec" extends="general.definition">
 		<put-attribute name="title" value="Contact Manager" />
@@ -435,6 +440,36 @@
 		<put-attribute name="title" value="Contact Manager" />
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/manageActivity/JoinMembersOfPro.jsp" />
+	</definition>
+	<definition name="queryJoinGSiMoneyForPro" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageActivity/JoinGSiMoneyOfPro.jsp" />
+	</definition>
+	<definition name="queryJoinTimesForPro" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageActivity/JoinTimesOfPro.jsp" />
+	</definition>
+	<definition name="queryJoinAlbumForPro" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageActivity/JoinAlbumsOfPro.jsp" />
+	</definition>
+	<definition name="queryJoinSongsForPro" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageActivity/JoinSongsOfPro.jsp" />
+	</definition>
+	<definition name="forwardUpdatePromotionActivity" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageActivity/UpdatePromotionActivity.jsp" />
+	</definition>
+	<definition name="forwardUpdateRecommendActivity" extends="general.definition">
+		<put-attribute name="title" value="Contact Manager" />
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/MenuRanking.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageActivity/UpdateRecommendActivity.jsp" />
 	</definition>
 	<!-- kevin end -->
 	

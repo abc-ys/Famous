@@ -17,8 +17,15 @@
 <td>創作者</td>
 <td>被購買次數</td>
 </tr>
+<c:forEach var="arAlbum" varStatus="status" items="${arAlbum}" >
+<td>${status.count}</td>
+<td>${arAlbum.albumID}</td>
+<td><a href="${pageContext.request.contextPath}/queryAlbumData.do?albumid=${arAlbum.albumID}">${arAlbum.name }</a></td>
+<td>${arAlbum.creator.userName }</td>
+<td>${purchaseCount}</td>
+</c:forEach>
+</table>
 
-
-推薦專輯被購買總次數:${fn:length(arMember)}
+推薦專輯被購買總次數:${totalCount}
 </body>
 </html>

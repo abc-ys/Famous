@@ -43,9 +43,9 @@
 </div>
 <br>
 
-符合內容: <input type="radio" id="contentCondition" name="condition"  value="1">符合全部所選ID<br>
-          <input type="radio" id="contentCondition" name="condition" value="2">只符合一個所選的ID<br>
-          <input type="radio" id="contentCondition" name="condition" value="3">須符合三個所選的ID<br>
+符合內容: <input type="radio"  name="condition"  value="1">符合全部所選ID<br>
+          <input type="radio"  name="condition" value="2">只符合一個所選的ID<br>
+          <input type="radio"  name="condition" value="3">須符合三個所選的ID<br>
           
 贈送內容: GSiBonus  <br>
     <input type="radio" name="rewardCondition"  value="1"> <input type="text" id="a_rewardMoney1"  name="rewardMoney1" >元(點)<br>

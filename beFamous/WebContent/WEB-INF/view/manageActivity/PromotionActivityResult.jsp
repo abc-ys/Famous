@@ -10,12 +10,12 @@
 </head>
 <body>
 <h1>活動列表</h1>
-
+<form action="" method="post" name="qForm">
 活動期間:<input type="text" name="year" >年 - <input type="text" name="month" >月<br></br>
 
 <input type="button" name="111" value="查詢" onclick="onSubmit();">
 
-<form action="" method="post" name="qForm">
+
 <input type="hidden" name="activityID" >
 </form>
 
@@ -47,14 +47,13 @@
 </td>
 
 <td><input type="button" name="444" value="參加會員" onclick="queryMember('${arActivity.activityID}');"><br>
-    
-     <input type="button" name="555" value="儲值總金額" onclick="queryAlbum('${arActivity.activityID}');"><br>
-     <input type="button" name="666" value="儲值總次數" onclick="queryAlbum('${arActivity.activityID}');"><br>
+     <input type="button" name="555" value="儲值總金額" onclick="queryGSiMoney('${arActivity.activityID}');"><br>
+     <input type="button" name="666" value="儲值總次數" onclick="queryTimes('${arActivity.activityID}');"><br>
      <input type="button" name="777" value="購買專輯總數" onclick="queryAlbum('${arActivity.activityID}');"><br>
-     <input type="button" name="888" value="購買單曲總數" onclick="queryAlbum('${arActivity.activityID}');"><br>
+     <input type="button" name="888" value="購買單曲總數" onclick="querySong('${arActivity.activityID}');"><br>
 </td>
-<td><input type="button" name="222" value="顯示內容" onclick="onSubmit();"><br>
-    <c:if test="${arActivity.status==3}"><input type="button" name="333" value="編輯內容" onclick="onSubmit();"></c:if>
+<td>
+   <input type="button" name="333" value="編輯內容" onclick="onEdit('${arActivity.activityID}');">
 </td>
 </tr>
 </c:forEach>
@@ -63,15 +62,45 @@
 </body>
 
 <script type="text/javascript">
+
+function onSubmit(){
+	
+	document.qForm.action="${pageContext.request.contextPath}/queryPromotionActivity.do";
+	document.qForm.submit();
+}
+
+function onEdit(activityID){
+	document.qForm.activityID.value=activityID;
+	document.qForm.action="${pageContext.request.contextPath}/forwardUpdatePromotionActivity/"+activityID+".do";
+	document.qForm.submit();
+}
+
 function queryMember(activityID){
 	document.qForm.activityID.value=activityID;
-	document.qForm.action="${pageContext.request.contextPath}"+"/queryJoinMemberForPro.do";
+	document.qForm.action="${pageContext.request.contextPath}/queryJoinMemberForPro.do";
+	document.qForm.submit();
+}
+
+function queryGSiMoney(activityID){
+	document.qForm.activityID.value=activityID;
+	document.qForm.action="${pageContext.request.contextPath}/queryJoinGSiMoneyForPro.do";
+	document.qForm.submit();
+}
+
+function queryTimes(activityID){
+	document.qForm.activityID.value=activityID;
+	document.qForm.action="${pageContext.request.contextPath}/queryJoinTimesForPro.do";
 	document.qForm.submit();
 }
 
 function queryAlbum(activityID){
 	document.qForm.activityID.value=activityID;
-	document.qForm.action="${pageContext.request.contextPath}"+"/queryJoinAlbumForRec.do";
+	document.qForm.action="${pageContext.request.contextPath}/queryJoinAlbumForPro.do";
+	document.qForm.submit();
+}
+function querySong(activityID){
+	document.qForm.activityID.value=activityID;
+	document.qForm.action="${pageContext.request.contextPath}/queryJoinSongsForPro.do";
 	document.qForm.submit();
 }
 </script>
