@@ -1,6 +1,8 @@
 package com.ubn.befamous.controller;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +12,7 @@ import com.ubn.befamous.entity.Album;
 import com.ubn.befamous.entity.Creator;
 import com.ubn.befamous.entity.Hidden;
 import com.ubn.befamous.entity.MusicCategory;
+import com.ubn.befamous.entity.Offense;
 import com.ubn.befamous.entity.Song;
 import com.ubn.befamous.entity.SongPrice;
 
@@ -48,6 +51,10 @@ public class ManageMusicController {
 		creator.setMemberId(u);
 		Hidden hidden = new Hidden();
 		hidden.setHiddenReason("");
+		Offense o = new Offense();
+		o.setHidden(hidden);
+		Set<Offense> offense = new HashSet();
+		offense.add(o);
 		Album album = new Album();
 		album.setType("單曲");
 		long p = 1159;
@@ -57,7 +64,7 @@ public class ManageMusicController {
 		album.setMusicCategory(musicCategory);
 		album.setDate("2011/06/30 14:30:20");
 		album.setTag("鄧福如,原來如此,抒情歌");
-		album.setHidden(hidden);
+		album.setOffense(offense);
 		
 		MusicCategory musicCategory2 = new MusicCategory();
 		musicCategory2.setName("搖滾樂");
@@ -69,6 +76,10 @@ public class ManageMusicController {
 		hidden2.setHiddenReason("音質太差");
 		hidden2.setModifyDate("2011/08/29 12:30:06");
 		hidden2.setModifyUser("小明");
+		Offense o2 = new Offense();
+		o2.setHidden(hidden2);
+		Set<Offense> offense2 = new HashSet();
+		offense2.add(o2);
 		Album album2 = new Album();
 		album2.setType("EP");
 		long p2 =13456;
@@ -78,7 +89,7 @@ public class ManageMusicController {
 		album2.setMusicCategory(musicCategory2);
 		album2.setDate("2011/07/31 10:30:20");
 		album2.setTag("蕭敬騰,狂想曲,搖滾樂");
-		album2.setHidden(hidden2);
+		album2.setOffense(offense2);
 		
 		
 		ArrayList list = new ArrayList();     //明細第一筆
@@ -164,6 +175,10 @@ public class ManageMusicController {
 		hidden.setModifyDate("2011/06/18 08:06:10");
 		hidden.setModifyUser("大胖");
 		hidden.setHiddenReason("涉嫌抄襲");
+		Offense o = new Offense();
+		o.setHidden(hidden);
+		Set<Offense> offense = new HashSet();
+		offense.add(o);
 		SongPrice songPrice = new SongPrice();
 		songPrice.setPrice("20");
 		songPrice.setDiscountPrice("15元");
@@ -176,7 +191,7 @@ public class ManageMusicController {
 		song.setDate("2011/03/19 16:00:03");
 		song.setSongPrice(songPrice);
 		song.setTag("盧廣仲,搖滾樂,一百種生活");
-		song.setHidden(hidden);
+		song.setOffense(offense);
 		
 		Creator creator2 = new Creator();
 		creator2.setUserName("蕭敬騰");
@@ -191,6 +206,10 @@ public class ManageMusicController {
 		hidden2.setModifyDate("");
 		hidden2.setModifyUser("");
 		hidden2.setHiddenReason("");
+		Offense o2 = new Offense();
+		o2.setHidden(hidden2);
+		Set<Offense> offense2 = new HashSet();
+		offense2.add(o2);
 		SongPrice songPrice2 = new SongPrice();
 		songPrice2.setPrice("15");
 		songPrice2.setDiscountPrice("不提供");
@@ -203,7 +222,7 @@ public class ManageMusicController {
 		song2.setDate("2011/05/03 10:03:23");
 		song2.setSongPrice(songPrice2);
 		song2.setTag("蕭敬騰,狂想曲,你");
-		song2.setHidden(hidden2);
+		song2.setOffense(offense2);
 			
 		Song[] s = {song,song2};
 		

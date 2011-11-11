@@ -2,6 +2,7 @@ package com.ubn.befamous.controller;
 
 import java.io.File;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -15,12 +16,14 @@ import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.ubn.befamous.entity.Album;
 import com.ubn.befamous.entity.Hidden;
 import com.ubn.befamous.entity.MusicCategory;
+import com.ubn.befamous.entity.Offense;
 import com.ubn.befamous.entity.OrderDetail;
 import com.ubn.befamous.entity.Song;
 import com.ubn.befamous.entity.SongPrice;
@@ -36,21 +39,29 @@ public class UploadMusicController {
 		
 		Hidden hidden = new Hidden();
 		hidden.setHiddenReason("被檢舉次數過多");
+		Offense o = new Offense();
+		o.setHidden(hidden);
+		Set<Offense> offense = new HashSet();
+		offense.add(o);
 		Album album = new Album();
 		album.setName("小星星");
 		album.setDate("2011/06/10 12:00:30");
 		album.setCover("images/album.jpg");
-		album.setHidden(hidden);
+		album.setOffense(offense);
 		long p = 22222;
 		album.setAlbumID(p);
 		
 		Hidden hidden2 = new Hidden();
 		hidden2.setHiddenReason("");
+		Offense o2 = new Offense();
+		o2.setHidden(hidden2);
+		Set<Offense> offense2 = new HashSet();
+		offense2.add(o2);
 		Album album2 = new Album();
 		album2.setName("原來如此");
 		album2.setDate("2011/09/25 14:45:30");
 		album2.setCover("images/album.jpg");
-		album2.setHidden(hidden2);
+		album2.setOffense(offense2);
 		long p2 = 33333;
 		album2.setAlbumID(p2);
 		
