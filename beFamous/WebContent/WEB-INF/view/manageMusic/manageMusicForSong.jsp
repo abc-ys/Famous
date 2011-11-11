@@ -50,10 +50,12 @@
 	<td><font size="2">${hm.songPrice.price}</font></td>
 	<td><font size="2">${hm.songPrice.discountPrice}</font></td>
 	<td><font size="2">${hm.tag}</font></td>
-	<td><font size="2">${hm.hidden.modifyDate}已隱藏 by${hm.hidden.modifyUser}
+	<c:forEach var="hm2" items="${hm.offense}">
+	<td><font size="2">${hm2.hidden.modifyDate}已隱藏 by${hm2.hidden.modifyUser}
 	<br><a href="javascript:hiddenSong('${hm.songID}')">隱藏</a>
 	<br><a href="javascript:cancleHiddenSong('${hm.songID}')">取消隱藏</a></font></td>	
-	<td><font size="2">${hm.hidden.hiddenReason}</font></td><tr>
+	<td><font size="2">${hm2.hidden.hiddenReason}</font></td><tr>
+	</c:forEach> 
 	</c:forEach> 
 </table>
 </form>

@@ -53,10 +53,12 @@
 	<td><font size="2">${hm[0].date}</font></td>
 	<td><font size="2">${hm[2]}</font></td>
 	<td><font size="2">${hm[0].tag}</font></td>
-	<td><font size="2">${hm[0].hidden.modifyDate}已隱藏 by${hm[0].hidden.modifyUser}
+	<c:forEach var="hm2" items="${hm[0].offense}">
+	<td><font size="2">${hm2.hidden.modifyDate}已隱藏 by${hm2.hidden.modifyUser}</font>
 	<br><a href="javascript:hiddenAlbum('${hm[0].albumID}')">隱藏</a>
-	<br><a href="javascript:cancleHiddenAlbum('${hm[0].albumID}')">取消隱藏</a></font></td>	
-	<td><font size="2">${hm[0].hidden.hiddenReason}</font></td><tr>
+	<br><a href="javascript:cancleHiddenAlbum('${hm[0].albumID}')">取消隱藏</a></td>	
+	<td><font size="2">${hm2.hidden.hiddenReason}</font></td><tr>
+	</c:forEach>
 	</c:forEach> 
 </table>
 </form>
