@@ -807,5 +807,224 @@ public class MemberController {
 		System.out.println("    memberId="+memberId+", adminId="+adminId+", statusName="+statusName+", accountName="+accountName+", bankName="+bankName+", bankBranch="+bankBranch+", accountNO="+accountNO+", userName="+userName+", identityNO="+identityNO+", address="+address+", cellPhone="+cellPhone+", tel="+tel);
 		return "redirect:/manageCreatorDetail/modify/"+adminId+"/"+memberId+".do";
 	}
+	
+	//創作人被檢舉清單(專輯)
+		@RequestMapping("/queryOffenseAlbum")
+		public ModelAndView queryOffenseAlbum(String adminId,String memberId, Model model) {						
+			System.out.println("queryOffenseAlbum==>");		
+			System.out.println("    memberId="+memberId+", adminId="+adminId);
+			
+			ArrayList a = new ArrayList();
+			ArrayList b = new ArrayList();
+			ArrayList c = new ArrayList();
+			ArrayList d = new ArrayList();
+			
+			Creator creator = new Creator();
+			creator.setMemberId(1111111);
+					
+			Album a1 = new Album();
+			a1.setAlbumID(123);
+			a1.setName("peace");
+			a1.setCreator(creator);
+			a1.setStatus("公開");
+			int number1 = 12;
+			a.add(a1);
+			a.add(number1);
+			
+			Album a2 = new Album();
+			a2.setAlbumID(456);
+			a2.setName("peace");
+			a2.setCreator(creator);
+			a2.setStatus("隱藏");
+			int number2 = 33;
+			b.add(a2);
+			b.add(number2);
+			
+			Song s1 = new Song();
+			s1.setSongID(1234);
+			s1.setAlbum(a1);
+			s1.setName("in your eyes");
+			int number3 = 12;
+			c.add(s1);
+			c.add(number3);
+			
+			Song s2 = new Song();
+			s2.setSongID(4567);
+			s2.setAlbum(a2);
+			s2.setName("happy");
+			int number4 = 33;
+			d.add(s2);
+			d.add(number4);
+			
+			ArrayList offenseAlbums = new ArrayList();
+			offenseAlbums.add(a);
+			offenseAlbums.add(b);
+			ArrayList offenseSongs = new ArrayList();
+			offenseSongs.add(c);
+			offenseSongs.add(d);
+			
+			model.addAttribute("offenseAlbums", offenseAlbums);
+			model.addAttribute("offenseSongs", offenseSongs);
+			return new ModelAndView("queryOffenseAlbum");
+		}	
+		
+		//創作人被檢舉清單(歌曲)
+		@RequestMapping("/queryOffenseSong")
+		public ModelAndView queryOffenseSong(String adminId,String memberId, Model model) {						
+			System.out.println("queryOffenseSong==>");		
+			System.out.println("    memberId="+memberId+", adminId="+adminId);
+			
+			ArrayList a = new ArrayList();
+			ArrayList b = new ArrayList();
+			ArrayList c = new ArrayList();
+			ArrayList d = new ArrayList();
+			
+			Creator creator = new Creator();
+			creator.setMemberId(1111111);
+					
+			Album a1 = new Album();
+			a1.setAlbumID(123);
+			a1.setName("peace");
+			a1.setCreator(creator);
+			a1.setStatus("公開");
+			int number1 = 12;
+			a.add(a1);
+			a.add(number1);
+			
+			Album a2 = new Album();
+			a2.setAlbumID(456);
+			a2.setName("peace");
+			a2.setCreator(creator);
+			a2.setStatus("隱藏");
+			int number2 = 33;
+			b.add(a2);
+			b.add(number2);
+			
+			Song s1 = new Song();
+			s1.setSongID(1234);
+			s1.setAlbum(a1);
+			s1.setName("in your eyes");
+			int number3 = 12;
+			c.add(s1);
+			c.add(number3);
+			
+			Song s2 = new Song();
+			s2.setSongID(4567);
+			s2.setAlbum(a2);
+			s2.setName("happy");
+			int number4 = 33;
+			d.add(s2);
+			d.add(number4);
+			
+			ArrayList offenseAlbums = new ArrayList();
+			offenseAlbums.add(a);
+			offenseAlbums.add(b);
+			ArrayList offenseSongs = new ArrayList();
+			offenseSongs.add(c);
+			offenseSongs.add(d);
+			
+			model.addAttribute("offenseAlbums", offenseAlbums);
+			model.addAttribute("offenseSongs", offenseSongs);		
+			return new ModelAndView("queryOffenseSong");
+		}
+		
+		//查詢儲值紀錄
+				@RequestMapping("/queryPrePayRecord")
+				public ModelAndView queryPrePayRecord() {
+					ModelAndView mav = new ModelAndView("queryPrePayRecord");
+					Order order = new Order();
+					long id = 89123456;
+					order.setOrderRid(id);
+					order.setPurchaseDate("2011/03/31");
+					order.setPayMethod("信用卡付款");
+					order.setPayDate("2011/04/01 12:33:46");
+					order.setBillStatus("已寄送");
+					GsiMoney gsiMoney = new GsiMoney();
+					gsiMoney.setPrepaid("300");
+					gsiMoney.setMemo("test");
+					OrderDetail orderDetail = new OrderDetail();
+					orderDetail.setOrder(order);
+					orderDetail.setGsiMoney(gsiMoney);
+					
+					Order order2 = new Order();
+					long id2 = 63253456;
+					order2.setOrderRid(id2);
+					order2.setPurchaseDate("2011/06/28");
+					order2.setPayMethod("轉帳付款");
+					order2.setPayDate("2011/06/29 12:33:46");
+					order2.setBillStatus("未寄送");
+					GsiMoney gsiMoney2 = new GsiMoney();
+					gsiMoney2.setPrepaid("200");
+					gsiMoney2.setMemo("test");
+					OrderDetail orderDetail2 = new OrderDetail();
+					orderDetail2.setOrder(order2);
+					orderDetail2.setGsiMoney(gsiMoney2);
+					mav.addObject("orderDetail",orderDetail);
+					mav.addObject("orderDetail2",orderDetail2);
+					return mav;
+				}
+
+				//查詢訂單詳細紀錄(訂單編號的連結)
+				@RequestMapping("/queryPayDetailRecord")  
+				public ModelAndView queryPayDetailRecord() {
+					ModelAndView mav = new ModelAndView("queryPayDetailRecord");
+					String tPrice="350";
+					Order order = new Order();
+					long id = 89123456;
+					order.setOrderRid(id);
+					order.setPurchaseDate("2011/03/31");
+					SongPrice songPrice = new SongPrice();
+					songPrice.setPrice("20");
+					Song song = new Song();
+					song.setName("早安晨之美");
+					song.setSongPrice(songPrice);
+					SongPrice songPrice2 = new SongPrice();
+					songPrice2.setPrice("25");
+					Song song2 = new Song();
+					song2.setName("你");
+					song2.setSongPrice(songPrice2);
+					Album album = new Album();
+					album.setName("盧廣仲");
+					Album album2 = new Album();
+					album2.setName("蕭敬騰");
+					ProductionCategory productionCategory = new ProductionCategory();
+					productionCategory.setSong(song);
+					productionCategory.setAlbum(album);
+					ProductionCategory productionCategory2 = new ProductionCategory();
+					productionCategory2.setSong(song2);
+					productionCategory2.setAlbum(album2);
+					OrderDetail orderDetail = new OrderDetail();
+					orderDetail.setProductionCategory(productionCategory);
+					orderDetail.setOrder(order);
+					OrderDetail orderDetail2 = new OrderDetail();
+					orderDetail2.setProductionCategory(productionCategory2);
+					OrderDetail[] od = {orderDetail,orderDetail2};
+					mav.addObject("orderDetail",od);
+					mav.addObject("tPrice",tPrice);
+					return mav;
+				}
+					
+				//查詢贈送點數記錄
+				@RequestMapping("/queryRewardRecord")
+				public ModelAndView queryRewardRecord() {
+					ModelAndView mav = new ModelAndView("queryRewardRecord");
+					String waitOnBonus = "0";
+					String OnBonus = "300";
+					String offBonus = "0";
+					Order order = new Order();
+					long id = 89123456;
+					order.setOrderRid(id);
+					GsiBonus gsiBonus = new GsiBonus();
+					gsiBonus.setOnDate("2011/03/31");
+					gsiBonus.setOffDate("2011/10/31");
+					OrderDetail orderDetail = new OrderDetail();
+					orderDetail.setOrder(order);
+					orderDetail.setGsiBonus(gsiBonus);
+					mav.addObject("orderDetail",orderDetail);
+					mav.addObject("waitOnBonus",waitOnBonus);
+					mav.addObject("OnBonus",OnBonus);
+					mav.addObject("offBonus",offBonus);
+					return mav;
+				}
 }
 

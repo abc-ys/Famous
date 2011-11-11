@@ -12,9 +12,9 @@
 		<tr>
 		<td colspan=2 ><h4>會員詳細資料</h4></td><tr>		
 		<td width="200" >帳號:&nbsp ${creatorDetail[0].email}</td>
-		<td width="200" >GSiMoney:&nbsp <a href="${pageContext.request.contextPath}/prePayRecord.do">${creatorDetail[0].gsiMoney.balance}</a></td><tr>
+		<td width="200" >GSiMoney:&nbsp <a href="${pageContext.request.contextPath}/queryPrePayRecord.do">${creatorDetail[0].gsiMoney.balance}</a></td><tr>
 		<td width="200" >ID:&nbsp ${creatorDetail[0].memberId}</td>
-		<td width="200" >GSiBonus:&nbsp <a href="${pageContext.request.contextPath}/rewardRecord.do">${creatorDetail[0].gsiBonus.balance}</a></td><tr>
+		<td width="200" >GSiBonus:&nbsp <a href="${pageContext.request.contextPath}/queryRewardRecord.do">${creatorDetail[0].gsiBonus.balance}</a></td><tr>
 		<td width="200" >身分:&nbsp ${creatorDetail[0].identityName}</td>
 		<td width="200" >粉絲數:&nbsp ${creatorDetail[1]}</td><tr>
 		<td width="200" >加入日期:&nbsp ${creatorDetail[0].createDate}</td>
@@ -31,9 +31,9 @@
 		<td width="200" ><font color="red">
 			<c:if test="${creatorDetail[0].memberStatus.statusName == '停權'}">				
 				${creatorDetail[0].memberStatus.statusReason}			
-			</c:if></font></td><td width="200" >被檢舉歌曲數:&nbsp <a href="">${creatorDetail[5]}</a></td><tr>	
-		<td width="200" ></td><td width="200" >被檢舉專輯數:&nbsp <a href="">${creatorDetail[6]}</a></td><tr>	
-		<td width="200" ></td><td width="200" >檢舉次數:&nbsp <a href="">${creatorDetail[7]}</a></td><tr>	
+			</c:if></font></td><td width="200" >被檢舉歌曲數:&nbsp <a href="${pageContext.request.contextPath}/queryOffenseSong.do">${creatorDetail[5]}</a></td><tr>	
+		<td width="200" ></td><td width="200" >被檢舉專輯數:&nbsp <a href="${pageContext.request.contextPath}/queryOffenseAlbum.do">${creatorDetail[6]}</a></td><tr>	
+		<td width="200" ></td><td width="200" >檢舉次數:&nbsp <a href="${pageContext.request.contextPath}/memberOffenseList.do">${creatorDetail[7]}</a></td><tr>	
 	</table>
 	<table border="0" cellpadding="0" cellspacing="0"> 
 		<td ><h4>付款資訊</h4></td><tr>

@@ -347,4 +347,245 @@ public class UploadMusicController {
 		
 		return "redirect:editAlbumData.do";
 	}
+	
+	
+	//Lucy write - 1110
+	
+	//新增專輯
+		@RequestMapping("/addAlbum")
+		public ModelAndView addAlbum(Model model)
+		{
+			System.out.println("addAlbum==>");
+			
+			ArrayList coverList = new ArrayList();
+			coverList.add("images/album.png");
+			coverList.add("images/album.png");
+			coverList.add("images/album.png");
+			
+			model.addAttribute("defaultCover", coverList);
+			return new ModelAndView("addAlbum");
+			
+		}
+		//儲存專輯資訊
+		@RequestMapping("/saveAlbum")
+		public String saveAlbum(HttpServletRequest request, String creatorId, Model model) throws Exception
+		{
+			System.out.println("saveAlbum==>");
+			
+			String albumType = "";
+			String albumName = "";
+			String albumBrand = "";
+			String musicCategory = "";
+			String albumTag = "";
+			String albumIntroduction = "";
+			String albumStatus = "";
+			String albumCover = "";
+			
+			int yourMaxMemorySize = 500 * 500* 1024;
+			File yourTempDirectory = new File("/tmp");
+			int yourMaxRequestSize = 300 * 300* 1024;
+			boolean writeToFile = true;
+			String allowedFileTypes = ".jpg";
+			String saveDirectory = "D:/UBN_Area/ImageWeb/WebContent/image/memberPicture";
+
+			// Check that we have a file upload request
+			boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+			System.out.println("isMultipart=" + isMultipart + "<br>");
+
+			// Create a factory for disk-based file items
+			DiskFileItemFactory factory = new DiskFileItemFactory(yourMaxMemorySize, yourTempDirectory);
+			
+			// Create a new file upload handler
+			ServletFileUpload upload = new ServletFileUpload(factory);
+
+			// Set overall request size constraint
+			upload.setSizeMax(yourMaxRequestSize);
+
+			try {
+				// Parse the request
+				List items = upload.parseRequest(request);
+
+				// Process the uploaded items
+				Iterator iter = items.iterator();
+				while (iter.hasNext()) {
+					FileItem item = (FileItem) iter.next();
+
+					if (item.isFormField()) {
+						// Process a regular form field	
+						//processFormField(item);		
+						String name = item.getFieldName();
+						String value = item.getString("UTF-8");
+						if(name.equals("albumType")){
+							albumType  = value;
+						}else if(name.equals("name")){
+							albumName = value;
+						}else if(name.equals("brand")){
+							albumBrand = value;
+						}else if(name.equals("musicCategory")){
+							musicCategory = value;
+						}else if(name.equals("tag")){
+							albumTag = value;
+						}else if(name.equals("introduction")){
+							albumIntroduction = value;
+						}else if(name.equals("status")){
+							albumStatus = value;
+						}else if(name.equals("cover")){
+							albumCover = value;
+						}
+					} else {
+						// Process a file upload
+						//processUploadedFile(item);	
+						String fieldName = item.getFieldName();
+						String fileName = item.getName();
+						String contentType = item.getContentType();
+						boolean isInMemory = item.isInMemory();
+						long sizeInBytes = item.getSize();
+						
+						System.out.println("fieldName=" + fieldName + "<br />");
+						System.out.println("fileName=" + fileName + "<br />");
+						System.out.println("contentType=" + contentType + "<br />");
+						System.out.println("isInMemory=" + isInMemory + "<br />");
+						System.out.println("sizeInBytes=" + sizeInBytes + "<br />");
+						
+						if (fileName != null && !"".equals(fileName)) {
+							if (writeToFile) {
+								// 副檔名
+								String formatName = fileName.substring(fileName.length() - 4,fileName.length());
+							    //fileName = (bannerType1 + formatName).toLowerCase();
+							      
+								System.out.println("fileName to be saved=" + fileName + "<br />");
+								String extension = FilenameUtils.getExtension(fileName);
+								if (allowedFileTypes.indexOf(extension.toLowerCase()) != -1) {
+								    File uploadedFile = new File(saveDirectory,	fileName);						
+								    item.write(uploadedFile);
+								} else {
+									System.out.println("上傳的檔案不能是" + extension + "<br />");
+								}
+							} else {
+								//InputStream uploadedStream = item.getInputStream();
+								//...
+								//uploadedStream.close();
+								// Process a file upload in memory
+								byte[] data = item.get();
+								System.out.println("data size=" + data.length + "<br />");
+							}
+						}
+					}
+				}
+			} catch (FileUploadBase.SizeLimitExceededException ex1) {
+				System.out.println("上傳檔案超過最大檔案允許大小" + yourMaxRequestSize / (1024 * 1024) + "MB !");
+			}
+			System.out.println(" creatorId="+creatorId+", albumType="+albumType+", albumName="+albumName+", albumBrand="+albumBrand+", musicCategory="+musicCategory+", albumTag="+albumTag+", albumIntroduction="+albumIntroduction+", albumStatus="+albumStatus+", albumCover="+albumCover);
+			model.addAttribute("creatorId", "qqqqqqq");
+			model.addAttribute("albumId", "111");
+			
+			return "redirect:/addSong.do";
+			
+		}
+		//新增歌曲
+		@RequestMapping("/addSong")
+		public ModelAndView addSong( String creatorId,String albumId, Model model)
+		{
+			System.out.println("addSong==>");
+			model.addAttribute("creatorId", "qqqqqqq");
+			model.addAttribute("albumId", "111");
+			return new ModelAndView("addSong");		
+		}
+		
+		//儲存歌曲檔案
+		@RequestMapping("/saveSong")
+		public ModelAndView saveSong(HttpServletRequest request, String creatorId, String albumId) throws Exception
+		{
+			System.out.println("saveSong==>");
+			System.out.println("	creatorId="+creatorId+", albumId="+albumId);
+			
+			boolean writeToFile = true;
+			String allowedFileTypes = ".mp3";
+			String saveDirectory = "D:/UBN_Area/ImageWeb/WebContent/image/memberPicture";
+			Song s = new Song();
+					
+			// Check that we have a file upload request
+			boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+			System.out.println("isMultipart=" + isMultipart + "<br>");
+
+			// Create a factory for disk-based file items
+			DiskFileItemFactory factory = new DiskFileItemFactory();
+				
+			// Create a new file upload handler
+			ServletFileUpload upload = new ServletFileUpload(factory);
+
+			// Parse the request
+			List items = upload.parseRequest(request);
+			// Process the uploaded items
+			Iterator iter = items.iterator();
+			while (iter.hasNext()) {
+				FileItem item = (FileItem) iter.next();
+
+				// Process a file upload
+				// processUploadedFile(item);	
+				String fieldName = item.getFieldName();
+				String fileName = item.getName();
+				String contentType = item.getContentType();
+				boolean isInMemory = item.isInMemory();
+				long sizeInBytes = item.getSize();
+				
+				System.out.println("fieldName=" + fieldName + "<br />");
+				System.out.println("fileName=" + fileName + "<br />");
+				System.out.println("contentType=" + contentType + "<br />");
+				System.out.println("isInMemory=" + isInMemory + "<br />");
+				System.out.println("sizeInBytes=" + sizeInBytes + "<br />");
+						
+				if (fileName != null && !"".equals(fileName)) {
+					if (writeToFile) {
+						// 副檔名
+						String formatName = fileName.substring(fileName.length() - 4,fileName.length());
+					    //fileName = (bannerType1 + formatName).toLowerCase();
+					      
+						System.out.println("fileName to be saved=" + fileName + "<br />");
+						String extension = FilenameUtils.getExtension(fileName);
+						if (allowedFileTypes.indexOf(extension.toLowerCase()) != -1) {
+						    File uploadedFile = new File(saveDirectory,	fileName);						
+						    item.write(uploadedFile);
+						    
+						    s.setSongID(12345);
+						    s.setName(fileName);
+						    
+						} else {
+							System.out.println("上傳的檔案不能是" + extension + "<br />");
+						}
+					} else {
+					//InputStream uploadedStream = item.getInputStream();
+					//...
+					//uploadedStream.close();
+					// Process a file upload in memory
+					byte[] data = item.get();
+					System.out.println("data size=" + data.length + "<br />");
+					}			
+				}	
+			} 	
+			
+			
+		  return new ModelAndView("addSongData");		
+			
+		}
+		
+		//新增歌曲資訊
+		@RequestMapping("/addSongData")
+		public ModelAndView addSongData( String creatorId,String albumId, Model model)
+		{
+			System.out.println("addSongData==>");
+			model.addAttribute("albumId", albumId);
+			model.addAttribute("creatorId", creatorId);
+			return new ModelAndView("addSongData");		
+		}
+			
+		//儲存歌曲資訊
+		@RequestMapping("/saveSongData")
+		public ModelAndView saveSongDetail(String creatorId, String albumId, String name, String date, String musicCategory, String status, String money, String tag) throws Exception
+		{
+			System.out.println("saveSongData==>");
+			System.out.println("	creatorId="+creatorId+", albumId="+albumId+", name="+name+", date="+date+",	musicCategory="+musicCategory+", status="+status+", money="+money+", tag="+tag);
+			
+			return new ModelAndView("addSong");	
+		}
 }
