@@ -12,15 +12,15 @@
 		<tr>
 		<td colspan=2 ><h4>會員詳細資料</h4></td><tr>		
 		<td width="200" >帳號:&nbsp <c:out value="${creatorDetail[0].email}"></c:out></td>
-		<td width="200" >GSiMoney:&nbsp <a href="${pageContext.request.contextPath}/prePayRecord.do"><c:out value="${creatorDetail[0].gsiMoney.balance}"></c:out></a></td><tr>
+		<td width="200" >GSiMoney:&nbsp <a href="${pageContext.request.contextPath}/queryPrePayRecord.do"><c:out value="${creatorDetail[0].gsiMoney.balance}"></c:out></a></td><tr>
 		<td width="200" >ID:&nbsp <c:out value="${creatorDetail[0].memberId}"></c:out></td>
-		<td width="200" >GSiBonus:&nbsp <a href="${pageContext.request.contextPath}/rewardRecord.do"><c:out value="${creatorDetail[0].gsiBonus.balance}"></c:out></a></td><tr>
+		<td width="200" >GSiBonus:&nbsp <a href="${pageContext.request.contextPath}/queryRewardRecord.do"><c:out value="${creatorDetail[0].gsiBonus.balance}"></c:out></a></td><tr>
 		<td width="200" >身分:&nbsp <c:out value="${creatorDetail[0].identityName}"></c:out></td>
 		<td width="200" >粉絲數:&nbsp <c:out value="${creatorDetail[1]}"></c:out></td><tr>
 		<td width="200" >加入日期:&nbsp <c:out value="${creatorDetail[0].createDate}"></c:out></td>
 		<td width="200" >好友數:&nbsp <c:out value="${creatorDetail[2]}"></c:out></td><tr>
 		<td width="200" >地區:&nbsp <c:out value="${creatorDetail[0].location}"></c:out></td>
-		<td width="200" >專輯數:&nbsp <a href=""><c:out value="${creatorDetail[3]}"></c:out></a></td><tr>	
+		<td width="200" >專輯數:&nbsp <a href="${pageContext.request.contextPath}/queryAlbum.do"><c:out value="${creatorDetail[3]}"></c:out></a></td><tr>	
 		<td width="200" >狀態:&nbsp
 		<select name="status" id="status" onchange="addReason('${admin}','${creatorDetail[0].memberId}')"> 
 			<c:if test="${creatorDetail[0].memberStatus.statusName == '正常'}">				
@@ -32,10 +32,10 @@
 					<option value="正常" >正常</option>				
 			</c:if>
 		</select></td>
-		<td width="200" >歌曲數:&nbsp <a href=""><c:out value="${creatorDetail[4]}"></c:out></a></td><tr>		
-		<td width="200" ></td><td width="200" >被檢舉歌曲數:&nbsp <a href=""><c:out value="${creatorDetail[5]}"></c:out></a></td><tr>	
-		<td width="200" ></td><td width="200" >被檢舉專輯數:&nbsp <a href=""><c:out value="${creatorDetail[6]}"></c:out></a></td><tr>	
-		<td width="200" ></td><td width="200" >檢舉次數:&nbsp <a href=""><c:out value="${creatorDetail[7]}"></c:out></a></td><tr><tr>		
+		<td width="200" >歌曲數:&nbsp <a href="${pageContext.request.contextPath}/querySong.do"><c:out value="${creatorDetail[4]}"></c:out></a></td><tr>		
+		<td width="200" ></td><td width="200" >被檢舉歌曲數:&nbsp <a href="${pageContext.request.contextPath}/queryOffenseSong.do"><c:out value="${creatorDetail[5]}"></c:out></a></td><tr>	
+		<td width="200" ></td><td width="200" >被檢舉專輯數:&nbsp <a href="${pageContext.request.contextPath}/queryOffenseAlbum.do"><c:out value="${creatorDetail[6]}"></c:out></a></td><tr>	
+		<td width="200" ></td><td width="200" >檢舉次數:&nbsp <a href="${pageContext.request.contextPath}/memberOffenseList.do"><c:out value="${creatorDetail[7]}"></c:out></a></td><tr><tr>		
 		
 		<td ><h4>付款資訊</h4></td><tr>
 		<td width="400">真實姓名/公司行號:&nbsp <input type="text" name="userName" id="userName" value='<c:out value="${creatorDetail[0].userName}"></c:out>'></td><tr>

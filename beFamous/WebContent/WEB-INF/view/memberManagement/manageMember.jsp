@@ -20,9 +20,10 @@
 			<option value="樂團" >樂團</option>
 		</select><br><br>
 	加入日期區間:&nbsp<input name="MOPEND" type="text" class="fillbox" readonly>&nbsp;
-	<A HREF="javascript:show_calendar('fm.MOPEND');"><img src="images/cal.gif" border="0"></img></a>&nbsp-&nbsp
+	<A HREF="javascript:show_calendar('fm.MOPEND');"><img src="${pageContext.request.contextPath}/images/cal.gif" border="0"></img></a>&nbsp-&nbsp
 	<input name="MCLOSED" type="text" class="fillbox" readonly >&nbsp;
-	<A HREF="javascript:show_calendar('fm.MCLOSED');"><img src="images/cal.gif" border="0"></img></a><br><br>
+	<A HREF="javascript:show_calendar('fm.MCLOSED');"><img src="${pageContext.request.contextPath}/images/cal.gif" border="0"></img></a><br><br>
+	
 	
 	地區:<select name="mLocation" id="mLocation">
 			<option value="" selected="selected">台灣</option>
