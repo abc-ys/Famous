@@ -247,9 +247,21 @@
 	</definition>
 	
 	<!-- 管理者最新消息 -->
-	<definition name="addAdminNews" extends="general.definition">
+	<definition name="addManagerNews" extends="general.definition">
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
-		<put-attribute name="body" value="/WEB-INF/view/news/addAdminNews.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/news/addManagerNews.jsp" />
+	</definition>
+	<definition name="queryManagerNews" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/news/queryManagerNews.jsp" />
+	</definition>
+	<definition name="editNewsData" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/news/editManagerNews.jsp" />
+	</definition>
+	<definition name="showNewsData" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/news/showManagerNews.jsp" />
 	</definition>
 	<!-- 怡秀的tiles_end -->
 	
