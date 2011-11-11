@@ -6,10 +6,7 @@ pageEncoding="UTF-8"%>
 <table>
   <tr>
   <td>
-    <h4>音樂管理</h4>
     <a href="${pageContext.request.contextPath}/manageMusicCategory.do">音樂類別管理</a><br>
-    <a href="${pageContext.request.contextPath}/queryAlbum.do">查詢專輯</a><br>
-    <a href="${pageContext.request.contextPath}/querySong.do">查詢歌曲</a><br>
   </td>
   <tr>
   <td>
@@ -54,6 +51,18 @@ pageEncoding="UTF-8"%>
   <td>
     <h4>關鍵字管理</h4>
     <a href="${pageContext.request.contextPath}/manageKeyWord.do">排除字詞組設定</a><br>
+  </td>
+  <tr> 
+  <td>
+    <h4>音樂管理</h4>
+    <a href="${pageContext.request.contextPath}/queryAlbum.do">查詢專輯</a><br>
+    <a href="${pageContext.request.contextPath}/querySong.do">查詢歌曲</a><br>
+  </td>
+  <tr> 
+  <td>
+    <h4>訊息管理</h4>
+    <a href="${pageContext.request.contextPath}/addManagerNews.do">新增最新消息</a><br>
+    <a href="${pageContext.request.contextPath}/queryManagerNews.do">查詢最新消息</a><br>
   </td>
   <tr> 
   <td>
