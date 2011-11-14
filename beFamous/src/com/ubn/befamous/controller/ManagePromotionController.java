@@ -591,12 +591,11 @@ public class ManagePromotionController {
 			OrderDetail orderDetail = new OrderDetail();
 			ProductionCategory productionCategory = new ProductionCategory();
 			PrePaid prePaid = new PrePaid();
-			Set<PrePaidPrice> listPrePaidPrice = new HashSet();
+			
 			PrePaidPrice prePaidPrice = new PrePaidPrice();
 			prePaidPrice.setpPrice("500");
-			listPrePaidPrice.add(prePaidPrice);
 			
-			prePaid.setPrePaidPrice(listPrePaidPrice);
+			prePaid.setPrePaidPrice(prePaidPrice);
 			productionCategory.setPrePaid(prePaid);
 			orderDetail.setProductionCategory(productionCategory);
 			Set<OrderDetail> listOrderDetail = new HashSet();
@@ -635,12 +634,10 @@ public class ManagePromotionController {
 			OrderDetail orderDetail = new OrderDetail();
 			ProductionCategory productionCategory = new ProductionCategory();
 			PrePaid prePaid = new PrePaid();
-			Set<PrePaidPrice> listPrePaidPrice = new HashSet();
 			PrePaidPrice prePaidPrice = new PrePaidPrice();
 			prePaidPrice.setpPrice("500");
-			listPrePaidPrice.add(prePaidPrice);
 			
-			prePaid.setPrePaidPrice(listPrePaidPrice);
+			prePaid.setPrePaidPrice(prePaidPrice);
 			productionCategory.setPrePaid(prePaid);
 			orderDetail.setProductionCategory(productionCategory);
 			Set<OrderDetail> listOrderDetail = new HashSet();
@@ -650,12 +647,12 @@ public class ManagePromotionController {
 			OrderDetail orderDetail2 = new OrderDetail();
 			ProductionCategory productionCategory2 = new ProductionCategory();
 			PrePaid prePaid2 = new PrePaid();
-			Set<PrePaidPrice> listPrePaidPrice2 = new HashSet();
+			
 			PrePaidPrice prePaidPrice2 = new PrePaidPrice();
 			prePaidPrice2.setpPrice("300");
-			listPrePaidPrice2.add(prePaidPrice2);
 			
-			prePaid2.setPrePaidPrice(listPrePaidPrice2);
+			
+			prePaid2.setPrePaidPrice(prePaidPrice2);
 			productionCategory2.setPrePaid(prePaid2);
 			orderDetail2.setProductionCategory(productionCategory2);
 			Set<OrderDetail> listOrderDetail2 = new HashSet();
