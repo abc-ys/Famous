@@ -603,9 +603,10 @@
 	<definition name="saveUpdateNews" extends="iframe.definition">
 		<put-attribute name="body" value="/WEB-INF/view/news/saveUpdateNews.jsp" />
 	</definition>
+	
 	<!-- 線上客服 -->
 	<definition name="addQuestion" extends="base.definition">
-		<put-attribute name="body" value="/WEB-INF/view/onlineQuestion/addQuestion.jsp" />		
+		<put-attribute name="body" value="/WEB-INF/view/onlineQuestion/addQuestion.jsp" />
 	</definition>	
 	<definition name="manageQuestion" extends="general.definition">
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
@@ -630,7 +631,7 @@
 	</definition>
 	<definition name="saveNote" extends="iframe.definition">
 		<put-attribute name="body" value="/WEB-INF/view/onlineQuestion/saveNote.jsp" />
-	
+	</definition>
 	
 	<!--會員管理 -->
 	<definition name="queryMemberData" extends="general.definition">
@@ -669,7 +670,7 @@
 	<definition name="queryOffenseSong" extends="general.definition">
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/memberManagement/queryOffenseSong.jsp" />
-	</definition>
+	</definition>	
 	<definition name="queryPrePayRecord" extends="general.definition">
 	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/memberManagement/queryPrePayRecord.jsp" />
@@ -681,7 +682,7 @@
 	<definition name="queryRewardRecord" extends="general.definition">
 	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/memberManagement/queryRewardRecord.jsp" />
-	</definition>	
+	</definition>
 	
 	<!-- 廣告管理 -->
 	<definition name="addAdBanner" extends="general.definition">
@@ -744,6 +745,5 @@
 	<definition name="forgetPassword" extends="iframe.definition">
 		<put-attribute name="body" value="/WEB-INF/view/memberRegisterLogin/forgetPassword.jsp" />
 	</definition>	
-	<!-- Lucy end -->
 	<!-- Lucy end -->
 </tiles-definitions> 

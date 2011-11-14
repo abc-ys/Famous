@@ -23,7 +23,7 @@ import com.ubn.befamous.entity.Member;
 
 @Controller
 @SessionAttributes
-public class MemberRegisterLogin {
+public class MemberRegisterLoginController {
 	
 	//註冊步驟一
 	@RequestMapping("/registerOne")

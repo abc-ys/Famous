@@ -8,7 +8,7 @@
 <body>
 
 管理排行榜<br>
-<a href="${pageContext.request.contextPath}/incomeOutgo.do">修改統計百分比</a><br>
+<!-- <a href="${pageContext.request.contextPath}/incomeOutgo.do">修改統計百分比</a><br> -->
 <a href="${pageContext.request.contextPath}/queryAlbumWeekRankingForAdmin.do">修改專輯週榜</a><br>
 <a href="${pageContext.request.contextPath}/querySongWeekRankingForAdmin.do">修改歌曲週榜</a><br>
 <a href="${pageContext.request.contextPath}/queryCreatorWeekRankingForAdmin.do">修改創作人週榜</a><br>
