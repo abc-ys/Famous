@@ -10,23 +10,6 @@
 <body>
 
 
-<!-- 
-<c:forEach var="hm" varStatus="status" items="${arMember}" >
-
-<c:forEach var="order" varStatus="status1" items="${hm.order}" >
-<c:forEach var="detail" varStatus="status1" items="${order.orderDetail}" >
-
-<c:forEach var="price" varStatus="status1" items="${detail.productionCategory.prePaid.prePaidPrice}" >
-     <c:set var="totalPrice" value="${price.pPrice}"/>
-<c:set var="totalPrice2" value="${totalPrice}"/>
-      ${price.pPrice}
-</c:forEach>
-
-</c:forEach>
-
-</c:forEach>
-</c:forEach>
- -->
 <c:set var="totalPrice" value="${1000}"/>
 <table border="1">
 <tr>

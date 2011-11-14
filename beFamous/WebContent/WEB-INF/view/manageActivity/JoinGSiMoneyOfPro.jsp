@@ -21,14 +21,14 @@
 <c:forEach var="hm" varStatus="status" items="${arOrder}" >
 
 <c:forEach var="orderDetail" varStatus="status1" items="${hm.orderDetail}" >
-<c:forEach var="price" varStatus="status2" items="${orderDetail.productionCategory.prePaid.prePaidPrice}" >
+
 <tr>
 <td>${status.count}</td>
 <td>${hm.billNo}</td>
 <td>${hm.member.email}</td>
-<td>${price.pPrice}</td>
+<td>${orderDetail.productionCategory.prePaid.prePaidPrice.pPrice}</td>
 </tr>
-</c:forEach>
+
 </c:forEach>
 </c:forEach>
 
