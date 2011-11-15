@@ -40,10 +40,10 @@ public class SongTableTag extends TagSupport {
 			for (int j = 0; j < songs.length; j++) {
 				Song song=songs[j];
 				String strAlbumName =song.getAlbum().getName();
-				String strAlbumId = String.valueOf(song.getAlbum().getAlbumID());
+				String strAlbumId = String.valueOf(song.getAlbum().getId());
 				String strAlbumCreator = song.getAlbum().getCreator().getUserName();
-				String strCreatorId = String.valueOf(song.getAlbum().getCreator().getMemberId());
-				String strSongId=String.valueOf(song.getSongID());
+				String strCreatorId = String.valueOf(song.getAlbum().getCreator().getId());
+				String strSongId=String.valueOf(song.getId());
 				String strSongName=song.getName();
 				sb.append("<tr>");
 				sb.append("<td>"+(j+1)+"<img src=\""+request.getContextPath()+"/images/play.png\" /></td>");

@@ -61,9 +61,9 @@ public class AlbumTableTag extends TagSupport {
 						} else {
 							Album album=albums[j* MAX_COLUMN + i];
 							String strAlbumName = album.getName();
-							String strAlbumId = String.valueOf(album.getAlbumID());
+							String strAlbumId = String.valueOf(album.getId());
 							String strAlbumCreator = album.getCreator().getUserName();
-							String strCreatorId = String.valueOf(album.getCreator().getMemberId());
+							String strCreatorId = String.valueOf(album.getCreator().getId());
 							String strAlbumDate = album.getDate();
 							String strCoverImage = album.getCover();
 
@@ -174,7 +174,7 @@ public class AlbumTableTag extends TagSupport {
 		for (int i = start; i < end; i++) {
 			Album album=albums[i];
 //			String strAlbumName = albumMap.get("albumName");
-			String strAlbumId = String.valueOf(album.getAlbumID());
+			String strAlbumId = String.valueOf(album.getId());
 //			String strCoverImage = albumMap.get("coverImage");
 			if(i!=start){
 				sb.append(",");
