@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:jsp="http://java.sun.com/xml/ns/javaee/jsp" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
   <filter>
     <filter-name>characterEncodingFilter</filter-name>
     <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
@@ -32,16 +32,24 @@
     <param-name>log4jConfigLocation</param-name>
     <param-value>/WEB-INF/classes/log4j.properties</param-value>
   </context-param>
-  
-    <context-param> 
-          <param-name>ImageWeb</param-name> 
-          <param-value>ImageWeb</param-value> 
-</context-param> 
-  
+  <context-param>
+    <param-name>ImageWeb</param-name>
+    <param-value>ImageWeb</param-value>
+  </context-param>
   <jsp-config>
-		<taglib>
-			<taglib-uri>http://www.gsi-media.com/</taglib-uri>
-			<taglib-location>/WEB-INF/tld/gsimedia.tld</taglib-location>
-		</taglib>
-	</jsp-config>
+    <taglib>
+      <taglib-uri>http://www.gsi-media.com/</taglib-uri>
+      <taglib-location>/WEB-INF/tld/gsimedia.tld</taglib-location>
+    </taglib>
+  </jsp-config>
+  
+  <!-- The definition of the Root Spring Container shared by all Servlets and Filters -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>/WEB-INF/applicationContext.xml,/WEB-INF/cacheContext.xml</param-value>
+	</context-param>
+	
+	<listener>  
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>  
+    </listener> 
 </web-app>
