@@ -64,7 +64,7 @@ public class AlbumTableTag extends TagSupport {
 							String strAlbumId = String.valueOf(album.getId());
 							String strAlbumCreator = album.getCreator().getUserName();
 							String strCreatorId = String.valueOf(album.getCreator().getId());
-							String strAlbumDate = album.getDate();
+							String strAlbumDate = album.getCreateDate();
 							String strCoverImage = album.getCover();
 
 							sb.append("          			<td>");
