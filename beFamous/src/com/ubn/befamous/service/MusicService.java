@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import com.ubn.befamous.entity.Album;
 import com.ubn.befamous.entity.Creator;
+import com.ubn.befamous.entity.Keyword;
 import com.ubn.befamous.entity.MusicCategory;
 import com.ubn.befamous.entity.News;
 import com.ubn.befamous.entity.Song;
@@ -189,6 +190,25 @@ public interface MusicService {
      */
     public News[] queryKeywordForNews (String keyword);
     
+    //管理關鍵字
+    
+    /**
+     * 查詢不雅字關鍵字    (??????)
+     */
+    public Keyword[] queryInelegantKeywords();
+    
+    /**
+     * 新增不雅字關鍵字    (??????)
+     */
+    public void addInelegantKeywords(long managerID, String keyword);
+    
+    /**
+     * 刪除不雅字關鍵字    (??????)
+     * @param managerID 管理者編號
+     * @param inelegantKeywordID 不雅關鍵字編號
+     */
+    public void deleteInelegantKeywords(long inelegantKeywordID);
+    
     //管理專輯類別與排行榜
     //管理音樂類別
     
@@ -202,21 +222,21 @@ public interface MusicService {
      * @param musicCategoryID 音樂分類編號
      * @param managerID 管理者編號
      */
-    public void deleteMusicCategory (long musicCategoryID, long managerID);
+    public void deleteMusicCategory (long musicCategoryID);
     
     /**
      * 新增音樂類別
-     * @param musicCategoryID 音樂分類編號
      * @param managerID 管理者編號
      */
-    public void addMusicCategory (long musicCategoryID, long managerID);
+    public void addMusicCategory (long managerID);
     
     /**
      * 更新音樂類別
      * @param musicCategoryID 音樂分類編號
+     * @param name 音樂分類名稱
      * @param managerID 管理者編號
      */
-    public void updateMusicCategory (long musicCategoryID, long managerID);
+    public void updateMusicCategory (long musicCategoryID, String name, long managerID);
     
     /**
      * 查詢子音樂類別

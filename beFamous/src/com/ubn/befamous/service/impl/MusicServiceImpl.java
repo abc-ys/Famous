@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ubn.befamous.dao.IBaseDao;
 import com.ubn.befamous.entity.Album;
 import com.ubn.befamous.entity.Creator;
+import com.ubn.befamous.entity.Keyword;
 import com.ubn.befamous.entity.Member;
 import com.ubn.befamous.entity.MemberStatus;
 import com.ubn.befamous.entity.MusicCategory;
@@ -50,6 +51,10 @@ public class MusicServiceImpl implements MusicService{
 	@Autowired
 	@Qualifier("songDAO")
 	private IBaseDao<Song, Long> songDAO;
+	
+	@Autowired
+	@Qualifier("keywordDAO")
+	private IBaseDao<Keyword, Long> keywordDAO;
 	
 	@Autowired
 	@Qualifier("recommendActivityDAO")
@@ -448,8 +453,7 @@ public class MusicServiceImpl implements MusicService{
 			i++;
 		}
     	
-    	Album[] a = {};
-    	return a;
+    	return albumList2;
     }
     
     //查詢關鍵字
@@ -505,6 +509,51 @@ public class MusicServiceImpl implements MusicService{
     	return n;
     }
     
+    //管理關鍵字
+    
+    /**
+     * 查詢不雅字關鍵字    (??????)
+     */
+    public Keyword[] queryInelegantKeywords(){
+
+    	Keyword[] keyword = this.keywordDAO.findAll();
+    	Keyword[] k = new Keyword[keyword.length];
+		int i = 0;
+		for (Keyword k2:keyword) {
+			k[i]=k2;
+			System.out.println("a==>"+k[i].getName());
+			i++;
+		}
+    	
+    	return k;
+    }
+    
+    /**
+     * 新增不雅字關鍵字    (??????)
+     * @param managerID 管理者編號
+     * @param keyword 關鍵字
+     */
+    public void addInelegantKeywords(long managerID, String keyword){
+    	
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");  //當天日期時間
+
+    	Keyword kw = new Keyword();
+    	kw.setCreateDate(datetime);
+    	kw.setCreateUser(String.valueOf(managerID));
+    	kw.setName(keyword);
+    	
+    	this.keywordDAO.save(kw);
+    }
+    
+    /**
+     * 刪除不雅字關鍵字    (??????)   (刪除失敗)
+     * @param inelegantKeywordID 不雅關鍵字編號
+     */
+    public void deleteInelegantKeywords(long inelegantKeywordID){
+    	
+    	this.keywordDAO.delete(inelegantKeywordID);
+    }
+    
     //管理專輯類別與排行榜
     //管理音樂類別
     
@@ -512,44 +561,86 @@ public class MusicServiceImpl implements MusicService{
      * 查詢音樂類別
      */
     public MusicCategory[] queryMusicCategory (){
-    	MusicCategory[] mc = {};
-    	return mc;
+
+    	MusicCategory[] musicCategory = this.musicCategoryDAO.findAll();
+    	
+    	MusicCategory[] mc = new MusicCategory[musicCategory.length];
+		int i = 0;
+		System.out.println("ssss==>");
+		for (MusicCategory mc2:musicCategory) {
+			mc[i]=mc2;
+			System.out.println("a==>"+mc[i].getId());
+			i++;
+		}
+    	
+    	return musicCategory;
     }
     
     /**
-     * 刪除音樂類別
+     * 刪除音樂類別        (刪除再度失敗)
      * @param musicCategoryID 音樂分類編號
      * @param managerID 管理者編號
      */
-    public void deleteMusicCategory (long musicCategoryID, long managerID){
+    public void deleteMusicCategory (long musicCategoryID){
+    	
+    	this.musicCategoryDAO.delete(musicCategoryID);
     	
     }
     
     /**
      * 新增音樂類別
-     * @param musicCategoryID 音樂分類編號
      * @param managerID 管理者編號
      */
-    public void addMusicCategory  (long musicCategoryID, long managerID){
+    public void addMusicCategory(long managerID){
     	
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");  //當天日期時間
+    	
+    	MusicCategory mc = new MusicCategory();
+    	mc.setName("抒情樂");
+    	mc.setCreateDate(datetime);
+    	mc.setCreateUser(String.valueOf(managerID));
+    	
+    	this.musicCategoryDAO.save(mc);
     }
     
     /**
-     * 更新音樂類別
+     * 更新音樂類別           (更新再度失敗)
      * @param musicCategoryID 音樂分類編號
+     * @param name 音樂分類名稱
      * @param managerID 管理者編號
      */
-    public void updateMusicCategory  (long musicCategoryID, long managerID){
+    public void updateMusicCategory(long musicCategoryID, String name, long managerID){
     	
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");  //當天日期時間
+    	
+    	MusicCategory mc = this.musicCategoryDAO.find(musicCategoryID);
+    	mc.setName(name);
+    	mc.setModifier(String.valueOf(managerID));
+    	mc.setModifyDate(datetime);
+    	
+    	this.musicCategoryDAO.update(mc);
     }
     
     /**
      * 查詢子音樂類別
      * @param musicCategoryID 音樂分類編號
      */
-    public MusicCategory[] querySubMusicCatrgory (long musicCategoryID){
-    	MusicCategory[] mc = {};
-    	return mc;
+    public MusicCategory[] querySubMusicCatrgory(long musicCategoryID){
+    	
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("from MusicCategory a where a.parent = :musicCategoryID");
+		query.setLong("musicCategoryID", musicCategoryID);
+		
+		List<MusicCategory> resultList=(List<MusicCategory>)query.list();
+		MusicCategory[] mcSet = new MusicCategory[resultList.size()];
+		
+			int i=0;
+			for (MusicCategory mc2:resultList) {
+				mcSet[i]=mc2;
+				System.out.println("ssss==>"+mcSet[i].getName());
+				i++;
+			}
+    	
+    	return mcSet;
     }
     
     //管理排行榜
@@ -705,4 +796,6 @@ public class MusicServiceImpl implements MusicService{
     	Song s = new Song();
     	return s;
     }
+    
+    
 }
