@@ -116,9 +116,9 @@ public interface MusicService {
 
     /**
      * 查詢音樂
-     * @param songID 歌曲編號
+     * @param albumID 歌曲編號
      */
-    public ArrayList queryMusic (long songID);
+    public Album queryMusic (long albumID);
     
     /**
      * 查詢專輯
@@ -130,7 +130,7 @@ public interface MusicService {
      * 更新專輯
      * @param albumID 專輯編號
      */
-    public void updateAlbum (Album album);
+    public void updateAlbum (long albumID, String albumType,String name,String date,String brand,String musicCategory,String tag,String cover,String cover2,String introduction,String status);
     
     /**
      * 查詢歌曲
@@ -142,7 +142,7 @@ public interface MusicService {
      * 更新歌曲
      * @param song 歌曲的bean
      */
-    public void updateSong (Song song);
+    public void updateSong (long songID, String songName, String musicType, String MOPEND, String status, String price, String price2, String discount, String tag, String lyrics, String lyricist, String composer, String producer);
     
     /**
      * 刪除歌曲

@@ -20,10 +20,12 @@ import com.ubn.befamous.dao.IBaseDao;
 import com.ubn.befamous.entity.Album;
 import com.ubn.befamous.entity.Creator;
 import com.ubn.befamous.entity.Member;
+import com.ubn.befamous.entity.MemberStatus;
 import com.ubn.befamous.entity.MusicCategory;
 import com.ubn.befamous.entity.News;
 import com.ubn.befamous.entity.RecommendActivity;
 import com.ubn.befamous.entity.Song;
+import com.ubn.befamous.entity.SongPrice;
 import com.ubn.befamous.service.MusicService;
 
 @Service("musicService")
@@ -36,6 +38,18 @@ public class MusicServiceImpl implements MusicService{
 	@Autowired
 	@Qualifier("albumDAO")
 	private IBaseDao<Album, Long> albumDAO;
+	
+	@Autowired
+	@Qualifier("songPriceDAO")
+	private IBaseDao<SongPrice, Long> songPriceDAO;
+	
+	@Autowired
+	@Qualifier("musicCategoryDAO")
+	private IBaseDao<MusicCategory, Long> musicCategoryDAO;
+	
+	@Autowired
+	@Qualifier("songDAO")
+	private IBaseDao<Song, Long> songDAO;
 	
 	@Autowired
 	@Qualifier("recommendActivityDAO")
@@ -111,7 +125,7 @@ public class MusicServiceImpl implements MusicService{
     }
     
     /**
-     * 查詢專輯資料
+     * 查詢專輯資料     (再確認一下，為什麼要有RecommendAlbum[]和song[])
      * @param albumID 專輯編號
      */
     public ArrayList queryAlbumData(long albumID){
@@ -121,7 +135,7 @@ public class MusicServiceImpl implements MusicService{
     }
     
     /**
-     * 新增專輯試聽
+     * 新增專輯試聽     (專輯試聽....?!)
      * @param albumID 專輯編號
      */
     public Song[] addAlbumAudition(long albumID){
@@ -133,17 +147,18 @@ public class MusicServiceImpl implements MusicService{
     //瀏覽分類頁面
     
     /**
-     * 音樂分類-查詢最新專輯       (要再加會員狀態不能是關閉的條件和被隱藏的條件)
+     * 音樂分類-查詢最新專輯       
      * @param musicCatrgoryID 音樂分類編號
      */
     public Album[] queryNewAlbumsForMusicCatrgory (long musicCatrgoryID){
     	String datetime = DateFormatUtils.format(new Date(), "yyyy-MM-dd");   //今天日期時間
     	String newest = DateFormatUtils.format(DateUtils.addMonths(new Date(), -3), "yyyy-MM-dd");    //最近三個月發表的專輯就算最新專輯
     	
-    	Query query = this.sessionfactory.getCurrentSession().createQuery("from Album a where (a.createDate between :newest and :datetime) and (a.musicCategory.id = :musicCatrgoryID)  ORDER BY a.createDate DESC");
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("from Album a where (a.createDate between :newest and :datetime) and (a.musicCategory.id = :musicCatrgoryID) and (a.hidden is empty) and (a.dropDate is null) and (a.creator.memberStatus.statusName = :memberStatus) ORDER BY a.createDate DESC");
 		query.setString("datetime", datetime);
 		query.setString("newest", newest);
 		query.setLong("musicCatrgoryID", musicCatrgoryID);
+		query.setString("memberStatus", "1");       //1: 會員狀態為正常 
     	
 		List<Album> resultList=(List<Album>)query.list();
 		Album[] albumset = new Album[resultList.size()];
@@ -172,18 +187,19 @@ public class MusicServiceImpl implements MusicService{
     //瀏覽最新專輯
     
     /**
-     * 查詢最新專輯          (要再加會員狀態不能是關閉的條件)
+     * 查詢最新專輯          
      * @param datetime 現在日期時間
      */
     public Album[] queryNewAlbums (String datetime){
     	//datetime = DateFormatUtils.format(new Date(), "yyyy-MM-dd");
     	String newest = DateFormatUtils.format(DateUtils.addMonths(new Date(), -3), "yyyy-MM-dd");    //最近三個月發表的專輯就算最新專輯
     	
-    	Query query = this.sessionfactory.getCurrentSession().createQuery("from Album a where (a.createDate between :newest and :datetime) and (a.status = :status) and (a.hidden is empty) ORDER BY a.createDate DESC");
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("from Album a where (a.createDate between :newest and :datetime) and (a.status = :status) and (a.hidden is empty) and (a.dropDate is null) and (a.creator.memberStatus.statusName = :memberStatus) ORDER BY a.createDate DESC");
 		query.setString("datetime", datetime);
 		query.setString("newest", newest);
 		query.setString("status", "1");       //1: 專輯條件為公開
-    	
+		query.setString("memberStatus", "1");       //1: 會員狀態為正常 
+		
 		List<Album> resultList=(List<Album>)query.list();
 		Album[] albumset = new Album[resultList.size()];
 		//RecommendActivity s=resultList.get(0);
@@ -202,12 +218,16 @@ public class MusicServiceImpl implements MusicService{
     //瀏覽大力推清單
     
     /**
-     * 查詢推薦專輯    (要再加會員狀態不能是關閉的條件和刪除時間為空)
+     * 查詢推薦專輯    (有問題!!)
      */
     public Album[] queryPromotionAlbums(){
     	String today=DateFormatUtils.format(new Date(), "yyyyMMdd");
-		Query query = this.sessionfactory.getCurrentSession().createQuery("from RecommendActivity a, Album b where (:today  between a.startDate and a.endDate) and ");
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("from RecommendActivity a where (:today  between a.startDate and a.endDate) and (a.albumSet.hidden is empty) and (a.albumSet.dropDate is null) and (a.albumSet.creator.memberStatus.statusName = :memberStatus)");
+		//Query query = this.sessionfactory.getCurrentSession().createQuery("from RecommendActivity a join a.albumSet b where (:today  between a.startDate and a.endDate) and (a.status = :status) and (b.hidden is empty) and (b.dropDate is null) and (b.creator.memberStatus.statusName = :memberStatus)");
 		query.setString("today", today);
+		query.setString("memberStatus", "1");       //1: 會員狀態為正常 
+		query.setString("status", "1");       //1: 專輯條件為公開
+		
 		List<RecommendActivity> resultList=query.list();
 		if(resultList==null||resultList.isEmpty()){
 			return new Album[0];
@@ -297,70 +317,126 @@ public class MusicServiceImpl implements MusicService{
     }
     
     /**
-     * 查詢音樂
-     * @param songID 歌曲編號
+     * 查詢音樂  (音樂管理-編輯專輯的第二個頁面)
+     * @param albumID 歌曲編號
      */
-    public ArrayList queryMusic (long songID){
-    	Album album = new Album();
-    	Song[] s = {};
+    public Album queryMusic (long albumID){
     	
-    	ArrayList list = new ArrayList();
-    	list.add(album);
-    	list.add(s);
-    	return list;
+    	Album album = this.albumDAO.find(albumID);
+    	/*
+    	System.out.println("albumName=="+album.getName());
+    	Song[] c2 = new Song[album.getSongSet().size()];
+		int w = 0;
+		//int j = 0;
+		for (Song c3:album.getSongSet()) {
+			c2[w]=c3;
+			System.out.println("aaaaa");
+			System.out.println("ID==>"+c2[w].getId());
+			System.out.println("s==>"+c2[w].getName());
+			w++;
+		}*/
+    	
+    	return album;
     }
     
     /**
-     * 查詢專輯
+     * 查詢專輯 (音樂管理-編輯專輯的編輯專輯資訊)
      * @param albumID 專輯編號
      */
     public Album queryAlbum (long albumID){
-    	Album a = new Album();
-    	return a;
+    	
+    	Album album = this.albumDAO.find(albumID);
+    	
+    	return album;
     }
     
     /**
-     * 更新專輯
+     * 更新專輯    (更新失敗)
      * @param album 專輯的bean
      */
-    public void updateAlbum (Album album){
+    public void updateAlbum (long albumID, String albumType,String name,String date,String brand,String musicCategory,String tag,String cover,String cover2,String introduction,String status){
+        	
+    	Album album = this.albumDAO.find(albumID);
+    	album.setType(albumType);
+    	album.setName(name);
+    	album.setModifyDate(date);
+    	album.setBrand(brand);    	
+    	MusicCategory mc = this.musicCategoryDAO.find(album.getMusicCategory().getId());
+    	mc.setName(musicCategory);
+    	album.setMusicCategory(mc);
+    	album.setTag(tag);
+    	if(cover.equals("")){
+    	album.setCover(cover2);
+    	}else{
+    		album.setCover(cover);
+    	}
+    	album.setIntroduction(introduction);
+    	album.setStatus(status);
     	
+    	this.albumDAO.update(album);
     }
     
     /**
      * 查詢歌曲
      * @param songID 歌曲編號
      */
-    public Song querySong (long songID){
-    	Song s = new Song();
-    	return s;
+    public Song querySong(long songID){
+    	
+    	Song song = this.songDAO.find(songID);
+    	
+    	System.out.println("songName=="+song.getName());
+    	
+    	return song;
     }
     
     /**
-     * 更新歌曲
+     * 更新歌曲       (更新失敗)
      * @param song 歌曲的bean
      */
-    public void updateSong (Song song){
+    public void updateSong(long songID, String songName, String musicType, String MOPEND, String status, String price, String price2, String discount, String tag, String lyrics, String lyricist, String composer, String producer){
+    	
+    	Song song = this.songDAO.find(songID);
+    	song.setName(songName);
+    	MusicCategory mc = this.musicCategoryDAO.find(song.getMusicCategory().getId());
+    	mc.setName(musicType);
+    	song.setMusicCategory(mc);
+    	song.setModifyDate(MOPEND);
+    	song.setSeconds(status);
+    	SongPrice sp = this.songPriceDAO.find(song.getSongPrice().getId());
+    	if(price2.equals("")){
+    		sp.setDiscountPrice(discount);
+    	}
+    	song.setSongPrice(sp);
+    	song.setTag(tag);
+    	song.setLyrics(lyrics);
+    	song.setLyricist(lyricist);
+    	song.setComposer(composer);
+    	song.setProducer(producer);
+    	
+    	this.songDAO.update(song);
     	
     }
     
     /**
-     * 刪除歌曲
+     * 刪除歌曲       (刪除失敗)
      * @param songID 歌曲編號
      */
-    public void deleteSong (long songID){
+    public void deleteSong(long songID){
+    	
+    	this.songDAO.delete(songID);
     	
     }
     
     //瀏覽所有歌曲
     /**
-     * 查詢所有專輯
+     * 查詢所有專輯 (音樂管理-編輯專輯的第一個頁面)
      * @param creatorID 創作人編號
      */
     public Album[] queryOwnAlbums (long creatorID){
     	
-    	Query query = this.sessionfactory.getCurrentSession().createQuery("from Album where creator.id = :creatorId and dropDate is null ORDER BY createDate DESC");
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("from Album a where (a.creator.id = :creatorId) and (a.dropDate is null) and (a.status = :status) and (a.hidden is empty) and (a.status = :status) ORDER BY createDate DESC");
     	query.setLong("creatorId", creatorID);
+		query.setString("status", "1");       //1: 專輯條件為公開
     	
     	List<Album> albumList = (List<Album>)query.list();
     	Album[] albumList2 = new Album[albumList.size()];
@@ -383,63 +459,7 @@ public class MusicServiceImpl implements MusicService{
      * @param keyword 關鍵字
      */
     public ArrayList queryKeyword (String keyword){
-    	Session session = sessionfactory.getCurrentSession();
     	
-    	//Keyword[] k = this.keywordDAO.findAll();
-    	
-    	/*
-		Query query = session.createQuery("from Keyword ");
-		
-		List<Keyword> k = (List<Keyword>)query.list();
-		Keyword[] k2 = new Keyword[k.size()];
-		int i = 0;
-		System.out.println("ssss==>");
-		for (Keyword k3:k) {
-			k2[i]=k3;
-			System.out.println("ssss==>"+k2[i].getName());
-			i++;
-		}
-		
-		
-		
-		Query query2 = session.createQuery("from Album");
-		
-		List<Album> a = (List<Album>)query2.list();
-		Album[] a2 = new Album[a.size()];
-		int j = 0;
-		System.out.println("ssss==>");
-		for (Album a3:a) {
-			a2[j]=a3;
-			System.out.println("ssss==>"+a2[j].getName());
-			j++;
-		}
-		
-		
-		Query query3 = session.createQuery("from Song");
-		
-		List<Song> s = (List<Song>)query3.list();
-		Song[] s2 = new Song[s.size()];
-		int z = 0;
-		System.out.println("ssss==>");
-		for (Song s3:s) {
-			s2[z]=s3;
-			System.out.println("ssss==>"+s2[z].getName());
-			z++;
-		}
-		
-		
-		Query query4 = session.createQuery("from Creator");
-		
-		List<Creator> c = (List<Creator>)query4.list();
-		Creator[] c2 = new Creator[c.size()];
-		int w = 0;
-		System.out.println("ssss==>");
-		for (Creator c3:c) {
-			c2[w]=c3;
-			System.out.println("ssss==>"+c2[w].getUserName());
-			w++;
-		}
-    	*/
     	ArrayList list = new ArrayList();
     	//list.add(k);
 //    	list.add(a2);
@@ -678,7 +698,7 @@ public class MusicServiceImpl implements MusicService{
     }
     
     /**
-     * 試聽
+     * 試聽      (怪怪的，好像少了檔案路徑)
      * @param songID 歌曲編號
      */
     public Song listenSong (long songID){
