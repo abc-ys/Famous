@@ -15,14 +15,14 @@
 <table>
 <td Width="140" Height="35" align="center" rowspan="4"><img alt="" src="${album.cover}"></td>
 <td>音樂類型:&nbsp${album.musicCategory.name}</td><tr>
-<td>${album.date}</td><tr>
-<c:if test="${album.status == '公開'}">
+<td>${album.createDate}</td><tr>
+<c:if test="${album.status == '1'}">
 <td>狀態:&nbsp公開&nbsp<a href="javascript:changeState('隱藏')">隱藏</a></td><tr>
 </c:if>
-<c:if test="${album.status == '隱藏'}">
+<c:if test="${album.status == '2'}">
 <td>狀態:&nbsp<a href="javascript:changeState('公開')">公開</a>&nbsp隱藏</td><tr>
 </c:if>
-<td><input type="button" value="編輯專輯資訊" onclick="editAlbumInfo('${album.albumID}')"/>&nbsp
+<td><input type="button" value="編輯專輯資訊" onclick="editAlbumInfo('${album.id}','${creatorId}')"/>&nbsp
 <input type="button" value="新增歌曲" onclick="addSong()"/></td>
 </table><p>
 <table border="1" BorderColor="#000000" cellpadding="0" cellspacing="0">
@@ -34,20 +34,20 @@
 	
 <c:forEach var="hm" items="${album.songSet}"  varStatus="status">
 <td Height="35"><font size="2">${status.index+1}</font></td>
-<td><font size="2"><INPUT type=checkbox name=interst value="${hm.songID}"></font></td>
+<td><font size="2"><INPUT type=checkbox name=interst value="${hm.id}"></font></td>
 <td><font size="2">${hm.name}</font></td>
 <td><font size="2"><a href="javascript:void(0)"><img alt="" src="${pageContext.request.contextPath}/images/title_01.gif"><br></a></font></td>	
-<td><font size="2"><a href="javascript:editSongData('${hm.songID}')">編輯</a></font></td><tr>
+<td><font size="2"><a href="javascript:editSongData('${hm.id}','${creatorId}')">編輯</a></font></td><tr>
 </c:forEach>
-<td Width="140" Height="35" colspan="5"><input type="submit" value="刪除" onclick="deleteData('${hm.songID}')"/></td>
+<td Width="140" Height="35" colspan="5"><input type="submit" value="刪除" onclick="deleteData('${hm.id}')"/></td>
 </table>
 提示:上下拖曳歌曲，即可調整曲序，調整完後請按儲存。<p>
-<input type="submit" value="儲存" onclick="saveData('${album.albumID}')"/>
+<input type="button" value="儲存" onclick="saveData('${album.id}','${creatorId}')"/>
 </form>
 </body>
 <script>
-function saveData(albumID){
-	document.fm.action="${pageContext.request.contextPath}/saveAlbumData.do?albumID="+albumID;
+function saveData(albumID,creatorId){
+	document.fm.action="${pageContext.request.contextPath}/saveAlbumData.do?albumID="+albumID+"&creatorId="+creatorId;
     document.fm.submit();
 }
 function deleteData(){
@@ -66,11 +66,11 @@ function changeState(state){
 }
 function addSong(){
 }
-function editSongData(songID){
-	window.open("${pageContext.request.contextPath}/editSongData.do?songID="+songID);
+function editSongData(songID,creatorId){
+	window.open("${pageContext.request.contextPath}/editSongData.do?songID="+songID+"&creatorId="+creatorId);
 }
-function editAlbumInfo(albumID){
-	document.fm.action="${pageContext.request.contextPath}/editAlbumData.do?albumID="+albumID;
+function editAlbumInfo(albumID,creatorId){
+	document.fm.action="${pageContext.request.contextPath}/editAlbumData.do?albumID="+albumID+"&creatorId="+creatorId;
 	document.fm.submit();
 }
 </script>
