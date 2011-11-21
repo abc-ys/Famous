@@ -13,7 +13,7 @@ pageEncoding="UTF-8"%>
 <body>
 <table width="1000" border="1" cellspacing="2" align=center rules="none"> 
 	<td height="270" width="200">
-		<img alt="" src=${creator.picture} width="200"　height="100" >
+		<img alt="" src="${creator.picture}" width="200"　height="100" >
 	</td>
 	<td width="300">
 		<form name="form">	
@@ -38,7 +38,7 @@ pageEncoding="UTF-8"%>
 		</form>
 	</td>
 	<td width="250">
-		<h3>最新專輯</h3><br>		
+		<h3>最新專輯</h3><br>	
 		 <gsimedia:albumTable listName="newAlbum"></gsimedia:albumTable>
  	</td>
 	<tr><tr>
@@ -55,13 +55,13 @@ pageEncoding="UTF-8"%>
  	<td colspan=3 rowspan=2 height="1000" width="740"> 		
 	 	<div id="creatorAllAlbums">
 	 		 <br>
-	 		 <iframe name="creatorAllAlbums" src="creatorAllAlbums.do?creatorID=${creator.memberId}" height="1000" width="740" frameborder="0"></iframe> 
+	 		 <iframe name="creatorAllAlbums" src="creatorAllAlbums.do?creatorID=${creator.id}" height="1000" width="740" frameborder="0"></iframe> 
 	 	</div>	
 	 	<div id="creatorNewActivity" style="display:none">
-	 		<iframe name="creatorNewActivity" src="creatorNewActivity.do?creatorID=${creator.memberId}" height="1000" width="740" frameborder="0"></iframe> 
+	 		<iframe name="creatorNewActivity" src="creatorNewActivity.do?creatorID=${creator.id}" height="1000" width="740" frameborder="0"></iframe> 
 	 	</div>	
 	 	<div id="creatorAllFriendsFans" style="display:none">
-	 		<iframe name="creatorAllFriendsFans" src="creatorAllFriendsFans.do?creatorID=${creator.memberId}" height="1000" width="740" frameborder="0"></iframe> 
+	 		<iframe name="creatorAllFriendsFans" src="creatorAllFriendsFans.do?creatorID=${creator.id}" height="1000" width="740" frameborder="0"></iframe> 
 	 	</div>		
  	</td>
 	<td width="250">
