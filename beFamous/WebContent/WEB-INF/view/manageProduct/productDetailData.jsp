@@ -12,29 +12,53 @@
 <br>
 詳細商品資料
 <p>
-<input type="hidden" name="id" value="${productionCategory.productionCategoryRid}">
-商品編號:&nbsp ${productionCategory.productionCategoryRid}<p>
-商品名稱:&nbsp<input type="text" size="10" name="name" value="${productionCategory.productionCategoryName}"><p>
-商品類別:&nbsp<input type="text" size="10" name="category" value="${productionCategory.productionCategoryName}"><p>
-交易方式:&nbsp
-<INPUT type=radio name=dealMethod value="現金">現金
-<INPUT type=radio name=dealMethod value="GSiMoney">GSiMoney
+<input type="hidden" name="productId" value="${production[0].pid}">
+商品編號:&nbsp; ${production[0].pid}<p>
+商品名稱:&nbsp;<input type="text" size="10" name="productName" value="${production[0].name}"><p>
+商品類別:&nbsp;
+<select name="newProductionClassificationId">
+	<c:forEach var="hm" items="${production[1]}">
+		<option value="${hm.id}">${hm.name}</option> 
+	</c:forEach>
+</select><p>
+交易方式:&nbsp;
+<c:if test="${empty production[0].transactionType}">
+	<INPUT type=radio name=transactionType value="1">現金
+	<INPUT type=radio name=transactionType value="2">GSiMoney
+</c:if>
+<c:if test="${production[0].transactionType==1}">
+	<INPUT type=radio name=transactionType value="1" checked>現金
+	<INPUT type=radio name=transactionType value="2">GSiMoney
+</c:if>
+<c:if test="${production[0].transactionType==2}">
+	<INPUT type=radio name=transactionType value="1">現金
+	<INPUT type=radio name=transactionType value="2" checked>GSiMoney
+</c:if>
 <p>
 商品價錢:<br>
-售價:&nbsp<input type="text" size="5" name="price" value="${productionCategory.sdCard.sdCardPrice.pPrice}">元&nbsp&nbsp&nbsp
-特惠價:&nbsp售價x<input type="text" size="5" name="price2" value="">&nbsp&nbsp&nbsp
-Bonus購買額:&nbsp<input type="text" size="5" name="price3" value="${productionCategory.sdCard.sdCardPrice.discountPrice}">元+&nbsp<input type="text" size="5" name="bonus" value="${productionCategory.sdCard.sdCardPrice.discountBonus}">點
+售價:&nbsp;<input type="text" size="5" name="realPrice" value="${production[0].sdCardPrice.price}">元&nbsp;&nbsp;&nbsp;
+特惠價:&nbsp;售價x<input type="text" size="5" name="specialPrice" value="">&nbsp;&nbsp;&nbsp;
+Bonus購買額:&nbsp;<input type="text" size="5" name="discountPrice" value="${production[0].sdCardPrice.discountPrice}">元+&nbsp;<input type="text" size="5" name="discountBonus" value="${production[0].sdCardPrice.discountBonus}">點
 <p>
-贈送bonus:&nbsp付款金額x<input type="text" size="5" name="price4" value="${productionCategory.sdCard.reward}"><p>
-商品庫存:&nbsp<input type="text" size="5" name="amount" value="${productionCategory.sdCard.amount}"><p>
-上架:&nbsp
-<INPUT type=radio name=onSale value="上架" checked>是
-<INPUT type=radio name=onSale value="下架">否<p>
-商品關鍵字:&nbsp<input type="text" size="20" name="keyword" value="${productionCategory.sdCard.keyWord}"><p>
-商品簡介:&nbsp<textarea cols=60 rows=6 name=msg>${productionCategory.sdCard.introduction}</textarea><p>
-
+贈送bonus:&nbsp;付款金額x<input type="text" size="5" name="giveBonus" value=""><p>
+商品庫存:&nbsp;<input type="text" size="5" name="stock" value="${production[0].amount}"><p>
+上架:&nbsp;
+<c:if test="${empty production[0].status}">
+	<INPUT type=radio name=status value="上架">是
+	<INPUT type=radio name=status value="下架">否<p>
+</c:if>
+<c:if test="${production[0].status==1}">
+	<INPUT type=radio name=status value="上架" checked>是
+	<INPUT type=radio name=status value="下架">否<p>
+</c:if>
+<c:if test="${production[0].status==2}">
+	<INPUT type=radio name=status value="上架">是
+	<INPUT type=radio name=status value="下架" checked>否<p>
+</c:if>
+商品關鍵字:&nbsp;<input type="text" size="20" name="keyword" value="${production[0].keyWord}"><p>
+商品簡介:&nbsp;<textarea cols=60 rows=6 name=memo>${production[0].introduction}</textarea><p>
+<input type="hidden" name="productionClassificationId" value="${production[0].productionClassification.id}">
 <center><input type="submit" value="儲存修改" onclick="saveData()"/></center>
-
 </form>
 </body>
 <script>

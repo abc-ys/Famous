@@ -3,6 +3,7 @@ package com.ubn.befamous.service.impl;
 import java.io.File;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -131,7 +132,7 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList addShoppingCart(Long userId, Long productId, String amount) {
+	public ArrayList addShoppingCart(long userId, long productId, String amount) {
 		
 		Member member = this.memberDAO.find(userId);	
 		ProductionCategory productionCategory = this.productionCategoryDAO.find(productId);
@@ -157,7 +158,7 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList purchaseConfirmShoppingCart(Long userId, ShoppingCart shoppingCart) {
+	public ArrayList purchaseConfirmShoppingCart(long userId, ShoppingCart shoppingCart) {
 		Member member = this.memberDAO.find(userId);		
 		ArrayList list = new ArrayList();
 		list.add(member);
@@ -167,7 +168,7 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	}
 	//實體幣-購物車變為訂單。
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Order addOrder(Long shoppingCartId) {
+	public Order addOrder(long shoppingCartId) {
 		
 		
 		return null;
@@ -175,7 +176,7 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 
 	//購買專輯或歌曲
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ShoppingCartDetail[] queryShoppingCart(Long userId) {
+	public ShoppingCartDetail[] queryShoppingCart(long userId) {
 		
 		Query query = this.sessionFactory.getCurrentSession().createQuery("from ShoppingCart s where s.member.id =:v1 order by s.id desc");
 		query.setParameter("v1", userId);
@@ -191,21 +192,21 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ShoppingCartDetail[] deleteShoppingCart(Long userId, Long transactionId) {
+	public ShoppingCartDetail[] deleteShoppingCart(long userId, long transactionId) {
 		this.shoppingCartDetailDAO.delete(transactionId);
 		ShoppingCartDetail[] shoppingCartDetail = this.queryShoppingCart(userId); 		 
 		return shoppingCartDetail;
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ShoppingCartDetail[] forwardPurchase(Long userId) {
+	public ShoppingCartDetail[] forwardPurchase(long userId) {
 		ShoppingCartDetail[] shoppingCartDetail = this.queryShoppingCart(userId); 		 
 		return shoppingCartDetail;
 	}
 
 	//確認購買，轉成訂單!
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void purchaseConfirm(Long shoppingCartId, String gsiMoney, String gsiBonus) {
+	public void purchaseConfirm(long shoppingCartId, String gsiMoney, String gsiBonus) {
 		
 		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
 		
@@ -253,72 +254,72 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 
 	//訂單管理-實體幣訂單
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Order[] queryCashTransRcd(String userEmail, Long transactionId,
+	public Order[] queryCashTransRcd(String userEmail, long transactionId,
 			String startDate, String endDate, String orderStatus) {
 	
 		return null;
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList queryCashTransDetail(Long transactionId) {
+	public ArrayList queryCashTransDetail(long transactionId) {
 		
 		return null;
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public boolean saveCashTransRcd(Long transactionId, String billStatus,
+	public boolean saveCashTransRcd(long transactionId, String billStatus,
 			String payStatus, String processStatus, String memo1, String memo2) {
 	
 		return false;
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Order queryDeliveryRcd(Long transactionId) {
+	public Order queryDeliveryRcd(long transactionId) {
 		
 		return null;
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList updateDeliveryRcd(Long transactionId, String deliveryDate,
+	public ArrayList updateDeliveryRcd(long transactionId, String deliveryDate,
 			String deliveryNo, String billNo) {
 		
 		return null;
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList returnGoods(Long transactionId) {
+	public ArrayList returnGoods(long transactionId) {
 		
 		return null;
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList cancelOrder(Long transactionId) {
+	public ArrayList cancelOrder(long transactionId) {
 		
 		return null;
 	}
 
 	//訂單管理-虛擬幣訂單
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Order[] queryInventTransRcd(String userEmail, Long transactionId,
+	public Order[] queryInventTransRcd(String userEmail, long transactionId,
 			String startDate, String endDate, String orderStatus) {
 	
 		return null;
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public OrderDetail queryInventTransDetail(Long transactionId) {
+	public OrderDetail queryInventTransDetail(long transactionId) {
 		
 		return null;
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Order queryInventMemo(Long transactionId) {
+	public Order queryInventMemo(long transactionId) {
 		
 		return null;
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public boolean updateInventMemo(Long transactionId, String memo1,
+	public boolean updateInventMemo(long transactionId, String memo1,
 			String memo2) {
 		
 		return false;
@@ -332,7 +333,7 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public GsiMoney queryExchangeDetail(Long gsiMoneyId) {
+	public GsiMoney queryExchangeDetail(long gsiMoneyId) {
 		
 		return null;
 	}
@@ -352,7 +353,7 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public OrderDetail queryBillDetail(Long transactionId) {
+	public OrderDetail queryBillDetail(long transactionId) {
 		
 		return null;
 	}
@@ -367,25 +368,25 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	
 	//GSiMoney&GSiBonus
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public GsiMoney queryGsiMoney(Long userId) {
+	public GsiMoney queryGsiMoney(long userId) {
 		
 		return null;
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList queryTransRcd(Long userId, String year, String month) {
+	public ArrayList queryTransRcd(long userId, String year, String month) {
 		
 		return null;
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public OrderDetail[] queryTransDetail(Long transactionId) {
+	public OrderDetail[] queryTransDetail(long transactionId) {
 	
 		return null;
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList applyChange(Long userId) {
+	public ArrayList applyChange(long userId) {
 		
 		return null;
 	}
@@ -397,43 +398,43 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public GsiMoney[] queryExchangeLog(Long userId, String year, String month) {
+	public GsiMoney[] queryExchangeLog(long userId, String year, String month) {
 	
 		return null;
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Order[] queryPrePaidRcd(Long userId, String year, String month) {
+	public Order[] queryPrePaidRcd(long userId, String year, String month) {
 		
 		return null;
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Order[] queryBuyLogRcd(Long userId, String year, String month) {
+	public Order[] queryBuyLogRcd(long userId, String year, String month) {
 		
 		return null;
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public OrderDetail[] queryBuyLogDetail(Long transactionId) {
+	public OrderDetail[] queryBuyLogDetail(long transactionId) {
 		
 		return null;
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList queryBonusDetail(Long userId) {
+	public ArrayList queryBonusDetail(long userId) {
 	
 		return null;
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Order[] queryCashRcd(Long userId, String status, Long transactionId) {
+	public Order[] queryCashRcd(long userId, String status, long transactionId) {
 	
 		return null;
 	}
 
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public OrderDetail[] queryCashRcdDetail(Long transactionId) {
+	public OrderDetail[] queryCashRcdDetail(long transactionId) {
 	
 		return null;
 	}
@@ -446,7 +447,7 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	/**
 	 * 新增檢舉介面*/
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList queryOffenseCategory(Long productionCategoryId) {
+	public ArrayList queryOffenseCategory(long productionCategoryId) {
 		OffenseType[] offenseType = this.offenseTypeDAO.findAll();		
 		ArrayList list = new ArrayList();		
 		list.add(offenseType);
@@ -457,7 +458,7 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	/**
 	 * 儲存檢舉內容*/
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void addOffense(Long userId, Long productionCategoryId, long offenseTypeId,
+	public void addOffense(long userId, long productionCategoryId, long offenseTypeId,
 			String reason) {	
 		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
 		Member member = this.memberDAO.find(userId);
@@ -506,7 +507,7 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	/**
 	 *更新專輯隱藏狀態 */
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList updateAlbumHide(Long adminId, Long albumId) {
+	public ArrayList updateAlbumHide(long adminId, long albumId) {
 		Album album = this.albumDAO.find(albumId);
 		Admin createUser = this.adminDAO.find(adminId);
 		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
@@ -528,7 +529,7 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	/**
 	 *更新歌曲隱藏狀態 */
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList updateSongHide(Long adminId, Long songId) {
+	public ArrayList updateSongHide(long adminId, long songId) {
 	
 		Song song = this.songDAO.find(songId);
 		Admin createUser = this.adminDAO.find(adminId);
@@ -551,7 +552,7 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	/**
 	 *查詢檢舉理由 */
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Offense[] queryOffenseReason(Long productionCategoryId) {
+	public Offense[] queryOffenseReason(long productionCategoryId) {
 		Offense[] offenseList;
 		Set<Offense> offenseSet = new HashSet();
 		Query query = this.sessionFactory.getCurrentSession().createQuery("from ProductionCategory p where p.id =:v1");
@@ -627,7 +628,7 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	/**
 	 *取消專輯隱藏狀態 */
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void canceAlbumHide(Long adminId, Long albumId) {
+	public void canceAlbumHide(long adminId, long albumId) {
 	
 		Album album = this.albumDAO.find(albumId);
 		Admin modifier = this.adminDAO.find(adminId);
@@ -646,7 +647,7 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	/**
 	 *取消歌曲隱藏狀態 */
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void canceSonglHide(Long adminId, Long songId) {
+	public void canceSonglHide(long adminId, long songId) {
 	
 		Song song = this.songDAO.find(songId);
 		Admin modifier = this.adminDAO.find(adminId);
@@ -685,7 +686,7 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	/**
 	 *查詢會員檢舉清單 */
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Offense[] queryOffenseByUser(Long userId) {
+	public Offense[] queryOffenseByUser(long userId) {
 		Query query = this.sessionFactory.getCurrentSession().createQuery("from Offense o where o.member.id = :userId");
 		query.setParameter("userId", userId);
 		List<Offense> offenseSet = (List<Offense>)query.list();
@@ -696,7 +697,7 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	/**
 	 *更新檢舉狀態(不正當檢舉) */
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void updateIncorrectOffense(Long adminId, Long offenseId) {
+	public void updateIncorrectOffense(long adminId, long offenseId) {
 		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
 		Offense offense = this.offenseDAO.find(offenseId);
 		offense.setModifier(String.valueOf(adminId));
@@ -737,7 +738,7 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	/**
 	 *編輯商品類別 */
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void editProductionClassification(Long productionClassificationId,
+	public void editProductionClassification(long productionClassificationId,
 			String productionClassificationName) {
 		
 		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
@@ -752,7 +753,7 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	/**
 	 *刪除商品類別 */
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ProductionClassification[] deleteProductionClassification(Long productionClassificationId) {
+	public ProductionClassification[] deleteProductionClassification(long productionClassificationId) {
 		
 		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
 		
@@ -763,14 +764,31 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 		ProductionClassification[] pClassificationList= this.queryProductionClassification();
 		return pClassificationList;
 	}
+	
+	/**
+	 *查詢商品*/
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public ArrayList queryProduct() {
+		
+		ProductionClassification[] proClassList = this.productionClassificationDAO.findAll();
+		ArrayList list = new ArrayList();
+		List emptyList = new ArrayList();		
+		list.add(proClassList);
+		list.add(emptyList);
+		return  list;
+	}
+
 
 	/**
 	 *查詢商品資訊 */
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList queryProductInfo(Long productionClassificationId) {
+	public ArrayList queryProductInfo(long productionClassificationId) {
 		
 		ArrayList list = new ArrayList();
 		String type="";
+		
+		ProductionClassification[] proClassList = this.productionClassificationDAO.findAll();
+		list.add(proClassList);
 		
 		Query query = this.sessionFactory.getCurrentSession().createQuery("from SDCard sd where sd.productionClassification.id = :productionClassificationId");
 		query.setParameter("productionClassificationId", productionClassificationId);
@@ -780,13 +798,13 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 			Query query2 = this.sessionFactory.getCurrentSession().createQuery("from PrePaid p where p.productionClassification.id = :productionClassificationId");
 			query2.setParameter("productionClassificationId", productionClassificationId);
 			List<PrePaid> prePaidList = (List<PrePaid>)query2.list();
-			list.add(type);
 			list.add(prePaidList);
+			list.add(type);
 		}else{
 			type = "SDCard";
 			List<SDCard> sdCardList= (List<SDCard>)query.list();
-			list.add(type);
 			list.add(sdCardList);
+			list.add(type);
 			
 		}
 		return list;
@@ -799,72 +817,140 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	 * condition為選擇的條件(1:定價 2:贈送點數)
 	 * @return */
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList updateProductBatch(Long productionClassificationId, String condition, double rate) {
+	public void updateProductBatch(long productionClassificationId, String condition, double rate) {
 		int sdPrice = 0;
 		int sdReward = 0;
 		int prePaidPrice = 0;
 		int prePaidReward = 0 ;
 		String finalPrice="";
 		String finalReward="";
-		BigDecimal result;
 		ArrayList list = this.queryProductInfo(productionClassificationId);
-		if(list.get(0).equals("SDCard")){ //代表list為List<SDCard>
+		
+		if(list.get(2).equals("SDCard")){ 
 			List<SDCard> sdCardList= (List<SDCard>) list.get(1);
 			if(condition.equals("1")){
-				for (SDCard s:sdCardList) {
+				for (SDCard s:sdCardList) {					
 					sdPrice = Integer.valueOf(s.getSdCardPrice().getPrice());
-					finalPrice = String.valueOf(sdPrice*rate);
+					System.out.println(sdPrice);
+					BigDecimal temp = new BigDecimal(sdPrice*rate);
+					finalPrice = String.valueOf(temp.setScale(0, RoundingMode.HALF_UP));
 					s.getSdCardPrice().setPrice(finalPrice);
-					this.sdCardDAO.save(s);
+					this.sdCardDAO.update(s);
 				}
 			}else if(condition.equals("2")){
 				for (SDCard s:sdCardList) {
 					sdReward = Integer.valueOf(s.getReward());
-					System.out.println("	sdReward="+s.getReward());
-					finalReward = String.valueOf(sdReward*rate);
+					BigDecimal temp = new BigDecimal(sdReward*rate);
+					finalReward = String.valueOf(temp.setScale(0, RoundingMode.HALF_UP));
 					s.setReward(finalReward);
-					this.sdCardDAO.save(s);
+					this.sdCardDAO.update(s);
 				}
 			}
-		}else if(list.get(0).equals("PrePaid")){	//代表list為List<PrePaid>
+		}else if(list.get(2).equals("PrePaid")){	//代表list為List<PrePaid>
 			List<PrePaid> prePaidList= (List<PrePaid>) list.get(1);
 			if(condition.equals("1")){
 				for (PrePaid s:prePaidList) {
 					prePaidPrice = Integer.valueOf(s.getPrePaidPrice().getPrice());
 					
-					//finalPrice = String.valueOf(result.valueOf(prePaidPrice*rate));
+					finalPrice = String.valueOf(prePaidPrice*rate);
 					s.getPrePaidPrice().setPrice(finalPrice);
-					this.prePaidDAO.save(s);
+					this.prePaidDAO.update(s);
 				}
 			}else if(condition.equals("2")){
 				for (PrePaid s:prePaidList) {
 					prePaidReward = Integer.valueOf(s.getReward());					
 					finalReward = String.valueOf(prePaidReward*rate);
 					s.setReward(finalReward);
-					this.prePaidDAO.save(s);
+					this.prePaidDAO.update(s);
 				}
 			}
 		}
-		return this.queryProductInfo(productionClassificationId);
 	}
 
 	/**
 	 *查詢商品細節 */
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ProductionClassification queryProductDetail(Long productId) {
-	
-		return null;
+	public ArrayList queryProductDetail(long productId) {
+		ArrayList list = new ArrayList();		
+		
+		Query query = this.sessionFactory.getCurrentSession().createQuery("FROM ProductionCategory p where p.pid = :productId");
+		query.setParameter("productId", productId);
+		Object product = query.uniqueResult();
+		if (product instanceof SDCard) {
+			SDCard sdCard = (SDCard)product;
+			list.add(sdCard);
+		}else{
+			PrePaid prePaid = (PrePaid)product;
+			list.add(prePaid);
+		}
+		
+		ProductionClassification[] proClassList = this.productionClassificationDAO.findAll();
+		list.add(proClassList);
+		
+		return list;
 	}
+
 
 	/**
-	 *更新商品資訊 */
+	 *更新商品資訊(查詢商品資訊頁) (修改者Modifier未加入)*/
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ProductionClassification[] updateProduct(Long productId,
-			String productName, String productionClassification, String realPrice,
-			String specialPrice, String giveBonus, String stock, String status,
-			String keyword, String memo) {
+	public long saveModify(long productId, String realPrice,
+			String specialPrice, String status, long productionClassificationId) {
+		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
 		
-		return null;
+		Query query = this.sessionFactory.getCurrentSession().createQuery("FROM ProductionCategory p where p.pid = :productId");
+		query.setParameter("productId", productId);
+		Object product = query.uniqueResult();
+		
+		if (product instanceof SDCard) {			
+			SDCard sdCard = (SDCard)product;
+			sdCard.setModifyDate(date);
+			sdCard.getSdCardPrice().setPrice(realPrice);			
+			sdCard.setStatus(status);
+			this.sdCardDAO.update(sdCard);	
+		}
+		return productionClassificationId;
 	}
-
+	
+	/**
+	 *更新商品資訊(查詢商品細節頁) (修改者Modifier未加入)*/
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public long updateProduct(long productId, String productName,
+			long newProductionClassificationId, String transactionType,
+			String realPrice, String specialPrice, String discountPrice, String discountBonus, String giveBonus,
+			String stock, String status, String keyword, String memo,
+			long productionClassificationId) {
+		
+		int rPrice = Integer.valueOf(realPrice);
+		double sRate = Double.valueOf(specialPrice);
+		String sPrice = "";
+		BigDecimal temp = new BigDecimal(rPrice*sRate);
+		sPrice = String.valueOf(temp.setScale(0, RoundingMode.HALF_UP));
+		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
+		ProductionClassification newProductionClassification = this.productionClassificationDAO.find(newProductionClassificationId);
+		Query query = this.sessionFactory.getCurrentSession().createQuery("FROM ProductionCategory p where p.pid = :productId");
+		query.setParameter("productId", productId);
+		Object product = query.uniqueResult();
+		
+		if (product instanceof SDCard) {			
+			SDCard sdCard = (SDCard)product;
+			sdCard.setModifyDate(date);
+			sdCard.setName(productName);
+			sdCard.setProductionClassification(newProductionClassification);
+			sdCard.setTransactionType(transactionType);
+			sdCard.getSdCardPrice().setPrice(realPrice);			
+			sdCard.getSdCardPrice().setSpecialPrice(sPrice);
+			sdCard.getSdCardPrice().setDiscountPrice(discountPrice);
+			sdCard.getSdCardPrice().setDiscountBonus(discountBonus);
+			sdCard.setReward(giveBonus);
+			sdCard.setAmount(stock);
+			sdCard.setStatus(status);
+			sdCard.setKeyWord(keyword);
+			sdCard.setIntroduction(memo);
+			this.sdCardDAO.update(sdCard);			
+		}else{			
+			
+		}		
+		return productionClassificationId;
+	}	
 }
