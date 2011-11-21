@@ -264,7 +264,7 @@ public class MusicServiceImpl implements MusicService{
     /**
      * 儲存專輯
      */
-    public long saveAlbum (long creatorId,String albumType, String albumName, String albumBrand, long musicCategory, String albumTag, String albumIntroduction, String albumStatus, String albumCover){
+    public long saveAlbum (long creatorId,String albumType, String albumName, String albumBrand, long musicCategory, String albumTag, String albumIntroduction, String albumStatus, String albumCover,String defaultCover){
     	//creatorId=1;
     	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");  //建立當天日期時間
     	
@@ -295,7 +295,11 @@ public class MusicServiceImpl implements MusicService{
     	album.setTag(albumTag);
     	album.setIntroduction(albumIntroduction);
     	album.setStatus(albumStatus);
+    	if(albumCover.equals(null)){
     	album.setCover(albumCover);
+    	}else{
+    		album.setCover(defaultCover);
+    	}
     	album.setCreateDate(datetime);
     	album.setCreator((Creator) member);
     	
@@ -362,6 +366,25 @@ public class MusicServiceImpl implements MusicService{
     	Album album = this.albumDAO.find(albumID);
     	
     	return album;
+    }
+    
+    /**
+     * 更新專輯的狀態
+     * @param state 專輯狀態
+     * @param albumID 專輯ID
+     * @param creatorId 創作人ID
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
+    public void changeAlbumStatus(String state,long albumID,long creatorId){
+        	
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");  //建立當天日期時間
+    	
+    	Album album = this.albumDAO.find(albumID);
+    	album.setStatus(state);
+    	album.setModifyDate(datetime);
+    	album.setModifier(String.valueOf(creatorId));
+    	
+    	this.albumDAO.update(album);
     }
     
     /**

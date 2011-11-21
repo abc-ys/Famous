@@ -3,6 +3,9 @@ package com.ubn.befamous.service;
 import java.io.File;
 import java.util.ArrayList;
 
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import com.ubn.befamous.entity.Album;
 import com.ubn.befamous.entity.Creator;
@@ -101,7 +104,7 @@ public interface MusicService {
      * 儲存專輯
      * @param album 專輯的bean
      */
-    public long saveAlbum (long creatorId,String albumType, String albumName, String albumBrand, long musicCategory, String albumTag, String albumIntroduction, String albumStatus, String albumCover);
+    public long saveAlbum (long creatorId,String albumType, String albumName, String albumBrand, long musicCategory, String albumTag, String albumIntroduction, String albumStatus, String albumCover, String defaultCover);
     
     /**
      * 儲存歌曲
@@ -127,6 +130,14 @@ public interface MusicService {
      * @param albumID 專輯編號
      */
     public Album queryAlbum (long albumID);
+    
+    /**
+     * 更新專輯的狀態
+     * @param state 專輯狀態
+     * @param albumID 專輯ID
+     * @param creatorId 創作人ID
+     */
+    public void changeAlbumStatus(String state,long albumID,long creatorId);
     
     /**
      * 更新專輯
