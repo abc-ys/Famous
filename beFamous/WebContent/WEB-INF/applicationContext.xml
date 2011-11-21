@@ -11,8 +11,7 @@
 	http://www.springframework.org/schema/tx/spring-tx-3.0.xsd"  default-autowire="byName" >
 
 	<context:property-placeholder location="classpath:jdbc.properties" />
-	
-    
+	    
 	<!-- 掃描所有的controller -->  
 	<context:component-scan base-package="com.ubn.befamous">
 		 <context:exclude-filter type="regex" expression="com.ubn.befamous.controller.*"/>  
@@ -27,6 +26,11 @@
 		<property name="password" value="${database.password}" />
 	</bean>
 
+	<bean id="hibernateTransactionManager"
+		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
@@ -76,6 +80,7 @@
 				<value>com.ubn.befamous.entity.SongPrice</value>
 				<value>com.ubn.befamous.entity.TransactionRcd</value>
 				<value>com.ubn.befamous.entity.WeekRanking</value>
+				<value>com.ubn.befamous.entity.InelegantKeyword</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
@@ -83,10 +88,11 @@
 				<prop key="hibernate.dialect">${hibernate.dialect}</prop>
 				<prop key="hibernate.show_sql">${hibernate.show_sql}</prop>	
 				<prop key="hibernate.hbm2ddl.auto">${hibernate.hbm2ddl.auto}</prop>
-				<!-- New 
+				<!-- New
 				<prop key="hibernate.cache.use_second_level_cache">true</prop>
 				<prop key="hibernate.cache.provider_class">org.hibernate.cache.EhCacheProvider</prop>
-				<prop key="hibernate.cache.use_query_cache">true</prop>-->
+				<prop key="hibernate.cache.use_query_cache">true</prop>
+				 -->
 				<!-- 
 				<prop key="hibernate.cache.use_query_cache">true</prop>
 				<prop key="hibernate.cache.use_second_level_cache">true</prop>   
@@ -96,35 +102,363 @@
 		</property>
 	</bean>
 
-	<bean id="hibernateTransactionManager"
-		class="org.springframework.orm.hibernate3.HibernateTransactionManager">
-		<property name="sessionFactory" ref="sessionFactory" />
-	</bean>
-	<!--<bean id="customerDAO" class="com.cht.yu.dao.impl.BaseDaoImpl">
+	<bean id="activityDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
 		<constructor-arg>
-			<value>com.cht.yu.bean.Customer</value>
+			<value>com.ubn.befamous.entity.Activity</value>
 		</constructor-arg>
 		<property name="sessionFactory">
 			<ref bean="sessionFactory" />
 		</property>
 	</bean>
-	
-	<bean id="albumDAO" class="com.cht.yu.dao.impl.BaseDaoImpl">
+	<bean id="adDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
 		<constructor-arg>
-			<value>com.cht.yu.bean.Album</value>
+			<value>com.ubn.befamous.entity.Ad</value>
 		</constructor-arg>
 		<property name="sessionFactory">
 			<ref bean="sessionFactory" />
 		</property>
 	</bean>
-	
-	<bean id="songDAO" class="com.cht.yu.dao.impl.BaseDaoImpl">
+	<bean id="adminDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
 		<constructor-arg>
-			<value>com.cht.yu.bean.Song</value>
+			<value>com.ubn.befamous.entity.Admin</value>
 		</constructor-arg>
 		<property name="sessionFactory">
 			<ref bean="sessionFactory" />
 		</property>
 	</bean>
-	-->
+	<bean id="adTypeDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.AdType</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="albumDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.Album</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="auditionDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.Audition</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="cpDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.CP</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="creatorDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.Creator</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="downloadListDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.DownloadList</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="fanDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.Fan</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="filthyKeywordDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.FilthyKeyword</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="friendDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.Friend</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="generalMemberDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.GeneralMember</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="gsiBonusDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.GsiBonus</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="gsiMoneyDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.GsiMoney</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean><bean id="hiddenDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.Hidden</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="hitDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.Hit</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="inelegantKeywordDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.InelegantKeyword</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="keywordDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.Keyword</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="likeCreatorDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.LikeCreator</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="memberDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.Member</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="memberStatusDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.MemberStatus</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="modifyDataDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.ModifyData</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="monthRankingDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.MonthRanking</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="musicCategoryDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.MusicCategory</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="newsDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.News</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="offenseDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.Offense</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="offenseTypeDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.OffenseType</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="orderDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.Order</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="orderDetailDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.OrderDetail</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="prePaidDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.PrePaid</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="prePaidPriceDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.PrePaidPrice</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="priceDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.Price</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="productionCategoryDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.ProductionCategory</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="promotionActivityDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.PromotionActivity</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="questionDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.Question</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="recommendActivityDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.RecommendActivity</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="sdCardDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.SDCard</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="sdCardPriceDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.SDCardPrice</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="shoppingCartDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.ShoppingCart</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="shoppingCartDetailDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.ShoppingCartDetail</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="songDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.Song</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="songPriceDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.SongPrice</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="transactionRcdDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.TransactionRcd</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="weekRankingDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.WeekRanking</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
 	</beans>
