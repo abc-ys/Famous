@@ -12,7 +12,8 @@
 類別名稱編輯
 <p>
 <font size="2">&nbsp名稱:</font>&nbsp
-<input type="text" name="modifyName" size="15" value="" >
+<input type="text" name="productionClassificationName" size="15" >
+<input type="hidden" name="productionClassificationId" size="15" value="${productionClassificationId}" >
 <input type="submit" value="修改" onclick="add()"/>
 </form>
 </body>

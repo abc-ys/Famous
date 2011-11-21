@@ -13,7 +13,7 @@
 商品類別管理
 <p>
 <font size="2">&nbsp新增商品類別:</font>&nbsp
-<input type="text" name="categoryName" size="15">
+<input type="text" name="productionClassificationName" size="15">
 <input type="submit" value="新增" onclick="add()"/>
 <p>
 <table border="1" BorderColor="#000000" cellpadding="0" cellspacing="0">
@@ -23,12 +23,12 @@
 	<td valign="top" Width="50"><font size="2">編輯</font></td>
 	<td valign="top" Width="50"><font size="2">刪除</font></td></tr>
 	
-	<c:forEach var="pc" items="${productionCategory}" varStatus="status">
+	<c:forEach var="pc" items="${productionClassification}" varStatus="status">
 <tr><td Height="30" valign="top"><font size="2">${status.index+1}</font></td>
-	<td valign="top"><font size="2">${pc.productionCategoryName}</font></td>
+	<td valign="top"><font size="2">${pc.name}</font></td>
 	<td valign="top"><font size="2"><a href="javascript:void(0)">子目錄</a></font></td>
-	<td valign="top"><font size="2"><a href="javascript:void(0)" onclick="edit()">編輯</a></font></td>
-	<td valign="top"><font size="2"><a href="javascript:void(0)" onclick="deleteCategory()">刪除</a></font></td></tr>
+	<td valign="top"><font size="2"><a href="javascript:void(0)" onclick="edit(${pc.id})">編輯</a></font></td>
+	<td valign="top"><font size="2"><a href="javascript:void(0)" onclick="deleteCategory(${pc.id})">刪除</a></font></td></tr>
 	</c:forEach>
 </table>
 </form>
@@ -38,11 +38,11 @@ function add(){
      document.fm.action="${pageContext.request.contextPath}/addProductCategory.do";
      document.fm.submit();
 }
-function edit(){
-	window.open("${pageContext.request.contextPath}/editProductCategory.do","parent","height=120,width=300,location=no,scrollbars=no,toolbar=no,directories=no,menubar=no,directories=no");
+function edit(productionClassificationId){
+	window.open("${pageContext.request.contextPath}/editProductCategory.do?productionClassificationId="+productionClassificationId,"parent","height=120,width=300,location=no,scrollbars=no,toolbar=no,directories=no,menubar=no,directories=no");
 }
-function deleteCategory(){
-	document.fm.action="${pageContext.request.contextPath}/deleteProductCategory.do";
+function deleteCategory(productionClassificationId){
+	document.fm.action="${pageContext.request.contextPath}/deleteProductCategory.do?productionClassificationId="+productionClassificationId;
     document.fm.submit();
 }
 </script>
