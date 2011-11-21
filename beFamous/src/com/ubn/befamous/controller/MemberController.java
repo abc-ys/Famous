@@ -2,13 +2,17 @@ package com.ubn.befamous.controller;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,19 +31,27 @@ import com.ubn.befamous.entity.GsiMoney;
 import com.ubn.befamous.entity.Member;
 import com.ubn.befamous.entity.MemberStatus;
 import com.ubn.befamous.entity.ModifyData;
+import com.ubn.befamous.entity.Order;
+import com.ubn.befamous.entity.OrderDetail;
+import com.ubn.befamous.entity.ProductionCategory;
 import com.ubn.befamous.entity.Song;
+import com.ubn.befamous.entity.SongPrice;
+import com.ubn.befamous.service.PersonService;
 
 @Controller
 @SessionAttributes
 public class MemberController {
 	
+	@Autowired
+	private PersonService personService;
+	
 	//創作人頁面
 	@RequestMapping("/creatorProfile")
 	public ModelAndView creatorProfile(String creatorID,Model model) {
 		System.out.println("creatorProfile---"+creatorID);
-	
-		Creator creator = new Creator();
-		creator.setMemberId(111);
+		ArrayList list = personService.queryCreatorData(Long.parseLong(creatorID));
+		/*Creator creator = new Creator();
+		creator.setId(111);
 		creator.setPicture("images/lucy.jpg");
 		creator.setUserName("劉為駿");
 		creator.setLocation("台灣");
@@ -50,15 +62,18 @@ public class MemberController {
 		creator.setIntroduction("我是kevin，我長得像小夫!");
 		
 		Album newAlbum = new Album();
-		newAlbum.setAlbumID(111);
+		newAlbum.setId(111);
 		newAlbum.setCover("image/image001.png");	
 		newAlbum.setName("aaa");
 		newAlbum.setCreator(creator);
-		newAlbum.setDate("2011.10.25");
+		newAlbum.setCreateDate("2011.10.25");
 		
 		Album[] albums={newAlbum};		
 		model.addAttribute("creator", creator);
 		model.addAttribute("newAlbum", albums);
+		*/
+		model.addAttribute("creator", list.get(0));
+		model.addAttribute("newAlbum", list.get(2));
 		
 		return new ModelAndView("creatorProfile");		
 	}		
@@ -68,30 +83,31 @@ public class MemberController {
 	public ModelAndView queryAllAlbums(long creatorID,Model model) {		
 			
 		System.out.println("AllAlbums---"+creatorID);
-		Creator creator = new Creator();		
-		creator.setMemberId(creatorID);
+		ArrayList list = personService.queryAllCreatorAlbum(creatorID);
+		/*Creator creator = new Creator();		
+		creator.setId(creatorID);
 		creator.setUserName("lendy");	
 		
 		Album album = new Album();
-		album.setAlbumID(111);
+		album.setId(111);
 		album.setCover("image/image001.png");	
 		album.setName("aaa");
 		album.setCreator(creator);
-		album.setDate("2011.10.25");
+		album.setCreateDate("2011.10.25");
 	
 		Album album1 = new Album();
-		album1.setAlbumID(112);
+		album1.setId(112);
 		album1.setCover("image/image002.png");	
 		album1.setName("bbb");
 		album1.setCreator(creator);
-		album1.setDate("2011.10.24");
+		album1.setCreateDate("2011.10.24");
 		
 		Album album2 = new Album();
-		album2.setAlbumID(113);
+		album2.setId(113);
 		album2.setCover("image/image003.png");	
 		album2.setName("bbb");
 		album2.setCreator(creator);
-		album2.setDate("2011.10.24");
+		album2.setCreateDate("2011.10.24");
 		
 		Album[] albums = {album, album1, album2};	
 		
@@ -108,44 +124,44 @@ public class MemberController {
 		hotSong2.setAlbum(album1);
 		
 		Song[] hotSongs = { hotSong, hotSong1, hotSong2};
-		
-		model.addAttribute("albumList", albums);
-		model.addAttribute("songList", hotSongs);
+		*/
+		model.addAttribute("albumList", list.get(0));
+		model.addAttribute("songList", list.get(1));
 		return new ModelAndView("queryAllAlbums");
 	}
 	
 	//創作人頁面的最新動態tab(iframe)
 	@RequestMapping("/creatorNewActivity")
-	public ModelAndView queryCreatorRecentAction(String creatorID, Model model) {		
+	public ModelAndView queryCreatorRecentAction(long creatorID, Model model) {		
 		System.out.println("CreatorRecentAction---"+creatorID);
-		
+		/*
 		Creator creator = new Creator();		
-		creator.setMemberId(9999);
+		creator.setId(9999);
 		creator.setUserName("lendy");
 		Creator creator2 = new Creator();
-		creator2.setMemberId(8888);
+		creator2.setId(8888);
 		creator2.setUserName("KevinLiu");
 		Creator creator3 = new Creator();		
-		creator3.setMemberId(7777);
+		creator3.setId(7777);
 		creator3.setUserName("lendyLin");
 		
 		Album album = new Album();
 		album.setCover("image/image001.png");	
 		album.setName("ccc");
 		album.setCreator(creator);
-		album.setDate("2011.10.25");
+		//album.setDate("2011.10.25");
 		
 		Album album1 = new Album();
 		album1.setCover("image/image002.png");	
 		album1.setName("dddd");
 		album1.setCreator(creator2);
-		album1.setDate("2011.10.25");
+		//album1.setDate("2011.10.25");
 		
 		Album album2 = new Album();
 		album2.setCover("image/image003.png");	
 		album2.setName("eeeee");
 		album2.setCreator(creator3);
-		album2.setDate("2011.10.25");
+		//album2.setDate("2011.10.25");
 		
 		Album[] albums = { album, album1, album2};
 		
@@ -176,69 +192,72 @@ public class MemberController {
 		listenSong2.setAlbum(album2);
 		
 		Song[] listenSongs = { likeSong, likeSong1, likeSong2};
+		*/
+		ArrayList list = personService.queryRecentActivity(creatorID);
 		
-		model.addAttribute("albumList", albums);
-		model.addAttribute("likeSongList", likeSongs);
-		model.addAttribute("listenSongList", listenSongs);
+		model.addAttribute("albumList", list.get(0));
+		model.addAttribute("likeSongList", list.get(1));
+		model.addAttribute("listenSongList", list.get(2));
 		return new ModelAndView("queryCreatorRecentAction");
 	}
 	
 	//創作人頁面的好友與粉絲tab(iframe)
 	@RequestMapping("/creatorAllFriendsFans")
-	public ModelAndView queryFriendsFans(String creatorID,Model model) {		
+	public ModelAndView queryFriendsFans(long creatorID,Model model) {		
 		
 		System.out.println("FriendsFans---"+creatorID);
-		
+		/*
 		Member friend = new Member();
 		friend.setUserName("aaa");
 		friend.setIdentityName("一般會員");
-		friend.setMemberId(001);
+		friend.setId(001);
 		friend.setPicture("images/title_01.gif");
 		
 		Member friend1 = new Member();
 		friend1.setUserName("bbb");
 		friend1.setIdentityName("創作人");
-		friend1.setMemberId(002);
+		friend1.setId(002);
 		friend1.setPicture("images/title_01.gif");
 		
 		Member friend2 = new Member();
 		friend2.setUserName("ccc");
 		friend2.setIdentityName("一般會員");
-		friend2.setMemberId(003);
+		friend2.setId(003);
 		friend2.setPicture("images/title_01.gif");
 		
 		Member friend3 = new Member();
 		friend3.setUserName("ddd");
 		friend3.setIdentityName("創作人");
-		friend3.setMemberId(004);
+		friend3.setId(004);
 		friend3.setPicture("images/title_01.gif");
 		
 		Member[] friends = {friend, friend1, friend2, friend3};
 		
 		Member fan = new Member();
 		fan.setUserName("aaaa");
-		fan.setMemberId(104);
+		fan.setId(104);
 		fan.setPicture("images/title_01.gif");
 		
 		Member fan1 = new Member();
 		fan1.setUserName("bbbb");
-		fan1.setMemberId(105);
+		fan1.setId(105);
 		fan1.setPicture("images/title_01.gif");
 		
 		Member fan2 = new Member();
 		fan2.setUserName("cccc");
-		fan2.setMemberId(106);
+		fan2.setId(106);
 		fan2.setPicture("images/title_01.gif");
 		
 		Member fan3 = new Member();
 		fan3.setUserName("dddd");
-		fan3.setMemberId(107);
+		fan3.setId(107);
 		fan3.setPicture("images/title_01.gif");
 		
 		Member[] fans = {fan, fan1, fan2, fan3};
-		
-		model.addAttribute("friendList", friends);
-		model.addAttribute("fanList", fans);
+		*/
+		ArrayList list = personService.queryFriendFans(creatorID);
+		model.addAttribute("friendList", list.get(0));
+		model.addAttribute("fanList", list.get(1));
 			
 		return new ModelAndView("queryFriendsFans");
 	}
@@ -248,7 +267,7 @@ public class MemberController {
 	public ModelAndView memberProfile(String memberID,Model model) {
 		System.out.println("memberProfile==>"+memberID);
 		Member member = new Member();
-		member.setMemberId(111);
+		member.setId(111);
 		member.setPicture("images/lucy.jpg");
 		member.setUserName("劉為駿");
 		member.setLocation("台灣");
@@ -264,32 +283,32 @@ public class MemberController {
 		System.out.println("MemberRecentAction---"+memberID);
 		
 		Creator creator = new Creator();		
-		creator.setMemberId(1111);
+		creator.setId(1111);
 		creator.setUserName("lendy");
 		Creator creator2 = new Creator();
-		creator2.setMemberId(1111);
+		creator2.setId(1111);
 		creator2.setUserName("KevinLiu");
 		Creator creator3 = new Creator();		
-		creator3.setMemberId(1111);
+		creator3.setId(1111);
 		creator3.setUserName("lendyLin");
 		
 		Album album = new Album();
 		album.setCover("image/image001.png");	
 		album.setName("ccc");
 		album.setCreator(creator);
-		album.setDate("2011.10.25");
+		//album.setDate("2011.10.25");
 		
 		Album album1 = new Album();
 		album1.setCover("image/image002.png");	
 		album1.setName("dddd");
 		album1.setCreator(creator2);
-		album1.setDate("2011.10.25");
+		//album1.setDate("2011.10.25");
 		
 		Album album2 = new Album();
 		album2.setCover("image/image003.png");	
 		album2.setName("eeeee");
 		album2.setCreator(creator3);
-		album2.setDate("2011.10.25");
+		//album2.setDate("2011.10.25");
 		
 		Album[] albums = { album, album1, album2};
 		
@@ -334,43 +353,43 @@ public class MemberController {
 		
 		Member friend = new Member();
 		friend.setUserName("aaa");
-		friend.setMemberId(001);
+		friend.setId(001);
 		friend.setPicture("images/title_01.gif");
 		
 		Member friend1 = new Member();
 		friend1.setUserName("bbb");
-		friend1.setMemberId(002);
+		friend1.setId(002);
 		friend1.setPicture("images/title_01.gif");
 		
 		Member friend2 = new Member();
 		friend2.setUserName("ccc");
-		friend2.setMemberId(003);
+		friend2.setId(003);
 		friend2.setPicture("images/title_01.gif");
 		Member friend3 = new Member();
 		friend3.setUserName("ddd");
-		friend3.setMemberId(004);
+		friend3.setId(004);
 		friend3.setPicture("images/title_01.gif");
 		
 		Member[] friends = {friend, friend1, friend2, friend3};
 		
 		Member creator = new Member();
 		creator.setUserName("aaaa");
-		creator.setMemberId(105);
+		creator.setId(105);
 		creator.setPicture("images/title_01.gif");
 		
 		Member creator1 = new Member();
 		creator1.setUserName("bbbb");
-		creator1.setMemberId(106);
+		creator1.setId(106);
 		creator1.setPicture("images/title_01.gif");
 		
 		Member creator2 = new Member();
 		creator2.setUserName("cccc");
-		creator2.setMemberId(107);
+		creator2.setId(107);
 		creator2.setPicture("images/title_01.gif");
 		
 		Member creator3 = new Member();
 		creator3.setUserName("dddd");
-		creator3.setMemberId(108);
+		creator3.setId(108);
 		creator3.setPicture("images/title_01.gif");
 		
 		Member[] creators = {creator, creator1, creator2, creator3};
@@ -391,7 +410,7 @@ public class MemberController {
 		creator.setLikeSinger("安心亞,瑤瑤");
 		
 		Member member = new Member();
-		member.setMemberId(111);
+		member.setId(111);
 		member.setIdentityName("創作人");
 		member.setPicture("images/lucy.jpg");
 		member.setUserName("劉為駿");
@@ -404,7 +423,7 @@ public class MemberController {
 		member.setWebSite("www.google.com");		
 		member.setSubscribeStatus("Y");
 		member.setIntroduction("我是kevin，我長得像小夫!");
-		member.setCreator(creator);
+		//member.setCreator(creator);
 				
 		model.addAttribute("member", member);			
 		
@@ -435,7 +454,7 @@ public class MemberController {
 		member.setWebSite(webSite);		
 		member.setSubscribeStatus(subscribeStatus);
 		member.setIntroduction(introduction);
-		member.setCreator(creator);
+		//member.setCreator(creator);
 		
 		model.addAttribute("member", member);	
 		return "redirect:editMemberData.do";	
@@ -596,7 +615,7 @@ public class MemberController {
 		ms.setStatusName("正常");
 		
 		Member member = new Member();
-		member.setMemberId(1111111);
+		member.setId(1111111);
 		member.setEmail("xxx@ubn.net");
 		member.setUserName("王大明");
 		member.setIdentityName("創作人");
@@ -615,7 +634,7 @@ public class MemberController {
 		model.addAttribute("memberLists",memberLists);
 		
 		Admin admin = new Admin();
-		admin.setAdminId(1111);
+		admin.setId(1111);
 		model.addAttribute("admin",admin);
 		return new ModelAndView("queryMemberData");
 		
@@ -630,14 +649,14 @@ public class MemberController {
 		ModifyData md = new ModifyData();
 		md.setContent("電話修正為0922222222");
 		md.setCreateDate("2011-10-10 19:20:20");
-		md.setCreator("xxx");
-		md.setModifyNoteId(001);
+		//md.setCreator("xxx");
+		md.setId(001);
 		
 		ModifyData md1 = new ModifyData();
 		md1.setContent("電話修正為0933333333");
 		md1.setCreateDate("2011-10-13 13:20:20");
-		md1.setCreator("xxx");
-		md1.setModifyNoteId(002);
+		//md1.setCreator("xxx");
+		md1.setId(002);
 		
 		ModifyData[] mds = {md, md1};
 		
@@ -658,7 +677,7 @@ public class MemberController {
 		ms.setStatusReason("被檢舉次數過多");
 			
 		GeneralMember member = new GeneralMember();
-		member.setMemberId(1111111);
+		member.setId(1111111);
 		member.setEmail("xxx@ubn.net");
 		member.setUserName("王大明");
 		member.setIdentityName("一般會員");
@@ -668,11 +687,18 @@ public class MemberController {
 		
 		GsiMoney gsiMoney = new GsiMoney();
 		gsiMoney.setBalance("300");
-		member.setGsiMoney(gsiMoney);
+		
+		Set<GsiMoney> g = new HashSet<GsiMoney>();
+		g.add(gsiMoney);
+		
+		member.setGsiMoney(g);
 		
 		GsiBonus gsiBonus = new GsiBonus();
 		gsiBonus.setBalance("50");
-		member.setGsiBonus(gsiBonus);
+		Set<GsiBonus> b = new HashSet<GsiBonus>();
+		b.add(gsiBonus);
+		
+		member.setGsiBonus(b);
 		
 		int fans = 20;
 		int friends = 100;
@@ -741,22 +767,30 @@ public class MemberController {
 		ms.setStatusName("正常");
 								
 		Creator creator = new Creator();
-		creator.setMemberId(1111111);
+		creator.setId(1111111);
 		creator.setEmail("xxx@ubn.net");
 		creator.setUserName("王大明");
 		creator.setIdentityName("創作人");
 		creator.setLocation("台灣");
 		creator.setCreateDate("2011/11/11");
 		creator.setMemberStatus(ms);
-				
+		
+		
 		GsiMoney gsiMoney = new GsiMoney();
 		gsiMoney.setBalance("300");
-		creator.setGsiMoney(gsiMoney);
-			
+		
+		Set<GsiMoney> g = new HashSet<GsiMoney>();
+		g.add(gsiMoney);
+		
+		creator.setGsiMoney(g);
+		
 		GsiBonus gsiBonus = new GsiBonus();
 		gsiBonus.setBalance("50");
-		creator.setGsiBonus(gsiBonus);
-			
+		Set<GsiBonus> b = new HashSet<GsiBonus>();
+		b.add(gsiBonus);
+		
+		creator.setGsiBonus(b);
+				
 		//付款資訊
 		creator.setUserName("劉為駿");
 		creator.setIdentityNO("N111111111");
@@ -820,10 +854,10 @@ public class MemberController {
 			ArrayList d = new ArrayList();
 			
 			Creator creator = new Creator();
-			creator.setMemberId(1111111);
+			creator.setId(1111111);
 					
 			Album a1 = new Album();
-			a1.setAlbumID(123);
+			a1.setId(123);
 			a1.setName("peace");
 			a1.setCreator(creator);
 			a1.setStatus("公開");
@@ -832,7 +866,7 @@ public class MemberController {
 			a.add(number1);
 			
 			Album a2 = new Album();
-			a2.setAlbumID(456);
+			a2.setId(456);
 			a2.setName("peace");
 			a2.setCreator(creator);
 			a2.setStatus("隱藏");
@@ -841,7 +875,7 @@ public class MemberController {
 			b.add(number2);
 			
 			Song s1 = new Song();
-			s1.setSongID(1234);
+			s1.setId(1234);
 			s1.setAlbum(a1);
 			s1.setName("in your eyes");
 			int number3 = 12;
@@ -849,7 +883,7 @@ public class MemberController {
 			c.add(number3);
 			
 			Song s2 = new Song();
-			s2.setSongID(4567);
+			s2.setId(4567);
 			s2.setAlbum(a2);
 			s2.setName("happy");
 			int number4 = 33;
@@ -880,10 +914,10 @@ public class MemberController {
 			ArrayList d = new ArrayList();
 			
 			Creator creator = new Creator();
-			creator.setMemberId(1111111);
+			creator.setId(1111111);
 					
 			Album a1 = new Album();
-			a1.setAlbumID(123);
+			a1.setId(123);
 			a1.setName("peace");
 			a1.setCreator(creator);
 			a1.setStatus("公開");
@@ -892,7 +926,7 @@ public class MemberController {
 			a.add(number1);
 			
 			Album a2 = new Album();
-			a2.setAlbumID(456);
+			a2.setId(456);
 			a2.setName("peace");
 			a2.setCreator(creator);
 			a2.setStatus("隱藏");
@@ -901,7 +935,7 @@ public class MemberController {
 			b.add(number2);
 			
 			Song s1 = new Song();
-			s1.setSongID(1234);
+			s1.setId(1234);
 			s1.setAlbum(a1);
 			s1.setName("in your eyes");
 			int number3 = 12;
@@ -909,7 +943,7 @@ public class MemberController {
 			c.add(number3);
 			
 			Song s2 = new Song();
-			s2.setSongID(4567);
+			s2.setId(4567);
 			s2.setAlbum(a2);
 			s2.setName("happy");
 			int number4 = 33;
@@ -934,7 +968,7 @@ public class MemberController {
 					ModelAndView mav = new ModelAndView("queryPrePayRecord");
 					Order order = new Order();
 					long id = 89123456;
-					order.setOrderRid(id);
+					order.setId(id);
 					order.setPurchaseDate("2011/03/31");
 					order.setPayMethod("信用卡付款");
 					order.setPayDate("2011/04/01 12:33:46");
@@ -944,11 +978,11 @@ public class MemberController {
 					gsiMoney.setMemo("test");
 					OrderDetail orderDetail = new OrderDetail();
 					orderDetail.setOrder(order);
-					orderDetail.setGsiMoney(gsiMoney);
+					//orderDetail.setGsiMoney(gsiMoney);
 					
 					Order order2 = new Order();
 					long id2 = 63253456;
-					order2.setOrderRid(id2);
+					order2.setId(id2);
 					order2.setPurchaseDate("2011/06/28");
 					order2.setPayMethod("轉帳付款");
 					order2.setPayDate("2011/06/29 12:33:46");
@@ -958,7 +992,7 @@ public class MemberController {
 					gsiMoney2.setMemo("test");
 					OrderDetail orderDetail2 = new OrderDetail();
 					orderDetail2.setOrder(order2);
-					orderDetail2.setGsiMoney(gsiMoney2);
+					//orderDetail2.setGsiMoney(gsiMoney2);
 					mav.addObject("orderDetail",orderDetail);
 					mav.addObject("orderDetail2",orderDetail2);
 					return mav;
@@ -971,7 +1005,7 @@ public class MemberController {
 					String tPrice="350";
 					Order order = new Order();
 					long id = 89123456;
-					order.setOrderRid(id);
+					order.setId(id);
 					order.setPurchaseDate("2011/03/31");
 					SongPrice songPrice = new SongPrice();
 					songPrice.setPrice("20");
@@ -988,11 +1022,11 @@ public class MemberController {
 					Album album2 = new Album();
 					album2.setName("蕭敬騰");
 					ProductionCategory productionCategory = new ProductionCategory();
-					productionCategory.setSong(song);
-					productionCategory.setAlbum(album);
+					//productionCategory.setSong(song);
+					//productionCategory.setAlbum(album);
 					ProductionCategory productionCategory2 = new ProductionCategory();
-					productionCategory2.setSong(song2);
-					productionCategory2.setAlbum(album2);
+					//productionCategory2.setSong(song2);
+					//productionCategory2.setAlbum(album2);
 					OrderDetail orderDetail = new OrderDetail();
 					orderDetail.setProductionCategory(productionCategory);
 					orderDetail.setOrder(order);
@@ -1013,13 +1047,13 @@ public class MemberController {
 					String offBonus = "0";
 					Order order = new Order();
 					long id = 89123456;
-					order.setOrderRid(id);
+					order.setId(id);
 					GsiBonus gsiBonus = new GsiBonus();
 					gsiBonus.setOnDate("2011/03/31");
 					gsiBonus.setOffDate("2011/10/31");
 					OrderDetail orderDetail = new OrderDetail();
 					orderDetail.setOrder(order);
-					orderDetail.setGsiBonus(gsiBonus);
+					//orderDetail.setGsiBonus(gsiBonus);
 					mav.addObject("orderDetail",orderDetail);
 					mav.addObject("waitOnBonus",waitOnBonus);
 					mav.addObject("OnBonus",OnBonus);
