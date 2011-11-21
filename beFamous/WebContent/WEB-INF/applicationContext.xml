@@ -69,6 +69,7 @@
 				<value>com.ubn.befamous.entity.PrePaidPrice</value>
 				<value>com.ubn.befamous.entity.Price</value>
 				<value>com.ubn.befamous.entity.ProductionCategory</value>
+				<value>com.ubn.befamous.entity.ProductionClassification</value>
 				<value>com.ubn.befamous.entity.PromotionActivity</value>
 				<value>com.ubn.befamous.entity.Question</value>
 				<value>com.ubn.befamous.entity.RecommendActivity</value>
@@ -80,7 +81,6 @@
 				<value>com.ubn.befamous.entity.SongPrice</value>
 				<value>com.ubn.befamous.entity.TransactionRcd</value>
 				<value>com.ubn.befamous.entity.WeekRanking</value>
-				<value>com.ubn.befamous.entity.InelegantKeyword</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
@@ -221,7 +221,8 @@
 		<property name="sessionFactory">
 			<ref bean="sessionFactory" />
 		</property>
-	</bean><bean id="hiddenDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+	</bean>
+	<bean id="hiddenDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
 		<constructor-arg>
 			<value>com.ubn.befamous.entity.Hidden</value>
 		</constructor-arg>
@@ -232,14 +233,6 @@
 	<bean id="hitDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
 		<constructor-arg>
 			<value>com.ubn.befamous.entity.Hit</value>
-		</constructor-arg>
-		<property name="sessionFactory">
-			<ref bean="sessionFactory" />
-		</property>
-	</bean>
-	<bean id="inelegantKeywordDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
-		<constructor-arg>
-			<value>com.ubn.befamous.entity.InelegantKeyword</value>
 		</constructor-arg>
 		<property name="sessionFactory">
 			<ref bean="sessionFactory" />
@@ -368,6 +361,14 @@
 	<bean id="productionCategoryDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
 		<constructor-arg>
 			<value>com.ubn.befamous.entity.ProductionCategory</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="productionClassificationDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.ProductionClassification</value>
 		</constructor-arg>
 		<property name="sessionFactory">
 			<ref bean="sessionFactory" />
