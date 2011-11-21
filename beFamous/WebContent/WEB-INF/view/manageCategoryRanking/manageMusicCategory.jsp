@@ -14,7 +14,7 @@
 <p>
 <font size="2">&nbsp新增音樂類別:</font>&nbsp
 <input type="text" name="categoryName" size="15">
-<input type="submit" value="新增" onclick="add()"/>
+<input type="button" value="新增" onclick="add()"/>
 <p>
 <table border="1" BorderColor="#000000" cellpadding="0" cellspacing="0">
 <tr><td Width="50" Height="35" valign="top"><font size="2">編號</font></td>
@@ -26,27 +26,27 @@
 	<c:forEach var="mc" items="${musicCategory}" varStatus="status">
 <tr><td Height="30" valign="top"><font size="2">${status.index+1}</font></td>
 	<td valign="top"><font size="2">${mc.name}</font></td>
-	<td valign="top"><font size="2"><a href="javascript:void(0)" onclick="subCategory()">子目錄</a></font></td>
-	<td valign="top"><font size="2"><a href="javascript:void(0)" onclick="edit()">編輯</a></font></td>
-	<td valign="top"><font size="2"><a href="javascript:void(0)" onclick="deleteCategory()">刪除</a></font></td></tr>
+	<td valign="top"><font size="2"><a href="javascript:void(0)" onclick="subCategory('${mc.id}','1')">子目錄</a></font></td>
+	<td valign="top"><font size="2"><a href="javascript:void(0)" onclick="edit('${mc.id}','1')">編輯</a></font></td>
+	<td valign="top"><font size="2"><a href="javascript:void(0)" onclick="deleteCategory('${mc.id}')">刪除</a></font></td></tr>
 	</c:forEach>
 </table>
 </form>
 </body>
 <script>
 function add(){
-     document.fm.action="${pageContext.request.contextPath}/addMusicCategory/father.do";
+     document.fm.action="${pageContext.request.contextPath}/addMusicCategory.do";
      document.fm.submit();
 }
-function subCategory(){
-    document.fm.action="${pageContext.request.contextPath}/subMusicCategory.do";
+function subCategory(id,adminID){
+    document.fm.action="${pageContext.request.contextPath}/subMusicCategory.do?ID="+id+"&adminID="+adminID;
     document.fm.submit();
 }
-function edit(){
-	window.open("${pageContext.request.contextPath}/editMusicCategory.do","parent","height=120,width=300,location=no,scrollbars=no,toolbar=no,directories=no,menubar=no,directories=no");
+function edit(id,adminID){
+	window.open("${pageContext.request.contextPath}/editMusicCategory.do?ID="+id+"&adminID="+adminID,"parent","height=120,width=300,location=no,scrollbars=no,toolbar=no,directories=no,menubar=no,directories=no");
 }
-function deleteCategory(){
-	document.fm.action="${pageContext.request.contextPath}/deleteMusicCategory.do";
+function deleteCategory(id){
+	document.fm.action="${pageContext.request.contextPath}/deleteMusicCategory.do?ID="+id;
     document.fm.submit();
 }
 </script>
