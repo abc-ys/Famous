@@ -3,6 +3,7 @@ package com.ubn.befamous.controller;
 import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -15,93 +16,54 @@ import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.ubn.befamous.entity.Album;
+import com.ubn.befamous.entity.Creator;
 import com.ubn.befamous.entity.Hidden;
 import com.ubn.befamous.entity.MusicCategory;
 import com.ubn.befamous.entity.Offense;
 import com.ubn.befamous.entity.OrderDetail;
 import com.ubn.befamous.entity.Song;
 import com.ubn.befamous.entity.SongPrice;
+import com.ubn.befamous.service.MusicService;
 
 
 @Controller
 public class UploadMusicController {
+	
+	@Autowired
+	 MusicService musicService;
+	
 
 	//音樂管理-編輯專輯
 	@RequestMapping("/editAlbum")
-	public ModelAndView editalbum(){
+	public ModelAndView editalbum(long creatorId){
 		ModelAndView mav = new ModelAndView("editAlbum");
 		
-		Hidden hidden = new Hidden();
-		hidden.setHiddenReason("被檢舉次數過多");
-		Offense o = new Offense();
-		o.setHidden(hidden);
-		Set<Offense> offense = new HashSet();
-		offense.add(o);
-		Album album = new Album();
-		album.setName("小星星");
-		album.setDate("2011/06/10 12:00:30");
-		album.setCover("images/album.jpg");
-		album.setOffense(offense);
-		long p = 22222;
-		album.setAlbumID(p);
-		
-		Hidden hidden2 = new Hidden();
-		hidden2.setHiddenReason("");
-		Offense o2 = new Offense();
-		o2.setHidden(hidden2);
-		Set<Offense> offense2 = new HashSet();
-		offense2.add(o2);
-		Album album2 = new Album();
-		album2.setName("原來如此");
-		album2.setDate("2011/09/25 14:45:30");
-		album2.setCover("images/album.jpg");
-		album2.setOffense(offense2);
-		long p2 = 33333;
-		album2.setAlbumID(p2);
-		
-		Album[] a = {album,album2};
+		creatorId = 2;
+		Album[] a = musicService.queryOwnAlbums(creatorId);
 		mav.addObject("album", a);
+		mav.addObject("creatorId", creatorId);
 		return mav;
 	}
 	
 	//音樂管理-編輯專輯
 	@RequestMapping("/editAlbumContent")
-	public ModelAndView editalbumcontent(String albumID){
+	public ModelAndView editalbumcontent(long albumID, long creatorId){
 		
 		System.out.println("albumID==>"+albumID);
 		
 		ModelAndView mav = new ModelAndView("editAlbumContent");
-		
-		Song song = new Song();
-		long s = 444;
-		song.setSongID(s);
-		song.setName("你");
-		Song song2 = new Song();
-		long s2 = 888;
-		song2.setSongID(s2);
-		song2.setName("敷衍");
-		Set<Song> songSet = new HashSet();
-		songSet.add(song);
-		songSet.add(song2);
-		MusicCategory musicCategory = new MusicCategory();
-		musicCategory.setName("兒歌");
-		Album album = new Album();
-		long a = 1666;
-		album.setAlbumID(a);
-		album.setName("小星星");
-		album.setMusicCategory(musicCategory);
-		album.setDate("2011/06/10 12:00:30");
-		album.setCover("images/album.jpg");
-		album.setStatus("隱藏");
-		album.setSongSet(songSet);
+		Album album = musicService.queryMusic(albumID);
 		
 		mav.addObject("album", album);
+		mav.addObject("creatorId", creatorId);
 		return mav;
 	}
 	
@@ -118,7 +80,7 @@ public class UploadMusicController {
 	
 	//音樂管理-編輯專輯-儲存
 	@RequestMapping("/saveAlbumData")
-	public String savealbumdata(String albumID){
+	public String savealbumdata(long albumID, long creatorId){
 				
 		System.out.println("albumID==>"+albumID);
 				
@@ -136,7 +98,7 @@ public class UploadMusicController {
 	
 	//音樂管理-編輯專輯-編輯歌曲資訊
 	@RequestMapping("/editSongData")
-	public ModelAndView editsongdata(String songID, String songName, String musicType, String MOPEND, String status, String price, String price2, String discount, String tag, String lyrics, String lyricist, String composer, String producer){
+	public ModelAndView editsongdata(long songID, long creatorId, String songName, String musicType, String MOPEND, String status, String price, String price2, String discount, String tag, String lyrics, String lyricist, String composer, String producer){
 		
 		System.out.println("songID==>"+songID);
 		System.out.println("songName==>"+songName);
@@ -163,22 +125,7 @@ public class UploadMusicController {
 		
 		MusicCategory[] mType = {mc,mc2,mc3};
 		
-		SongPrice songPrice = new SongPrice();
-		songPrice.setPrice("");
-		songPrice.setDiscountPrice("不提供紅包打賞");
-		MusicCategory musicCategory = new MusicCategory();
-		musicCategory.setName("古典樂");
-		Song song = new Song();
-		song.setName("小星星");
-		song.setMusicCategory(musicCategory);
-		song.setDate("2011-06-30");
-		song.setSeconds("90秒");
-		song.setSongPrice(songPrice);
-		song.setTag("小星星,兒歌");
-		song.setLyrics("一閃一閃亮晶晶 滿天都是小星星");
-		song.setComposer("小明");
-		song.setLyricist("中明");
-		song.setProducer("大明");
+		Song song = musicService.querySong(songID);
 		
 		mav.addObject("mType",mType);
 		mav.addObject("song",song);
@@ -186,9 +133,33 @@ public class UploadMusicController {
 		return mav;
 	}
 	
+	//音樂管理-編輯專輯-更新歌曲資訊   (怪怪的)
+		@RequestMapping("/updateSongData")
+		public String updatesongdata(long songID, long creatorId, String songName, String musicType, String MOPEND, String status, String price, String price2, String discount, String tag, String lyrics, String lyricist, String composer, String producer){
+			
+			System.out.println("更新");
+			System.out.println("songID==>"+songID);
+			System.out.println("songName==>"+songName);
+			System.out.println("musicType==>"+musicType);
+			System.out.println("MOPEND==>"+MOPEND);
+			System.out.println("status==>"+status);
+			System.out.println("price==>"+price);
+			System.out.println("price2==>"+price2);
+			System.out.println("discount==>"+discount);
+			System.out.println("tag==>"+tag);
+			System.out.println("lyrics==>"+lyrics);
+			System.out.println("lyricist==>"+lyricist);
+			System.out.println("composer==>"+composer);
+			System.out.println("producer==>"+producer);
+			
+			musicService.updateSong(creatorId, songID, songName, musicType, MOPEND, status, price, price2, discount, tag, lyrics, lyricist, composer, producer);
+			
+			return "redirect:editSongData.do?songID="+songID+"&creatorId="+creatorId;
+		}
+	
 	//音樂管理-編輯專輯-編輯專輯資訊
 	@RequestMapping("/editAlbumData")
-	public ModelAndView editalbumdata(String albumID){
+	public ModelAndView editalbumdata(long albumID, long creatorId){
 			
 		System.out.println("albumID==>"+albumID);
 			
@@ -211,31 +182,20 @@ public class UploadMusicController {
 		ac3.setCover("images/play.png");
 		Album[] a = {ac,ac2,ac3};
 		
-		Album album = new Album();
-		album.setType("EP");
-		album.setName("小星星");
-		album.setDate("2011-09-01");
-		album.setBrand("統一");
-		MusicCategory musicCategory = new MusicCategory();
-		musicCategory.setName("兒歌");
-		album.setMusicCategory(musicCategory);
-		album.setTag("小星星,兒歌");
-		album.setIntroduction("小時候唱的歌");
-		album.setStatus("公開");
-		album.setCover("images/repair.png");
+		Album album = musicService.queryAlbum(albumID);
 			
 		mav.addObject("albumID",albumID);
 		mav.addObject("mType",mType);
 		mav.addObject("cover",a);
 		mav.addObject("album",album);
+		mav.addObject("creatorId",creatorId);
 		return mav;
 	}
 	
 	//音樂管理-編輯專輯-編輯專輯資訊
 	@RequestMapping("/saveAlbumInfo")
-	public String savealbuminfo(HttpServletRequest request) throws Exception {
+	public String savealbuminfo(HttpServletRequest request,long albumID, long creatorId) throws Exception {
 		
-		String albumID = "";
 		String albumType = "";
 		String name = "";
 		String date = "";
@@ -285,7 +245,6 @@ public class UploadMusicController {
 					String name2 = item.getFieldName();
 					value = item.getString("UTF-8");
 					System.out.println(name2 + "=" + value + "<br />");
-					if(name2.equals("albumID")){albumID=value;}
 					if(name2.equals("albumType")){albumType=value;}
 					if(name2.equals("name")){name=value;}
 					if(name2.equals("date")){date=value;}
@@ -355,6 +314,7 @@ public class UploadMusicController {
 		System.out.println("introduction==>"+introduction);
 		System.out.println("status==>"+status);	
 		
+		musicService.updateAlbum(creatorId,albumID, albumType, fileName, date, brand, musicCategory, tag, cover, cover2, introduction, status);
 		
 		return "redirect:editAlbumData.do";
 	}
@@ -379,14 +339,16 @@ public class UploadMusicController {
 		}
 		//儲存專輯資訊
 		@RequestMapping("/saveAlbum")
-		public String saveAlbum(HttpServletRequest request, String creatorId, Model model) throws Exception
+		public String saveAlbum(HttpServletRequest request, long creatorId, Model model) throws Exception
 		{
+			creatorId=1;
+			
 			System.out.println("saveAlbum==>");
 			
 			String albumType = "";
 			String albumName = "";
 			String albumBrand = "";
-			String musicCategory = "";
+			long musicCategory = 0;
 			String albumTag = "";
 			String albumIntroduction = "";
 			String albumStatus = "";
@@ -433,7 +395,7 @@ public class UploadMusicController {
 						}else if(name.equals("brand")){
 							albumBrand = value;
 						}else if(name.equals("musicCategory")){
-							musicCategory = value;
+							musicCategory = Long.valueOf(value);
 						}else if(name.equals("tag")){
 							albumTag = value;
 						}else if(name.equals("introduction")){
@@ -487,15 +449,18 @@ public class UploadMusicController {
 				System.out.println("上傳檔案超過最大檔案允許大小" + yourMaxRequestSize / (1024 * 1024) + "MB !");
 			}
 			System.out.println(" creatorId="+creatorId+", albumType="+albumType+", albumName="+albumName+", albumBrand="+albumBrand+", musicCategory="+musicCategory+", albumTag="+albumTag+", albumIntroduction="+albumIntroduction+", albumStatus="+albumStatus+", albumCover="+albumCover);
-			model.addAttribute("creatorId", "qqqqqqq");
-			model.addAttribute("albumId", "111");
+			
+			long albumID = musicService.saveAlbum(creatorId,albumType,albumName,albumBrand,musicCategory,albumTag,albumIntroduction,albumStatus,albumCover);
+			
+			model.addAttribute("creatorId", creatorId);
+			model.addAttribute("albumId", albumID);
 			
 			return "redirect:/addSong.do";
 			
 		}
 		//新增歌曲
 		@RequestMapping("/addSong")
-		public ModelAndView addSong( String creatorId,String albumId, Model model)
+		public ModelAndView addSong(long creatorId,String albumId, Model model)
 		{
 			System.out.println("addSong==>");
 			model.addAttribute("creatorId", "qqqqqqq");
@@ -558,7 +523,7 @@ public class UploadMusicController {
 						    File uploadedFile = new File(saveDirectory,	fileName);						
 						    item.write(uploadedFile);
 						    
-						    s.setSongID(12345);
+						    s.setId(12345);
 						    s.setName(fileName);
 						    
 						} else {

@@ -3,6 +3,7 @@ package com.ubn.befamous.controller;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -12,15 +13,20 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.ubn.befamous.entity.Album;
 import com.ubn.befamous.entity.Creator;
+import com.ubn.befamous.entity.InelegantKeyword;
 import com.ubn.befamous.entity.Keyword;
 import com.ubn.befamous.entity.MusicCategory;
 import com.ubn.befamous.entity.News;
 import com.ubn.befamous.entity.Song;
 import com.ubn.befamous.entity.SongPrice;
+import com.ubn.befamous.service.MusicService;
 
 @Controller
 @SessionAttributes
 public class KeyWordController {
+	
+	@Autowired
+	public MusicService musicService;
 	
 	//查詢關鍵字
 	@RequestMapping(value = "/queryKeyWord", method = RequestMethod.GET)
@@ -58,12 +64,12 @@ public class KeyWordController {
 		
 		Album album = new Album();
 		album.setName("bird");
-		album.setAlbumID(1234567);
+		album.setId(1234567);
 		album.setCreator(creator);
 		album.setBrand("UBN");
 		album.setCover("image/image001.png");
 		album.setType("MP3");
-		album.setDate("2011/10/25");
+		album.setCreateDate("2011/10/25");
 		album.setMusicCategory(musicCategory);
 		album.setIntroduction("This is very good album!");
 		Album[] arAlbum = {album};
@@ -117,12 +123,12 @@ public class KeyWordController {
 		creator.setUserName("kevin");
 		Album album = new Album();
 		album.setName("鳥");
-		album.setAlbumID(1234567);
+		album.setId(1234567);
 		album.setCreator(creator);
 		album.setBrand("UBN");
 		album.setCover("image/image001.png");
 		album.setType("MP3");
-		album.setDate("2011/10/25");
+		album.setCreateDate("2011/10/25");
 		album.setIntroduction("This is very good album!");
 		
 		
@@ -159,12 +165,12 @@ public class KeyWordController {
 		//專輯
 		Album album3 = new Album();
 		album3.setName("bird");
-		album3.setAlbumID(1234567);
+		album3.setId(1234567);
 		album3.setCreator(creator);
 		album3.setBrand("UBN");
 		album3.setCover("image/image001.png");
 		album3.setType("MP3");
-		album3.setDate("2011/10/25");
+		album3.setCreateDate("2011/10/25");
 		album3.setMusicCategory(musicCategory);
 		album3.setIntroduction("This is very good album!");
 		Album[] arAlbum = {album3}; 
@@ -196,14 +202,14 @@ public class KeyWordController {
 		album.setCover("image/image001.png");	
 		album.setName("ccc");
 		album.setCreator(creator);
-		album.setDate("2011.10.25");
-		album.setAlbumID(1234567);
+		album.setCreateDate("2011.10.25");
+		album.setId(1234567);
 		Album album2 = new Album();
 		album.setCover("image/image001.png");	
 		album.setName("ccc");
 		album.setCreator(creator);
-		album.setDate("2011.10.25");
-		album.setAlbumID(1234567);
+		album.setCreateDate("2011.10.25");
+		album.setId(1234567);
 		Set<Album> set = new HashSet();
 		set.add(album);
 		set.add(album2);
@@ -245,34 +251,31 @@ public class KeyWordController {
 	//怡秀 write-1107
 		//管理關鍵字-排除字詞組設定
 		@RequestMapping("/manageKeyWord")
-		public ModelAndView managekeyword() {
+		public ModelAndView managekeyword(long adminID) {
 			ModelAndView mav = new ModelAndView("manageKeyWord");
 			    
-			Keyword keyword = new Keyword();
-			keyword.setName("賽德克巴萊");
-			Keyword keyword2 = new Keyword();
-			keyword2.setName("鋼鐵擂台");
-			Keyword[] kw = {keyword,keyword2};
+			InelegantKeyword[] kw = musicService.queryInelegantKeywords();
 			
 			mav.addObject("keyword", kw);
+			mav.addObject("adminID", adminID);
 			return mav;
 		}
 		
 		//管理關鍵字-排除字詞組設定-新增關鍵字
 		@RequestMapping("/addKeyWord")
-		public String addkeyword(String keyWordName) {
+		public String addkeyword(String keyWordName,long adminID) {
 			
 			System.out.println("keyWordName==>"+keyWordName);
-			
-			return "redirect:manageKeyWord.do";
+			musicService.addInelegantKeywords(adminID, keyWordName);
+			return "redirect:manageKeyWord.do?adminID="+adminID;
 		}
 		
 		//管理關鍵字-排除字詞組設定-刪除關鍵字
 		@RequestMapping("/deleteKeyWord")
-		public String deletekeyword() {
+		public String deletekeyword(long ID,long adminID) {
 			
 			System.out.println("刪除關鍵字");
-			
-			return "redirect:manageKeyWord.do";
+			musicService.deleteInelegantKeywords(ID);
+			return "redirect:manageKeyWord.do?adminID="+adminID;
 		}
 }
