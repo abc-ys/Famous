@@ -20,11 +20,9 @@
 <img alt="" src="${hm.cover}"><br>
 <a href="javascript:editAlbumContent('${hm.id}','${creatorId}')">${hm.name}</a><br>
 ${hm.createDate}<br>
-<c:forEach var="hm2" items="${hm.offense}">
-<c:if test="${hm2.hidden.hiddenReason != ''}">
-<font color="ff0000">被管理員隱藏<br>${hm2.hidden.hiddenReason}</font>
+<c:if test="${hm.hidden.id != null}">
+<font color="ff0000">被管理員隱藏<br>${hm.hidden.hiddenReason}</font>
 </c:if>
-</c:forEach>
 </td>
 </c:forEach>
 </table>

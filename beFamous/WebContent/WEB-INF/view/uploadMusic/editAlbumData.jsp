@@ -11,9 +11,9 @@
 <form name="form" enctype="multipart/form-data" method="post">
 	<h4>編輯專輯資訊</h4><p>	
 	*專輯型式:&nbsp;
-	<input type="radio" name="albumType" id="albumType" value="單曲" <c:if test="${album.type == '1'}"> checked </c:if>/>單曲
-	<input type="radio" name="albumType" id="albumType" value="EP" <c:if test="${album.type == '2'}"> checked </c:if>/>EP
-	<input type="radio" name="albumType" id="albumType" value="專輯" <c:if test="${album.type == '3'}"> checked </c:if>/>專輯<br><br>
+	<input type="radio" name="albumType" id="albumType" value="1" <c:if test="${album.type == '1'}"> checked </c:if>/>單曲
+	<input type="radio" name="albumType" id="albumType" value="2" <c:if test="${album.type == '2'}"> checked </c:if>/>EP
+	<input type="radio" name="albumType" id="albumType" value="3" <c:if test="${album.type == '3'}"> checked </c:if>/>專輯<br><br>
 	*專輯名稱:&nbsp;<input type="text" name="name" value="${album.name}"><br><br>
 	*發行日期:&nbsp;<input type="text" name="date" value="${album.createDate}" class="fillbox" readonly>&nbsp;<A HREF="javascript:show_calendar('form.date');"><img src="${pageContext.request.contextPath}/images/cal.gif" border="0"></img></a><br><br>
 	廠牌:&nbsp;<input type="text" name="brand" value="${album.brand}"><br><br>
@@ -34,8 +34,8 @@
 	<br><br>
 	專輯介紹/創作理念:&nbsp<br><textarea rows="6" cols="40" name="introduction">${album.introduction}</textarea><br><br>
 	*專輯狀態:&nbsp
-	<input type="radio" name="status" id="status" value="公開" <c:if test="${album.status == '1'}"> checked </c:if>/>公開
-	<input type="radio" name="status" id="status" value="隱藏" <c:if test="${album.status == '2'}"> checked </c:if>/>隱藏<br><br>
+	<input type="radio" name="status" id="status" value="1" <c:if test="${album.status == '1'}"> checked </c:if>/>公開
+	<input type="radio" name="status" id="status" value="2" <c:if test="${album.status == '2'}"> checked </c:if>/>隱藏<br><br>
 	公開發表後，為確保消費者權益，設定收費的作品內容及資訊將只能變更<b>專輯介紹、標籤、專輯狀態、試聽長度、作詞人、作曲人、製作人和曲序</b>。<br><br>
 	<center><input type="button" value="完成" onclick="saveAlbumInfo('${albumID}','${creatorId}')"></center>
 </form>

@@ -17,13 +17,13 @@
 <td>音樂類型:&nbsp${album.musicCategory.name}</td><tr>
 <td>${album.createDate}</td><tr>
 <c:if test="${album.status == '1'}">
-<td>狀態:&nbsp公開&nbsp<a href="javascript:changeState('隱藏')">隱藏</a></td><tr>
+<td>狀態:&nbsp公開&nbsp<a href="javascript:changeState('2','${album.id}','${creatorId}')">隱藏</a></td><tr>
 </c:if>
 <c:if test="${album.status == '2'}">
-<td>狀態:&nbsp<a href="javascript:changeState('公開')">公開</a>&nbsp隱藏</td><tr>
+<td>狀態:&nbsp<a href="javascript:changeState('1','${album.id}','${creatorId}')">公開</a>&nbsp隱藏</td><tr>
 </c:if>
 <td><input type="button" value="編輯專輯資訊" onclick="editAlbumInfo('${album.id}','${creatorId}')"/>&nbsp
-<input type="button" value="新增歌曲" onclick="addSong()"/></td>
+<input type="button" value="新增歌曲" onclick="addSong('${album.id}','${creatorId}')"/></td>
 </table><p>
 <table border="1" BorderColor="#000000" cellpadding="0" cellspacing="0">
 <td Width="30" Height="35" valign="top"><font size="2">序號</font></td>
@@ -39,7 +39,7 @@
 <td><font size="2"><a href="javascript:void(0)"><img alt="" src="${pageContext.request.contextPath}/images/title_01.gif"><br></a></font></td>	
 <td><font size="2"><a href="javascript:editSongData('${hm.id}','${creatorId}')">編輯</a></font></td><tr>
 </c:forEach>
-<td Width="140" Height="35" colspan="5"><input type="submit" value="刪除" onclick="deleteData('${hm.id}')"/></td>
+<td Width="140" Height="35" colspan="5"><input type="button" value="刪除" onclick="deleteData('${creatorId}')"/></td>
 </table>
 提示:上下拖曳歌曲，即可調整曲序，調整完後請按儲存。<p>
 <input type="button" value="儲存" onclick="saveData('${album.id}','${creatorId}')"/>
@@ -50,21 +50,23 @@ function saveData(albumID,creatorId){
 	document.fm.action="${pageContext.request.contextPath}/saveAlbumData.do?albumID="+albumID+"&creatorId="+creatorId;
     document.fm.submit();
 }
-function deleteData(){
+function deleteData(creatorId){
 	if(confirm('你確定要刪除這些歌?')){
-		document.fm.action="${pageContext.request.contextPath}/deleteSongData.do";
+		document.fm.action="${pageContext.request.contextPath}/deleteSongData.do?creatorId="+creatorId;
 		document.fm.submit();
 		}
 }
-function changeState(state){
-	var url = "${pageContext.request.contextPath}/changeState.do?state="+state;    
+function changeState(state,albumID,creatorId){
+	//var url =     
 	//以下兩行是將中文字做編碼
-	url = encodeURI(url); 
-	url = encodeURI(url);
-	document.fm.action=url;
+	//url = encodeURI(url); 
+	//url = encodeURI(url);
+	document.fm.action="${pageContext.request.contextPath}/changeState.do?state="+state+"&albumID="+albumID+"&creatorId="+creatorId;
     document.fm.submit();
 }
-function addSong(){
+function addSong(albumID,creatorId){
+	document.fm.action="${pageContext.request.contextPath}/addSong.do?albumId="+albumID+"&creatorId="+creatorId;
+	document.fm.submit();
 }
 function editSongData(songID,creatorId){
 	window.open("${pageContext.request.contextPath}/editSongData.do?songID="+songID+"&creatorId="+creatorId);
