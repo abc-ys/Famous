@@ -135,7 +135,7 @@ public class MusicServiceImpl implements MusicService{
     }
     
     /**
-     * 查詢專輯資料     (再確認一下，為什麼要有RecommendAlbum[]和song[])
+     * 查詢專輯資料(就是專輯profile頁)     (再確認一下，為什麼要有RecommendAlbum[]和song[])
      * @param albumID 專輯編號
      */
     public ArrayList queryAlbumData(long albumID){
@@ -371,10 +371,12 @@ public class MusicServiceImpl implements MusicService{
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
     public void updateAlbum (long creatorId,long albumID, String albumType,String name,String date,String brand,String musicCategory,String tag,String cover,String cover2,String introduction,String status){
         	
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");  //建立當天日期時間
+    	
     	Album album = this.albumDAO.find(albumID);
     	album.setType(albumType);
     	album.setName(name);
-    	album.setModifyDate(date);
+    	album.setModifyDate(datetime);
     	album.setModifier(String.valueOf(creatorId));
     	album.setBrand(brand);    	
     	MusicCategory mc = this.musicCategoryDAO.find(album.getMusicCategory().getId());
@@ -412,17 +414,26 @@ public class MusicServiceImpl implements MusicService{
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
     public void updateSong(long creatorId,long songID, String songName, String musicType, String MOPEND, String status, String price, String price2, String discount, String tag, String lyrics, String lyricist, String composer, String producer){
     	
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");  //建立當天日期時間
+    	
     	Song song = this.songDAO.find(songID);
     	song.setName(songName);
     	MusicCategory mc = this.musicCategoryDAO.find(song.getMusicCategory().getId());
     	mc.setName(musicType);
     	song.setMusicCategory(mc);
-    	song.setModifyDate(MOPEND);
+    	song.setModifyDate(datetime);
     	song.setModifier(String.valueOf(creatorId));
     	song.setSeconds(status);
     	SongPrice sp = this.songPriceDAO.find(song.getSongPrice().getId());
-    	if(price2.equals("")){
-    		sp.setDiscountPrice(discount);
+    	sp.setDiscountPrice(discount);
+    	sp.setModifier(String.valueOf(creatorId));
+    	sp.setModifyDate(datetime);
+    	if(price2.equals("")&&price.equals("2")){
+    		sp.setPrice("");
+    	}else if(!price2.equals("")&&price.equals("2")){
+    		sp.setPrice("");
+    	}else{
+    		sp.setPrice(price2);
     	}
     	song.setSongPrice(sp);
     	song.setTag(tag);
