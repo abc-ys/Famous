@@ -12,7 +12,9 @@ import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -21,10 +23,13 @@ import com.ubn.befamous.entity.Order;
 import com.ubn.befamous.entity.ProductionCategory;
 import com.ubn.befamous.entity.SDCard;
 import com.ubn.befamous.entity.SDCardPrice;
+import com.ubn.befamous.service.TransactionRecordService;
 
 @Controller
 public class ManageProductDataController {
-
+	@Autowired
+	private TransactionRecordService transactionRecordService;
+	
 	//商品管理-新增商品資料
 	@RequestMapping("/addProductData")
 	public ModelAndView addproductdata(String year, String month) {
@@ -127,50 +132,38 @@ public class ManageProductDataController {
 	//商品管理-商品類別管理
 	@RequestMapping("/manageProductCategory")
 	public ModelAndView manageproductcategory() {
-		ModelAndView mav = new ModelAndView("manageProductCategory");
-		
-		ProductionCategory productionCategory = new ProductionCategory();
-		productionCategory.setProductionCategoryName("4G GSiSD卡");
-		ProductionCategory productionCategory2 = new ProductionCategory();
-		productionCategory2.setProductionCategoryName("儲值 300元");
-		ProductionCategory[] pc = {productionCategory,productionCategory2};
-		
-		mav.addObject("productionCategory",pc);
-		return mav;
+		return new ModelAndView("manageProductCategory", "productionClassification",this.transactionRecordService.queryProductionClassification());
+
 	}
 
 	//商品管理-商品類別管理-新增商品類別或子類別
 	@RequestMapping("/addProductCategory")
-	public String addproductcategory(String categoryName) {
-		
-		System.out.println("categoryName==>"+categoryName);
-		
+	public String addproductcategory(String productionClassificationName) {		
+		this.transactionRecordService.addProductionClassification(productionClassificationName);
 		return "redirect:manageProductCategory.do";
 	}
 		
 	//商品管理-商品類別管理-編輯商品類別或子類別
 	@RequestMapping("/editProductCategory")
-	public ModelAndView editproductcategory() {
+	public ModelAndView editproductcategory(long productionClassificationId, Model model) {
 		ModelAndView mav = new ModelAndView("editProductCategory");
+		model.addAttribute("productionClassificationId", productionClassificationId);
 		return mav;
 	}
 		
 	//商品管理-商品類別管理-關閉編輯商品類別或子類別的視窗
 	@RequestMapping("/editProductCategoryClose")
-	public ModelAndView editproductcategoryclose(String modifyName) {
+	public ModelAndView editproductcategoryclose(long productionClassificationId, String productionClassificationName) {
 		ModelAndView mav = new ModelAndView("editProductCategoryClose");
-		
-		System.out.println("modifyName==>"+modifyName);
-		
+		this.transactionRecordService.editProductionClassification(productionClassificationId, productionClassificationName);
 		return mav;
 	}
 		
 	//商品管理-商品類別管理-刪除商品類別或子類別
 	@RequestMapping("/deleteProductCategory")
-	public String deleteproductcategory() {
-
+	public String deleteproductcategory(long productionClassificationId) {
 		System.out.println("刪除類別");
-		
+		this.transactionRecordService.deleteProductionClassification(productionClassificationId);
 		return "redirect:manageProductCategory.do";
 	}
 	
@@ -187,9 +180,9 @@ public class ManageProductDataController {
 		sdCard.setReward("原價x0.5");
 		ProductionCategory productionCategory = new ProductionCategory();
 		long p =45678912;
-		productionCategory.setProductionCategoryRid(p);
+		//productionCategory.setId(p);
 		productionCategory.setProductionCategoryName("4G GSiSD卡");
-		productionCategory.setSdCard(sdCard);
+		//productionCategory.setSdCard(sdCard);
 		
 		ProductionCategory[] pc = {productionCategory};
 		mav.addObject("productionCategory",pc);
@@ -224,7 +217,7 @@ public class ManageProductDataController {
 		ModelAndView mav = new ModelAndView("productDetailData");
 		
 		SDCardPrice sdCardPrice = new SDCardPrice();
-		sdCardPrice.setpPrice("399");
+		sdCardPrice.setPrice("399");
 		sdCardPrice.setDiscountPrice("349");
 		sdCardPrice.setDiscountBonus("50");
 		SDCard sdCard = new SDCard();
@@ -235,9 +228,9 @@ public class ManageProductDataController {
 		sdCard.setIntroduction("用來存放音樂");
 		ProductionCategory productionCategory = new ProductionCategory();
 		long p =45678912;
-		productionCategory.setProductionCategoryRid(p);
+		//productionCategory.setId(p);
 		productionCategory.setProductionCategoryName("4G GSiSD卡");
-		productionCategory.setSdCard(sdCard);
+		//productionCategory.setSdCard(sdCard);
 		
 		
 		mav.addObject("productionCategory",productionCategory);
