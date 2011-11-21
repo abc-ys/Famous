@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import com.ubn.befamous.entity.Album;
 import com.ubn.befamous.entity.Creator;
+import com.ubn.befamous.entity.InelegantKeyword;
 import com.ubn.befamous.entity.Keyword;
 import com.ubn.befamous.entity.MusicCategory;
 import com.ubn.befamous.entity.News;
@@ -131,7 +132,7 @@ public interface MusicService {
      * 更新專輯
      * @param albumID 專輯編號
      */
-    public void updateAlbum (long albumID, String albumType,String name,String date,String brand,String musicCategory,String tag,String cover,String cover2,String introduction,String status);
+    public void updateAlbum (long creatorId,long albumID, String albumType,String name,String date,String brand,String musicCategory,String tag,String cover,String cover2,String introduction,String status);
     
     /**
      * 查詢歌曲
@@ -143,7 +144,7 @@ public interface MusicService {
      * 更新歌曲
      * @param song 歌曲的bean
      */
-    public void updateSong (long songID, String songName, String musicType, String MOPEND, String status, String price, String price2, String discount, String tag, String lyrics, String lyricist, String composer, String producer);
+    public void updateSong (long creatorId,long songID, String songName, String musicType, String MOPEND, String status, String price, String price2, String discount, String tag, String lyrics, String lyricist, String composer, String producer);
     
     /**
      * 刪除歌曲
@@ -193,17 +194,17 @@ public interface MusicService {
     //管理關鍵字
     
     /**
-     * 查詢不雅字關鍵字    (??????)
+     * 查詢不雅字關鍵字    
      */
-    public Keyword[] queryInelegantKeywords();
+    public InelegantKeyword[] queryInelegantKeywords();
     
     /**
-     * 新增不雅字關鍵字    (??????)
+     * 新增不雅字關鍵字  
      */
     public void addInelegantKeywords(long managerID, String keyword);
     
     /**
-     * 刪除不雅字關鍵字    (??????)
+     * 刪除不雅字關鍵字  
      * @param managerID 管理者編號
      * @param inelegantKeywordID 不雅關鍵字編號
      */
@@ -228,7 +229,13 @@ public interface MusicService {
      * 新增音樂類別
      * @param managerID 管理者編號
      */
-    public void addMusicCategory (long managerID);
+    public void addMusicCategory (long managerID,String categoryName);
+    
+    /**
+     * 新增音樂子類別
+     * @param managerID 管理者編號
+     */
+    public void addSubMusicCategory(long managerID, String categoryName, long fatherID);
     
     /**
      * 更新音樂類別

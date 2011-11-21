@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ubn.befamous.dao.IBaseDao;
 import com.ubn.befamous.entity.Album;
 import com.ubn.befamous.entity.Creator;
+import com.ubn.befamous.entity.InelegantKeyword;
 import com.ubn.befamous.entity.Keyword;
 import com.ubn.befamous.entity.Member;
 import com.ubn.befamous.entity.MemberStatus;
@@ -39,6 +40,10 @@ public class MusicServiceImpl implements MusicService{
 	@Autowired
 	@Qualifier("albumDAO")
 	private IBaseDao<Album, Long> albumDAO;
+	
+	@Autowired
+	@Qualifier("inelegantKeywordDAO")
+	private IBaseDao<InelegantKeyword, Long> inelegantKeywordDAO;
 	
 	@Autowired
 	@Qualifier("songPriceDAO")
@@ -227,26 +232,30 @@ public class MusicServiceImpl implements MusicService{
      */
     public Album[] queryPromotionAlbums(){
     	String today=DateFormatUtils.format(new Date(), "yyyyMMdd");
-    	Query query = this.sessionfactory.getCurrentSession().createQuery("from RecommendActivity a where (:today  between a.startDate and a.endDate) and (a.albumSet.hidden is empty) and (a.albumSet.dropDate is null) and (a.albumSet.creator.memberStatus.statusName = :memberStatus)");
-		//Query query = this.sessionfactory.getCurrentSession().createQuery("from RecommendActivity a join a.albumSet b where (:today  between a.startDate and a.endDate) and (a.status = :status) and (b.hidden is empty) and (b.dropDate is null) and (b.creator.memberStatus.statusName = :memberStatus)");
-		query.setString("today", today);
-		query.setString("memberStatus", "1");       //1: 會員狀態為正常 
-		query.setString("status", "1");       //1: 專輯條件為公開
+    	
+    	System.out.println("today"+today);
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("from RecommendActivity a where (:today  between a.startDate and a.endDate)");
+    	query.setString("today", today);
+//		query.setString("memberStatus", "1");       //1: 會員狀態為正常 
+//		query.setString("status", "1");       //1: 專輯條件為公開
 		
 		List<RecommendActivity> resultList=query.list();
-		if(resultList==null||resultList.isEmpty()){
+		/*if(resultList==null||resultList.isEmpty()){
+			System.out.println("resultList is empty");
 			return new Album[0];
 		}
+		System.out.println("resultList is not  empty");*/
 		RecommendActivity s=resultList.get(0);
-//		for (RecommendActivity s:resultList) {
+		
 			System.out.println("size"+s.getAlbumSet().size());
 			Album[] albumset = new Album[s.getAlbumSet().size()];
 			int i=0;
 			for (Album as:s.getAlbumSet()) {
 				albumset[i]=as;
-				//System.out.println("ssss==>"+albumset[i].getCreator().getUserName());
+				System.out.println("ssss==>"+albumset[i].getCreator().getUserName());
 				i++;
 			}
+		
     	return albumset;
     }
 	
@@ -325,7 +334,7 @@ public class MusicServiceImpl implements MusicService{
      * 查詢音樂  (音樂管理-編輯專輯的第二個頁面)
      * @param albumID 歌曲編號
      */
-    public Album queryMusic (long albumID){
+    public Album queryMusic(long albumID){
     	
     	Album album = this.albumDAO.find(albumID);
     	/*
@@ -356,15 +365,17 @@ public class MusicServiceImpl implements MusicService{
     }
     
     /**
-     * 更新專輯    (更新失敗)
+     * 更新專輯   
      * @param album 專輯的bean
      */
-    public void updateAlbum (long albumID, String albumType,String name,String date,String brand,String musicCategory,String tag,String cover,String cover2,String introduction,String status){
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
+    public void updateAlbum (long creatorId,long albumID, String albumType,String name,String date,String brand,String musicCategory,String tag,String cover,String cover2,String introduction,String status){
         	
     	Album album = this.albumDAO.find(albumID);
     	album.setType(albumType);
     	album.setName(name);
     	album.setModifyDate(date);
+    	album.setModifier(String.valueOf(creatorId));
     	album.setBrand(brand);    	
     	MusicCategory mc = this.musicCategoryDAO.find(album.getMusicCategory().getId());
     	mc.setName(musicCategory);
@@ -395,10 +406,11 @@ public class MusicServiceImpl implements MusicService{
     }
     
     /**
-     * 更新歌曲       (更新失敗)
+     * 更新歌曲   
      * @param song 歌曲的bean
      */
-    public void updateSong(long songID, String songName, String musicType, String MOPEND, String status, String price, String price2, String discount, String tag, String lyrics, String lyricist, String composer, String producer){
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
+    public void updateSong(long creatorId,long songID, String songName, String musicType, String MOPEND, String status, String price, String price2, String discount, String tag, String lyrics, String lyricist, String composer, String producer){
     	
     	Song song = this.songDAO.find(songID);
     	song.setName(songName);
@@ -406,6 +418,7 @@ public class MusicServiceImpl implements MusicService{
     	mc.setName(musicType);
     	song.setMusicCategory(mc);
     	song.setModifyDate(MOPEND);
+    	song.setModifier(String.valueOf(creatorId));
     	song.setSeconds(status);
     	SongPrice sp = this.songPriceDAO.find(song.getSongPrice().getId());
     	if(price2.equals("")){
@@ -423,9 +436,10 @@ public class MusicServiceImpl implements MusicService{
     }
     
     /**
-     * 刪除歌曲       (刪除失敗)
+     * 刪除歌曲    
      * @param songID 歌曲編號
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
     public void deleteSong(long songID){
     	
     	this.songDAO.delete(songID);
@@ -439,14 +453,12 @@ public class MusicServiceImpl implements MusicService{
      */
     public Album[] queryOwnAlbums (long creatorID){
     	
-    	Query query = this.sessionfactory.getCurrentSession().createQuery("from Album a where (a.creator.id = :creatorId) and (a.dropDate is null) and (a.status = :status) and (a.hidden is empty) and (a.status = :status) ORDER BY createDate DESC");
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("from Album a where (a.creator.id = :creatorId) and (a.dropDate is null) ORDER BY createDate DESC");
     	query.setLong("creatorId", creatorID);
-		query.setString("status", "1");       //1: 專輯條件為公開
     	
     	List<Album> albumList = (List<Album>)query.list();
     	Album[] albumList2 = new Album[albumList.size()];
 		int i = 0;
-		System.out.println("ssss==>");
 		for (Album albumList3:albumList) {
 			albumList2[i]=albumList3;
 			System.out.println("a==>"+albumList2[i].getId());
@@ -512,14 +524,14 @@ public class MusicServiceImpl implements MusicService{
     //管理關鍵字
     
     /**
-     * 查詢不雅字關鍵字    (??????)
+     * 查詢不雅字關鍵字  
      */
-    public Keyword[] queryInelegantKeywords(){
+    public InelegantKeyword[] queryInelegantKeywords(){
 
-    	Keyword[] keyword = this.keywordDAO.findAll();
-    	Keyword[] k = new Keyword[keyword.length];
+    	InelegantKeyword[] keyword = this.inelegantKeywordDAO.findAll();
+    	InelegantKeyword[] k = new InelegantKeyword[keyword.length];
 		int i = 0;
-		for (Keyword k2:keyword) {
+		for (InelegantKeyword k2:keyword) {
 			k[i]=k2;
 			System.out.println("a==>"+k[i].getName());
 			i++;
@@ -529,7 +541,7 @@ public class MusicServiceImpl implements MusicService{
     }
     
     /**
-     * 新增不雅字關鍵字    (??????)
+     * 新增不雅字關鍵字 
      * @param managerID 管理者編號
      * @param keyword 關鍵字
      */
@@ -537,21 +549,22 @@ public class MusicServiceImpl implements MusicService{
     	
     	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");  //當天日期時間
 
-    	Keyword kw = new Keyword();
+    	InelegantKeyword kw = new InelegantKeyword();
     	kw.setCreateDate(datetime);
     	kw.setCreateUser(String.valueOf(managerID));
     	kw.setName(keyword);
     	
-    	this.keywordDAO.save(kw);
+    	this.inelegantKeywordDAO.save(kw);
     }
     
     /**
-     * 刪除不雅字關鍵字    (??????)   (刪除失敗)
+     * 刪除不雅字關鍵字    
      * @param inelegantKeywordID 不雅關鍵字編號
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
     public void deleteInelegantKeywords(long inelegantKeywordID){
     	
-    	this.keywordDAO.delete(inelegantKeywordID);
+    	this.inelegantKeywordDAO.delete(inelegantKeywordID);
     }
     
     //管理專輯類別與排行榜
@@ -564,23 +577,27 @@ public class MusicServiceImpl implements MusicService{
 
     	MusicCategory[] musicCategory = this.musicCategoryDAO.findAll();
     	
-    	MusicCategory[] mc = new MusicCategory[musicCategory.length];
-		int i = 0;
-		System.out.println("ssss==>");
-		for (MusicCategory mc2:musicCategory) {
-			mc[i]=mc2;
-			System.out.println("a==>"+mc[i].getId());
-			i++;
-		}
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("from MusicCategory a where a.parent is null and a.dropDate is null");
+		
+		List<MusicCategory> resultList=(List<MusicCategory>)query.list();
+		MusicCategory[] mcSet = new MusicCategory[resultList.size()];
+		
+			int i=0;
+			for (MusicCategory mc2:resultList) {
+				mcSet[i]=mc2;
+				System.out.println("ssss==>"+mcSet[i].getName());
+				i++;
+			}
     	
-    	return musicCategory;
+    	return mcSet;
     }
     
     /**
-     * 刪除音樂類別        (刪除再度失敗)
+     * 刪除音樂類別    
      * @param musicCategoryID 音樂分類編號
      * @param managerID 管理者編號
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
     public void deleteMusicCategory (long musicCategoryID){
     	
     	this.musicCategoryDAO.delete(musicCategoryID);
@@ -591,12 +608,12 @@ public class MusicServiceImpl implements MusicService{
      * 新增音樂類別
      * @param managerID 管理者編號
      */
-    public void addMusicCategory(long managerID){
+    public void addMusicCategory(long managerID,String categoryName){
     	
     	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");  //當天日期時間
     	
     	MusicCategory mc = new MusicCategory();
-    	mc.setName("抒情樂");
+    	mc.setName(categoryName);
     	mc.setCreateDate(datetime);
     	mc.setCreateUser(String.valueOf(managerID));
     	
@@ -604,11 +621,29 @@ public class MusicServiceImpl implements MusicService{
     }
     
     /**
-     * 更新音樂類別           (更新再度失敗)
+     * 新增音樂子類別
+     * @param managerID 管理者編號
+     */
+    public void addSubMusicCategory(long managerID, String categoryName, long fatherID){
+    	
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");  //當天日期時間
+    	
+    	MusicCategory mc = new MusicCategory();
+    	mc.setName(categoryName);
+    	mc.setCreateDate(datetime);
+    	mc.setCreateUser(String.valueOf(managerID));
+    	mc.setParent(String.valueOf(fatherID));
+    	
+    	this.musicCategoryDAO.save(mc);
+    }
+    
+    /**
+     * 更新音樂類別      
      * @param musicCategoryID 音樂分類編號
      * @param name 音樂分類名稱
      * @param managerID 管理者編號
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
     public void updateMusicCategory(long musicCategoryID, String name, long managerID){
     	
     	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");  //當天日期時間
@@ -723,6 +758,7 @@ public class MusicServiceImpl implements MusicService{
      * @param startDate 專輯周榜起始日期
      * @param endDate 專輯周架結束日期
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
     public Album[] updateAlbumWeekCP (String startDate, String endDate, String modifyDate, int CP){
     	Album[] a = {};
     	return a;
@@ -735,6 +771,7 @@ public class MusicServiceImpl implements MusicService{
      * @param startDate 專輯周榜起始日期
      * @param endDate 專輯周架結束日期
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
     public Album[] updateAlbumMonthCP (String startDate, String endDate, String modifyDate, int CP){
     	Album[] a = {};
     	return a;
@@ -747,6 +784,7 @@ public class MusicServiceImpl implements MusicService{
      * @param startDate 專輯周榜起始日期
      * @param endDate 專輯周架結束日期
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
     public Song[] updateSongWeekCP (String startDate, String endDate, String modifyDate, int CP){
     	Song[] s = {};
     	return s;
@@ -759,6 +797,7 @@ public class MusicServiceImpl implements MusicService{
      * @param startDate 專輯月榜起始日期
      * @param endDate 專輯月榜結束日期
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
     public Song[] updateSongMonthCP (String startDate, String endDate, String modifyDate, int CP){
     	Song[] s = {};
     	return s;
@@ -771,6 +810,7 @@ public class MusicServiceImpl implements MusicService{
      * @param startDate 專輯周榜起始日期
      * @param endDate 專輯周架結束日期
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
     public Creator[] updateCreatorWeekCP (String startDate, String endDate, String modifyDate, int CP){
     	Creator[] c = {};
     	return c;
@@ -783,6 +823,7 @@ public class MusicServiceImpl implements MusicService{
      * @param startDate 專輯月榜起始日期
      * @param endDate 專輯月榜結束日期
      */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
     public Creator[] updateCreatorMonthCP (String startDate, String endDate, String modifyDate, int CP){
     	Creator[] c = {};
     	return c;
