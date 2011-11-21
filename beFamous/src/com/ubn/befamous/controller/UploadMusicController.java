@@ -326,7 +326,7 @@ public class UploadMusicController {
 	
 	//新增專輯
 		@RequestMapping("/addAlbum")
-		public ModelAndView addAlbum(Model model)
+		public ModelAndView addAlbum(Model model,long creatorId)
 		{
 			System.out.println("addAlbum==>");
 			
@@ -336,6 +336,7 @@ public class UploadMusicController {
 			coverList.add("images/album.png");
 			
 			model.addAttribute("defaultCover", coverList);
+			model.addAttribute("creatorId", creatorId);
 			return new ModelAndView("addAlbum");
 			
 		}
@@ -343,7 +344,6 @@ public class UploadMusicController {
 		@RequestMapping("/saveAlbum")
 		public String saveAlbum(HttpServletRequest request, long creatorId, Model model) throws Exception
 		{
-			creatorId=1;
 			
 			System.out.println("saveAlbum==>");
 			
@@ -355,6 +355,7 @@ public class UploadMusicController {
 			String albumIntroduction = "";
 			String albumStatus = "";
 			String albumCover = "";
+			String defaultCover = "";
 			
 			int yourMaxMemorySize = 500 * 500* 1024;
 			File yourTempDirectory = new File("/tmp");
@@ -406,6 +407,8 @@ public class UploadMusicController {
 							albumStatus = value;
 						}else if(name.equals("cover")){
 							albumCover = value;
+						}else if(name.equals("defaultCover")){
+							defaultCover = value;
 						}
 					} else {
 						// Process a file upload
@@ -450,9 +453,9 @@ public class UploadMusicController {
 			} catch (FileUploadBase.SizeLimitExceededException ex1) {
 				System.out.println("上傳檔案超過最大檔案允許大小" + yourMaxRequestSize / (1024 * 1024) + "MB !");
 			}
-			System.out.println(" creatorId="+creatorId+", albumType="+albumType+", albumName="+albumName+", albumBrand="+albumBrand+", musicCategory="+musicCategory+", albumTag="+albumTag+", albumIntroduction="+albumIntroduction+", albumStatus="+albumStatus+", albumCover="+albumCover);
+			System.out.println(" creatorId="+creatorId+", albumType="+albumType+", albumName="+albumName+", albumBrand="+albumBrand+", musicCategory="+musicCategory+", albumTag="+albumTag+", albumIntroduction="+albumIntroduction+", albumStatus="+albumStatus+", albumCover="+albumCover+", defaultCover="+defaultCover);
 			
-			long albumID = musicService.saveAlbum(creatorId,albumType,albumName,albumBrand,musicCategory,albumTag,albumIntroduction,albumStatus,albumCover);
+			long albumID = musicService.saveAlbum(creatorId,albumType,albumName,albumBrand,musicCategory,albumTag,albumIntroduction,albumStatus,albumCover,defaultCover);
 			
 			model.addAttribute("creatorId", creatorId);
 			model.addAttribute("albumId", albumID);
