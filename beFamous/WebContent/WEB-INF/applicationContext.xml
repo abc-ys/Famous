@@ -81,6 +81,7 @@
 				<value>com.ubn.befamous.entity.TransactionRcd</value>
 				<value>com.ubn.befamous.entity.WeekRanking</value>
 				<value>com.ubn.befamous.entity.InelegantKeyword</value>
+				<value>com.ubn.befamous.entity.ProductionClassification</value>
 			</list>
 		</property>
 		<property name="hibernateProperties">
@@ -102,6 +103,14 @@
 		</property>
 	</bean>
 
+	<bean id="productionClassificationDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+		<constructor-arg>
+			<value>com.ubn.befamous.entity.ProductionClassification</value>
+		</constructor-arg>
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
 	<bean id="activityDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
 		<constructor-arg>
 			<value>com.ubn.befamous.entity.Activity</value>

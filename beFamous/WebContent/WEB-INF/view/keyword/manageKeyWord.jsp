@@ -14,7 +14,7 @@
 <p>
 <font size="2">&nbsp新增字詞組:</font>&nbsp
 <input type="text" name="keyWordName" size="15">
-<input type="submit" value="新增" onclick="add()"/>
+<input type="button" value="新增" onclick="add('${adminID}')"/>
 <p>
 查詢結果<br>
 <table border="1" BorderColor="#000000" cellpadding="0" cellspacing="0">
@@ -25,18 +25,18 @@
 	<c:forEach var="kw" items="${keyword}" varStatus="status">
 <tr><td Height="30" valign="top"><font size="2">${status.index+1}</font></td>
 	<td valign="top"><font size="2">${kw.name}</font></td>
-	<td valign="top"><font size="2"><a href="javascript:void(0)" onclick="deleteWord()">刪除</a></font></td></tr>
+	<td valign="top"><font size="2"><a href="javascript:void(0)" onclick="deleteWord('${kw.id}','${adminID}')">刪除</a></font></td></tr>
 	</c:forEach>
 </table>
 </form>
 </body>
 <script>
-function add(){
-     document.fm.action="${pageContext.request.contextPath}/addKeyWord.do";
+function add(adminID){
+     document.fm.action="${pageContext.request.contextPath}/addKeyWord.do?adminID="+adminID;
      document.fm.submit();
 }
-function deleteWord(){
-	document.fm.action="${pageContext.request.contextPath}/deleteKeyWord.do";
+function deleteWord(ID,adminID){
+	document.fm.action="${pageContext.request.contextPath}/deleteKeyWord.do?ID="+ID+"&adminID="+adminID;
     document.fm.submit();
 }
 </script>
