@@ -69,13 +69,14 @@ public class UploadMusicController {
 	
 	//音樂管理-編輯專輯
 	@RequestMapping("/changeState")
-	public String changestate(String state)throws UnsupportedEncodingException{
+	public String changestate(String state,long albumID,long creatorId){
+	//public String changestate(String state)throws UnsupportedEncodingException{
 			
-		String selStr=java.net.URLDecoder.decode(state,"UTF-8"); //這行是將中文字做解碼
-		
-		System.out.println("state==>"+selStr);
+		//String selStr=java.net.URLDecoder.decode(state,"UTF-8"); //這行是將中文字做解碼
+		musicService.changeAlbumStatus(state, albumID, creatorId);
+		System.out.println("state==>"+state);
 			
-		return "redirect:editAlbumContent.do";
+		return "redirect:editAlbumContent.do?albumID="+albumID+"&creatorId="+creatorId;
 	}
 	
 	//音樂管理-編輯專輯-儲存
@@ -130,10 +131,11 @@ public class UploadMusicController {
 		mav.addObject("mType",mType);
 		mav.addObject("song",song);
 		mav.addObject("songID", songID);
+		mav.addObject("creatorId", creatorId);
 		return mav;
 	}
 	
-	//音樂管理-編輯專輯-更新歌曲資訊   (怪怪的)
+	//音樂管理-編輯專輯-更新歌曲資訊   
 		@RequestMapping("/updateSongData")
 		public String updatesongdata(long songID, long creatorId, String songName, String musicType, String MOPEND, String status, String price, String price2, String discount, String tag, String lyrics, String lyricist, String composer, String producer){
 			
@@ -314,9 +316,9 @@ public class UploadMusicController {
 		System.out.println("introduction==>"+introduction);
 		System.out.println("status==>"+status);	
 		
-		musicService.updateAlbum(creatorId,albumID, albumType, fileName, date, brand, musicCategory, tag, cover, cover2, introduction, status);
+		musicService.updateAlbum(creatorId,albumID, albumType, name, date, brand, musicCategory, tag, cover, cover2, introduction, status);
 		
-		return "redirect:editAlbumData.do";
+		return "redirect:editAlbumData.do?albumID="+albumID+"&creatorId="+creatorId;
 	}
 	
 	
