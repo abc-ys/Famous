@@ -26,7 +26,7 @@ pageEncoding="UTF-8"%>
     <h4>商品管理</h4>
     <a href="${pageContext.request.contextPath}/addProductData.do">新增商品資料</a><br>
     <a href="${pageContext.request.contextPath}/manageProductCategory.do">商品類別管理</a><br>
-    <a href="${pageContext.request.contextPath}/queryProductData.do">查詢商品資料</a><br>
+    <a href="${pageContext.request.contextPath}/queryProduct.do">查詢商品資料</a><br>
   </td>
   <tr>
   <td>
