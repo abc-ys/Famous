@@ -399,210 +399,172 @@ public class MemberController {
 		return new ModelAndView("queryFriendsCreators");
 	}
 
-	//個人資料編輯頁
-	@RequestMapping("/editMemberData")
-	public ModelAndView queryMember(String memberID, Model model)
-	{
-		System.out.println("editMemberData==>");
-		System.out.println("	memberID="+memberID);
-		Creator creator = new Creator();
-		creator.setLikeMusicType("兒歌");
-		creator.setLikeSinger("安心亞,瑤瑤");
+	//個人資料編輯頁(傳入參數"userID"待新增!!!)
+		@RequestMapping("/editMemberData")
+		public ModelAndView queryMember(String userID, Model model)
+		{
+			System.out.println("editMemberData==>");
+			long userID2 = 1;
+			return new ModelAndView("queryMember", "member",this.personService.queryMember(userID2));
+			
+		}
 		
-		Member member = new Member();
-		member.setId(111);
-		member.setIdentityName("創作人");
-		member.setPicture("images/lucy.jpg");
-		member.setUserName("劉為駿");
-		member.setLocation("台灣");
-		member.setCity("台中");
-		member.setBirthday("2011/11/11");
-		member.setEmail("aaa.@ubn.com");
-		member.setPassword("xxxxxxx");
-		member.setSex("男");
-		member.setWebSite("www.google.com");		
-		member.setSubscribeStatus("Y");
-		member.setIntroduction("我是kevin，我長得像小夫!");
-		//member.setCreator(creator);
-				
-		model.addAttribute("member", member);			
+		//儲存個人資料編輯頁的修改並呈現修改後結果
+		@RequestMapping("/saveMemberData")
+		public String saveMemberData(long userID,String identityName,String userName,String location,String city,String birthday, String sex,String webSite,String subscribeStatus,String introduction,String likeMusicTypes,String likeSingers)
+		{
+			System.out.println("saveMemberData==>");
+			this.personService.updateMember(userID, identityName, userName, location, city, birthday, sex, webSite, subscribeStatus, introduction, likeMusicTypes, likeSingers);		
+			return "redirect:editMemberData.do";	
+		}
 		
-		return new ModelAndView("queryMember");
+		//個人資料編輯頁的修改email(window open)
+		@RequestMapping("/modifyEmail")
+		public ModelAndView modifyEmail(long userID, Model model) {
+			System.out.println("modifyEmail==>");
+			Member member = (Member) this.personService.queryMember(userID).get(0);
+			model.addAttribute("member",member);
+			return new ModelAndView("modifyEmail");
+		}
 		
-	}
-	
-	//儲存個人資料編輯頁的修改並呈現修改後結果
-	@RequestMapping("/saveMemberData")
-	public String saveMemberData(String memberID,String picture,String identityName,String userName,String location,String city,String birthday,String password, String email,String sex,String webSite,String subscribeStatus,String introduction,String likeMusicType,String likeSinger,Model model)
-	{
-		System.out.println("saveMemberData==>");
-		System.out.println("	memberID="+memberID+", identityName="+identityName+", userName="+userName+", location="+location+", city="+city+", birthday="+birthday+", sex="+sex+", webSite="+webSite+", subscribeStatus="+subscribeStatus+", introduction="+introduction+", likeMusicType="+likeMusicType+", likeSinger="+likeSinger);
+		//儲存修改email結果
+		@RequestMapping("/saveEmail")
+		public ModelAndView saveEmail(long userID, String newEmail) {
+			System.out.println("saveEmail==>");
+			System.out.println(		"userID="+userID+", newEmail="+newEmail);
+			this.personService.updateEmail(userID, newEmail);
+			return new ModelAndView("saveEmail");
+		}
 		
-		Creator creator = new Creator();
-		creator.setLikeMusicType(likeMusicType);
-		creator.setLikeSinger(likeSinger);
-		Member member = new Member();		
-		member.setPicture(picture);
-		member.setIdentityName(identityName);
-		member.setUserName(userName);
-		member.setLocation(location);
-		member.setCity(city);
-		member.setBirthday(birthday);
-		member.setEmail(email);
-		member.setPassword(password);
-		member.setSex(sex);
-		member.setWebSite(webSite);		
-		member.setSubscribeStatus(subscribeStatus);
-		member.setIntroduction(introduction);
-		//member.setCreator(creator);
+		//個人資料編輯頁的修改密碼(window open)
+		@RequestMapping("/modifyPassword")
+		public ModelAndView modifyPassword(long userID, Model model) {
+			System.out.println("modifyPassword==>");
+			Member member = (Member) this.personService.queryMember(userID).get(0);
+			model.addAttribute("member",member);
+			return new ModelAndView("modifyPassword");
+		}
 		
-		model.addAttribute("member", member);	
-		return "redirect:editMemberData.do";	
-	}
-	
-	//個人資料編輯頁的修改email(window open)
-	@RequestMapping("/modifyEmail")
-	public ModelAndView modifyEmail(String memberID, String password,Model model) {
-		System.out.println("modifyEmail==>");
-		System.out.println(		"memberID="+memberID+"password="+password);
-		model.addAttribute("password",password);
-		return new ModelAndView("modifyEmail");
-	}
-	
-	//儲存修改email結果
-	@RequestMapping("/saveEmail")
-	public ModelAndView saveEmail(String memberID, String newEmail) {
-		System.out.println("saveEmail==>");
-		System.out.println(		"memberID="+memberID+"newEmail="+newEmail);
-		Member member = new Member();
-		member.setEmail(newEmail);
-		System.out.println("newEmail------"+newEmail);
-		return new ModelAndView("saveEmail");
-	}
-	
-	//個人資料編輯頁的修改密碼(window open)
-	@RequestMapping("/modifyPassword")
-	public ModelAndView modifyPassword(String memberID, String password,Model model) {
-		System.out.println("modifyPassword==>");
-		System.out.println(		"memberID="+memberID+"password="+password);
-		model.addAttribute("password",password);
-		return new ModelAndView("modifyPassword");
-	}
-	
-	//儲存修改密碼結果
-	@RequestMapping("/savePassword")
-	public ModelAndView savePassword(String memberID, String newPassword) {
-		System.out.println("savePassword==>");
-		System.out.println(		"memberID="+memberID+"newPassword="+newPassword);
-		Member member = new Member();
-		member.setPassword(newPassword);
-		System.out.println("newPassword------"+newPassword);
-		return new ModelAndView("savePassword");
-	}
+		//儲存修改密碼結果
+		@RequestMapping("/savePassword")
+		public ModelAndView savePassword(long userID, String newPassword) {
+			System.out.println("savePassword==>");
+			this.personService.updatePassword(userID, newPassword);
+			return new ModelAndView("savePassword");
+		}
 
-	//個人資料編輯頁的刪除個人圖片
-	@RequestMapping("/deleteMemberPicture")
-	public String deleteMemberPicture(String memberID) {
-		Member member = new Member();
-		member.setPicture("");
-		return "redirect:editMemberData.do";
-	}
-	
-	//個人資料編輯頁的上傳個人圖片(window open)
-	@RequestMapping("/uploadMemberPicture")
-	public ModelAndView uploadMemberPicture(String memberId,Model model) {
-		System.out.println("uploadMemberPicture==>");
-		System.out.println(		"memberId="+memberId);
-		model.addAttribute("memberId",memberId);
-		return new ModelAndView("uploadMemberPicture");
-	}
-	
-	//儲存會員上傳的圖片
-	@RequestMapping("/handleUploadPicture")
-	public ModelAndView handleUploadPicture(HttpServletRequest request, String memberId) throws Exception {
+		//個人資料編輯頁的刪除個人圖片
+		@RequestMapping("/deleteMemberPicture")
+		public String deleteMemberPicture(long userID) {
+			this.personService.deleteMemberPicture(userID);
+			return "redirect:editMemberData.do";
+		}
 		
-		int yourMaxMemorySize = 500 * 500* 1024;
-		File yourTempDirectory = new File("/tmp");
-		int yourMaxRequestSize = 500 * 500* 1024;
-		boolean writeToFile = true;
-		String allowedFileTypes = ".gif .jpg .png";
-
-		String saveDirectory = "D:/gitTest/ImageWeb/WebContent/image/memberPicture";
-
-		// Check that we have a file upload request
-		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-		System.out.println("isMultipart=" + isMultipart + "<br>");
-
-		// Create a factory for disk-based file items
-		DiskFileItemFactory factory = new DiskFileItemFactory(yourMaxMemorySize, yourTempDirectory);
+		//個人資料編輯頁的上傳個人圖片(window open)
+		@RequestMapping("/uploadMemberPicture")
+		public ModelAndView uploadMemberPicture(long userID, Model model) {
+			System.out.println("uploadMemberPicture==>");
+			System.out.println(userID);
+			Member member = (Member) this.personService.queryMember(userID).get(0);
+			model.addAttribute("member",member);
+			return new ModelAndView("uploadMemberPicture");
+		}
 		
-		// Create a new file upload handler
-		ServletFileUpload upload = new ServletFileUpload(factory);
+		//儲存會員上傳的圖片
+		@RequestMapping("/handleUploadPicture")
+		public ModelAndView handleUploadPicture(HttpServletRequest request) throws Exception {
+			
+			int yourMaxMemorySize = 500 * 500* 1024;
+			File yourTempDirectory = new File("/tmp");
+			int yourMaxRequestSize = 500 * 500* 1024;
+			boolean writeToFile = true;
+			String allowedFileTypes = ".gif .jpg .png";
+			String fileName="";
+			long userID = 0;
+			String fName="";
+			String saveDirectory = "D:/UBN_Area/ImageWeb/WebContent/image";
 
-		// Set overall request size constraint
-		upload.setSizeMax(yourMaxRequestSize);
+			// Check that we have a file upload request
+			boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+			System.out.println("isMultipart=" + isMultipart + "<br>");
 
-		try {
-			// Parse the request
-			List items = upload.parseRequest(request);
+			// Create a factory for disk-based file items
+			DiskFileItemFactory factory = new DiskFileItemFactory(yourMaxMemorySize, yourTempDirectory);
+			
+			// Create a new file upload handler
+			ServletFileUpload upload = new ServletFileUpload(factory);
 
-			// Process the uploaded items
-			Iterator iter = items.iterator();
-			while (iter.hasNext()) {
-				FileItem item = (FileItem) iter.next();
+			// Set overall request size constraint
+			upload.setSizeMax(yourMaxRequestSize);
 
-				if (item.isFormField()) {
-					// Process a regular form field	
-					//processFormField(item);		
-					String name = item.getFieldName();
-					String value = item.getString("UTF-8");
-					System.out.println(name + "=" + value + "<br />");
-				} else {
-					// Process a file upload
-					//processUploadedFile(item);	
-					String fieldName = item.getFieldName();
-					String fileName = item.getName();
-					String contentType = item.getContentType();
-					boolean isInMemory = item.isInMemory();
-					long sizeInBytes = item.getSize();
-					System.out.println("memberId=" + memberId + "<br />");
-					System.out.println("fieldName=" + fieldName + "<br />");
-					System.out.println("fileName=" + fileName + "<br />");
-					System.out.println("contentType=" + contentType + "<br />");
-					System.out.println("isInMemory=" + isInMemory + "<br />");
-					System.out.println("sizeInBytes=" + sizeInBytes + "<br />");
-					
-				      
-					if (fileName != null && !"".equals(fileName)) {
-						if (writeToFile) {
-							// 副檔名
-							 String formatName = fileName.substring(fileName.length() - 4,fileName.length());
-						    fileName = (memberId + formatName).toLowerCase();
-						      
-							System.out.println("fileName to be saved=" + fileName + "<br />");
-							String extension = FilenameUtils.getExtension(fileName);
-							if (allowedFileTypes.indexOf(extension.toLowerCase()) != -1) {
-							    File uploadedFile = new File(saveDirectory,	fileName);						
-							    item.write(uploadedFile);
+			try {
+				// Parse the request
+				List items = upload.parseRequest(request);
+
+				// Process the uploaded items
+				Iterator iter = items.iterator();
+				while (iter.hasNext()) {
+					FileItem item = (FileItem) iter.next();
+
+					if (item.isFormField()) {
+						// Process a regular form field	
+						//processFormField(item);		
+						String name = item.getFieldName();
+						String value = item.getString("UTF-8");
+						if(name.equals("userID")){
+							userID = Long.parseLong(value);
+							fName = value;
+						}
+						System.out.println(name + "=" + value + "<br />");
+					} else {
+						// Process a file upload
+						//processUploadedFile(item);	
+						String fieldName = item.getFieldName();
+						fileName = item.getName();
+						String contentType = item.getContentType();
+						boolean isInMemory = item.isInMemory();
+						long sizeInBytes = item.getSize();
+						//System.out.println("userID=" + userID + "<br />");
+						System.out.println("fieldName=" + fieldName + "<br />");
+						System.out.println("fileName=" + fileName + "<br />");
+						System.out.println("contentType=" + contentType + "<br />");
+						System.out.println("isInMemory=" + isInMemory + "<br />");
+						System.out.println("sizeInBytes=" + sizeInBytes + "<br />");
+						
+					      
+						if (fileName != null && !"".equals(fileName)) {
+							if (writeToFile) {
+								// 副檔名
+								 String formatName = fileName.substring(fileName.length() - 4,fileName.length());
+								 fileName = (fName + formatName).toLowerCase();
+							      
+								System.out.println("fileName to be saved=" + fileName + "<br />");
+								String extension = FilenameUtils.getExtension(fileName);
+								if (allowedFileTypes.indexOf(extension.toLowerCase()) != -1) {
+								    File uploadedFile = new File(saveDirectory,	fileName);						
+								    item.write(uploadedFile);
+								} else {
+									System.out.println("上傳的檔案不能是" + extension + "<br />");
+								}
 							} else {
-								System.out.println("上傳的檔案不能是" + extension + "<br />");
+								//InputStream uploadedStream = item.getInputStream();
+								//...
+								//uploadedStream.close();
+								// Process a file upload in memory
+								byte[] data = item.get();
+								System.out.println("data size=" + data.length + "<br />");
 							}
-						} else {
-							//InputStream uploadedStream = item.getInputStream();
-							//...
-							//uploadedStream.close();
-							// Process a file upload in memory
-							byte[] data = item.get();
-							System.out.println("data size=" + data.length + "<br />");
 						}
 					}
 				}
+			} catch (FileUploadBase.SizeLimitExceededException ex1) {
+				System.out.println("上傳檔案超過最大檔案允許大小" + yourMaxRequestSize / (1024 * 1024) + "MB !");
 			}
-		} catch (FileUploadBase.SizeLimitExceededException ex1) {
-			System.out.println("上傳檔案超過最大檔案允許大小" + yourMaxRequestSize / (1024 * 1024) + "MB !");
+			System.out.println(userID);
+			String picture = "image/"+fileName;
+			this.personService.handleUploadPicture(userID, picture);
+			return new ModelAndView("handleUploadPicture");
 		}
-		return new ModelAndView("handleUploadPicture");
-	}
 	
 	//管理者查詢會員資料
 	@RequestMapping("/manageMember")

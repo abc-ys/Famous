@@ -3,6 +3,7 @@
 	<name>beFamous</name>
 	<comment></comment>
 	<projects>
+		<project>dbcore</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

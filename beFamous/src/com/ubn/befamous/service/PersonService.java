@@ -91,4 +91,39 @@ public interface PersonService {
 			           String actionName,String startDate,String endDate,
 			           String url,String createDate,String actionContent);
 	
+	/*
+	 * 查詢會員資料
+	 */
+	public ArrayList queryMember(long userID);
+	
+	/*
+	 * 更新會員資料
+	 */
+	public void updateMember(long userID,String identityName,String userName,String location,String city,String birthday, String sex,String webSite,String subscribeStatus,String introduction,String likeMusicTypes,String likeSingers);
+	
+	/*
+	 * 更新會員密碼
+	 */
+	public void updatePassword(long userID, String password);
+	
+	/*
+	 * 更新會員信箱
+	 */
+	public void updateEmail(long userID, String email);
+	
+	/*
+	 * 刪除會員圖片
+	 */
+	public void deleteMemberPicture(long userID);	
+	
+	/*
+	 * 刪除會員圖片
+	 */
+	public void handleUploadPicture(long userID, String picture);
+		
+	/*
+	 * 更新會員帳戶資料
+	 */
+	public void updateAccountData(long userID, String accountName, String accountNO, String bankName, String bankBranch, String identityNO, String address, String tel, String cellPhone);
+	
 }

@@ -9,12 +9,14 @@
 <body>
 <h4>變更email</h4>
 <form name="form">
- <input type="hidden" name="oldPassword" value=${password}><br><br>
+ <input type="hidden" name="userID" value=${member.id}>
+ <input type="hidden" name="oldPassword" value=${member.password}>
+ <br><br>
 	新email: <input type="text" name="newEmail"><br><br>
 	變更email必須重新認證!<br><br>
 	密碼: <input type="text" name="password"><br><br>
 	填寫你目前的密碼<br><br>
-	<input type="button" value="確定修改" onclick="modify('${password}')">
+	<input type="button" value="確定修改" onclick="modify('${member.password}')">
 	<input type="button" value="不想改了" onclick="window.close()">
 </form>	
 </body>
