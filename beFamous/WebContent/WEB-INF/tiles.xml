@@ -42,6 +42,9 @@
 	<definition name="sdCard" extends="base.definition">
 		<put-attribute name="body" value="/WEB-INF/view/shoppingCart/sdCard.jsp" />
 	</definition>
+	<definition name="sdCardTwo" extends="base.definition">
+		<put-attribute name="body" value="/WEB-INF/view/shoppingCart/sdCardTwo.jsp" />
+	</definition>
 	<definition name="shoppingCartOne" extends="base.definition">
 		<put-attribute name="body" value="/WEB-INF/view/shoppingCart/shoppingCartOne.jsp" />
 	</definition>
@@ -156,6 +159,10 @@
 	</definition>
 	<definition name="editProductCategoryClose" extends="iframe.definition">
 		<put-attribute name="body" value="/WEB-INF/view/manageProduct/editProductCategoryClose.jsp" />
+	</definition>
+	<definition name="queryProduct" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageProduct/queryProductData.jsp" />
 	</definition>
 	<definition name="queryProductData" extends="general.definition">
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
