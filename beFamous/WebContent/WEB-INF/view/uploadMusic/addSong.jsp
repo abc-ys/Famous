@@ -9,24 +9,23 @@
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar.js"></script>
 </head>
 <body>
-
 <p class="topic">歌曲上傳</p>
-<form name="form" enctype="multipart/form-data"  method="post">
-	<input type="hidden" id="creatorId" name="creatorId" value=${creatorId}><br><br>
-	<input type="hidden" id="albumId" name="albumId" value=${albumId}><br><br>
+<form name="form" enctype="multipart/form-data" method="post">
+	<input type="hidden" id="creatorId" name="creatorId" value="${creatorId}"><br><br>
+	<input type="hidden" id="albumId" name="albumId" value="${albumId}"><br><br>
 	<p>檔案:<input type="file" name="file" id="fileToUpload" size="20" /><br><br>
 	<p><input type="checkbox" name="agree" id="agree" value="agree">我已詳閱內容提供合約並同意授權此音樂作品予GSiMedia販售<br><br>
-	<p><input type="button" name="111" value="確定上傳" onclick="add()">
+	<p><input type="button" value="確定上傳" onclick="add()">
 </form>
 </body>
 <script type="text/javascript">
 function add(){
 	if($("#agree").attr('checked')==undefined){
 		alert('尚未勾選詳閱同意書');
-	}else{		
+	}		
 		document.form.action="${pageContext.request.contextPath}/saveSong.do";
 		document.form.submit();			
-	}
+	
 }
 </script>
 </html>
