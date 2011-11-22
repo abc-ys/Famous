@@ -109,15 +109,16 @@ public interface MusicService {
     /**
      * 儲存歌曲
      * @param albumID 專輯編號
-     * @param album 專輯的bean
+     * @param creatorId 創作人編號
+     * @param fileName 歌曲的檔案名稱
      */
-    public long saveSong (String albumID, File songFile);
+    public long saveSong (long albumID, long creatorId,String fileName);
     
     /**
      * 儲存歌曲資訊
      * @param song 歌曲的bean
      */
-    public void saveSongDetail (Song song);
+    public void saveSongDetail (long songId,long creatorId, long albumId, String name, String date, String musicCategory, String status, String price, String price2, String discount, String tag);
 
     /**
      * 查詢音樂

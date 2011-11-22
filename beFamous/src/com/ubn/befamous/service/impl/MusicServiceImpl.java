@@ -266,7 +266,7 @@ public class MusicServiceImpl implements MusicService{
      */
     public long saveAlbum (long creatorId,String albumType, String albumName, String albumBrand, long musicCategory, String albumTag, String albumIntroduction, String albumStatus, String albumCover,String defaultCover){
     	//creatorId=1;
-    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");  //建立當天日期時間
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");  //建立專輯當天日期時間
     	
     	//把會員資料撈出來
     	Query query = this.sessionfactory.getCurrentSession().createQuery("from Member where id = :creatorId");
@@ -295,7 +295,7 @@ public class MusicServiceImpl implements MusicService{
     	album.setTag(albumTag);
     	album.setIntroduction(albumIntroduction);
     	album.setStatus(albumStatus);
-    	if(albumCover.equals(null)){
+    	if(!albumCover.equals(null)){
     	album.setCover(albumCover);
     	}else{
     		album.setCover(defaultCover);
@@ -311,7 +311,7 @@ public class MusicServiceImpl implements MusicService{
     	query3.setLong("creatorId", creatorId);
     	query3.setString("datetime", datetime);
     	Album aLbum = (Album)query3.uniqueResult();
-    	long albumID = aLbum.getId();
+    	long albumID = aLbum.getPid();
        
     	
     	return albumID;
@@ -320,10 +320,33 @@ public class MusicServiceImpl implements MusicService{
     /**
      * 儲存歌曲
      * @param albumID 專輯編號
-     * @param album 專輯的bean
+     * @param creatorId 創作人編號
+     * @param fileName 歌曲的檔案名稱
      */
-    public long saveSong (String albumID, File songFile){
-    	long songID = 111;
+    public long saveSong(long albumID, long creatorId,String fileName){
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");  //建立當天日期時間
+    	
+    	//把專輯資料撈出來
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("from Album where pid = :albumID");
+    	query.setLong("albumID", albumID);
+    	Album album = (Album)query.uniqueResult();		
+    	
+    	Song song = new Song();
+    	song.setAlbum(album);
+    	song.setCreateDate(datetime);
+    	song.setCreateUser(String.valueOf(creatorId));
+    	song.setSongFile(fileName);
+    	
+    	this.songDAO.save(song);
+    	
+    	//儲存歌曲後再重新查詢歌曲的ID
+    	//存好音樂資料後，再拿創作人ID以及現在時間去查剛剛存的音樂ID
+    	Query query2 = this.sessionfactory.getCurrentSession().createQuery("from Song where album.pid = :albumID and createDate = :datetime");
+    	query2.setLong("albumID", albumID);
+    	query2.setString("datetime", datetime);
+    	Song s = (Song)query2.uniqueResult();
+    	long songID = s.getPid();
+    	
     	return songID;
     }
     
@@ -331,7 +354,34 @@ public class MusicServiceImpl implements MusicService{
      * 儲存歌曲資訊
      * @param song 歌曲的bean
      */
-    public void saveSongDetail (Song song){
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
+    public void saveSongDetail (long songId,long creatorId, long albumId, String name, String date, String musicCategory, String status, String price, String price2, String discount, String tag){
+    	
+    	
+    	//把音樂類別的資料撈出來
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("from MusicCategory where id = :musicCategoryId");
+    	query.setLong("musicCategoryId", Long.parseLong(musicCategory));
+    	MusicCategory mc = (MusicCategory)query.uniqueResult();
+    	
+    	Song song = this.songDAO.find(songId);
+    	song.setName(name);
+    	song.setCreateDate(date);
+    	song.setMusicCategory(mc);
+    	song.setSeconds(status);
+    	SongPrice sp = this.songPriceDAO.find(song.getSongPrice().getId());
+    	sp.setDiscountPrice(discount);
+    	sp.setCreateUser(String.valueOf(creatorId));
+    	if(price2.equals(null)&&price.equals("2")){
+    		sp.setPrice("");
+    	}else if(!price2.equals(null)&&price.equals("2")){
+    		sp.setPrice("");
+    	}else{
+    		sp.setPrice(price2);
+    	}
+    	song.setSongPrice(sp);
+    	song.setTag(tag);
+    	this.songDAO.update(song);
+    	
     }
     
     /**
