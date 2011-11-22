@@ -545,7 +545,7 @@ public class MusicServiceImpl implements MusicService{
 		int i = 0;
 		for (Album albumList3:albumList) {
 			albumList2[i]=albumList3;
-			System.out.println("a==>"+albumList2[i].getId());
+			System.out.println("a==>"+albumList2[i].getPid());
 			i++;
 		}
     	
