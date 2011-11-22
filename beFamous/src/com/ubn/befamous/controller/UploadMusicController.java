@@ -1,13 +1,9 @@
 package com.ubn.befamous.controller;
 
 import java.io.File;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -16,7 +12,6 @@ import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,13 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.ubn.befamous.entity.Album;
-import com.ubn.befamous.entity.Creator;
-import com.ubn.befamous.entity.Hidden;
 import com.ubn.befamous.entity.MusicCategory;
-import com.ubn.befamous.entity.Offense;
-import com.ubn.befamous.entity.OrderDetail;
 import com.ubn.befamous.entity.Song;
-import com.ubn.befamous.entity.SongPrice;
 import com.ubn.befamous.service.MusicService;
 
 
@@ -85,16 +75,21 @@ public class UploadMusicController {
 				
 		System.out.println("albumID==>"+albumID);
 				
-		return "redirect:editAlbumContent.do";
+		return "redirect:editAlbumContent.do?albumID="+albumID+"&creatorId="+creatorId;
 	}
 	
 	//音樂管理-編輯專輯-刪除歌曲
 	@RequestMapping("/deleteSongData")
-	public String deletesongdata(){
+	public String deletesongdata(String[] interst,long albumID, long creatorId){
 					
+		for(String s:interst){
+			System.out.println("s=="+s);
+			musicService.deleteSong(Long.parseLong(s));
+		}
+		
 		System.out.println("刪除歌曲");
-					
-		return "redirect:editAlbumContent.do";
+		
+		return "redirect:editAlbumContent.do?albumID="+albumID+"&creatorId="+creatorId;
 	}
 	
 	//音樂管理-編輯專輯-編輯歌曲資訊
