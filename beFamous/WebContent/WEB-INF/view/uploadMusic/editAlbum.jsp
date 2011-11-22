@@ -15,15 +15,17 @@
 編輯專輯資訊可修改專輯基本資訊及歌曲詳細資訊並可將歌曲重新排序。
 <p><p>
 <table>
-<c:forEach var="hm" items="${album}">
+<c:forEach var="hm" items="${album}" varStatus="status">
+<c:if test="${status.count%3==1}"><tr></c:if>
 <td>
-<img alt="" src="${hm.cover}"><br>
+<img alt="" src="${hm.cover}"  width="150" height="150"><br>
 <a href="javascript:editAlbumContent('${hm.id}','${creatorId}')">${hm.name}</a><br>
 ${hm.createDate}<br>
 <c:if test="${hm.hidden.id != null}">
 <font color="ff0000">被管理員隱藏<br>${hm.hidden.hiddenReason}</font>
 </c:if>
 </td>
+<c:if test="${status.count%3==0}"></tr></c:if>
 </c:forEach>
 </table>
 </form>
