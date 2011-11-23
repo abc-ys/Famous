@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
  <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -16,17 +17,22 @@
 
 <table border="0">
 <tr>
-<td><img alt="" src="${album.cover}">
+<td><img alt="" src="${album[0].cover}">
 
 </td>
 <td>
-<h1>${profile[0].name}</h1>
+<h1>${album[0].name}</h1>
 <input type="button" name="like" value="like">
-<p>創作人名稱: ${album.creator.accountName}  </p>
-<p>形式:      ${album.type}      </p>
-<p>音樂類型:   ${album.musicCategory.name}   </p>
-<p>發行日期:   ${album.date}   </p>
-<p>廠牌:      ${album.brand}</p>
+<p>創作人名稱: ${album[0].creator.userName}  </p>
+<p>形式:      
+<c:if test="${album[0].type == 1}">單曲</c:if>
+<c:if test="${album[0].type == 2}">EP</c:if>
+<c:if test="${album[0].type == 3}">專輯</c:if></p>
+<p>音樂類型:   ${album[0].musicCategory.name}   </p>
+<p>發行日期:   
+<fmt:parseDate var="dateObj" value="${album[0].createDate}" type="DATE" pattern="yyyyMMddHHmmss"/> 
+<fmt:formatDate value='${dateObj}' pattern='yyyy-MM-dd' /></p>
+<p>廠牌:      ${album[0].brand}</p>
 <table border="1">
    <tr>
       <td>${price}元</td>
@@ -41,7 +47,7 @@
 </td>
 <td>
 <h1>專輯簡介</h1>
-${album.introduction}
+${album[0].introduction}
 </td>
 
 </tr>
@@ -49,23 +55,23 @@ ${album.introduction}
 
 <br><br>
 歌曲列表<br>
-<a href="javascript: void(0)" onClick="display('a01');">歌曲(${fn:length(songList)})</a>
-<a href="javascript: void(0)" onClick="display('a02');">其他專輯(${fn:length(arOtherAlbum)})</a>
+<a href="javascript: void(0)" onClick="display('a01');">歌曲(${fn:length(album[0].songSet)})</a>
+<a href="javascript: void(0)" onClick="display('a02');">其他專輯(${fn:length(album[2])})</a>
 
 <div id="a01" >
-<iframe src="${pageContext.request.contextPath}/querySongList.do" height="500" width="740" frameborder="0"> </iframe>
+<iframe src="${pageContext.request.contextPath}/querySongList.do?albumID=${album[0].pid}" height="500" width="740" frameborder="0"> </iframe>
 </div>
 
 <div id="a02" style="display:none" >
-<iframe src="${pageContext.request.contextPath}/queryOtherAlbum.do"  height="500" width="740" frameborder="0"> </iframe>
+<iframe src="${pageContext.request.contextPath}/queryOtherAlbum.do?albumID=${album[0].pid}&creatorID=${album[0].creator.id}"  height="500" width="740" frameborder="0"> </iframe>
 </div>
 
 
 推薦專輯
 <table>
     <tr>
-    <c:forEach var="album" items="${recommandAlbum}">
- 		<td><img alt="" src="http://localhost:8080/ImageWeb/${album.cover}"  width="190"　height="80"></img><br><a href="${pageContext.request.contextPath}/queryAlbumData.do?albumid=${album.albumID}">album ${album.name}</a><br><a href="">artist ${album.creator.userName}</a><br>date${album.date}</td>
+    <c:forEach var="album" items="${album[1]}">
+ 		<td><img alt="" src="http://localhost:8080/ImageWeb/${album.cover}"  width="190"　height="80"></img><br><a href="${pageContext.request.contextPath}/queryAlbumData.do?albumid=${album.pid}">album ${album.name}</a><br><a href="">artist ${album.creator.userName}</a><br>date${album.createDate}</td>
  	</c:forEach>
  	</tr>
 </table>
