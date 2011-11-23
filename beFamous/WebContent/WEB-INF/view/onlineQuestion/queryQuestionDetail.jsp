@@ -25,18 +25,18 @@
 	備註者:&nbsp;${questionDetail.notePerson}<br>
 	備註內容:&nbsp;${questionDetail.noteContent}<br>
 	<p>
-	<input type="button" value="回覆" onclick="addAnswer('${admin}','${questionDetail.questionId}')">
-	<input type="button" value="備註"  onclick="addNote('${admin}','${questionDetail.questionId}')">
+	<input type="button" value="回覆" onclick="addAnswer('${admin}','${questionDetail.id}')">
+	<input type="button" value="備註"  onclick="addNote('${admin}','${questionDetail.id}')">
 </form>
 
 </body>
 <script type="text/javascript">
 
 function addAnswer(admin, qId){	
-	window.open("${pageContext.request.contextPath}/addAnswer.do?adminId="+admin+"&qId="+qId,'son','height=300,width=300,location=no,scrollbars=no,toolbar=no,directories=no,menubar=no,directories=no,status=no,titlebar=no');	
+	window.open("${pageContext.request.contextPath}/addAnswer.do?adminId="+admin+"&qId="+qId,'son','height=300,width=500,location=no,scrollbars=no,toolbar=no,directories=no,menubar=no,directories=no,status=no,titlebar=no');	
 }
 function addNote(admin, qId){  
-	window.open("${pageContext.request.contextPath}/addNote.do?adminId="+admin+"&qId="+qId,'son','height=300,width=300,location=no,scrollbars=no,toolbar=no,directories=no,menubar=no,directories=no,status=no,titlebar=no');	
+	window.open("${pageContext.request.contextPath}/addNote.do?adminId="+admin+"&qId="+qId,'son','height=300,width=500,location=no,scrollbars=no,toolbar=no,directories=no,menubar=no,directories=no,status=no,titlebar=no');	
 }
 </script>
 </html>

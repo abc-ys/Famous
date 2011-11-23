@@ -8,19 +8,20 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
-<form name="form">
+<form name="form" method="post">
 	回覆者:&nbsp;${admin.adminName}<br><p>
 	日期:&nbsp;<fmt:formatDate value="<%=new java.util.Date() %>" pattern ="yyyy-MM-dd"/><br><p>
 	內容:&nbsp;
 	<textarea rows="6" cols="40" name="answer" id="answer"></textarea><br><p>
 	<input type="button" value="送出" onclick="saveAnswer()">
 	<input type="button" value="取消" onclick="window.close()">
-	<input type="hidden" name="adminId" id="adminId" value=${admin.adminId}>	
-	<input type="hidden" name="qId" id="memberId" value=${qId}>
+	<input type="hidden" name="adminId" id="adminId" value="${adminId}">	
+	<input type="hidden" name="adminName" id="adminName" value="${admin.adminName}">	
+	<input type="hidden" name="qId" id="qId" value="${qId}">
 </form>
 </body>
 <script type="text/javascript">
-function saveAnswer(adminId, memberId){
+function saveAnswer(){
 	document.form.action="${pageContext.request.contextPath}/saveAnswer.do";
 	document.form.submit();
 }
