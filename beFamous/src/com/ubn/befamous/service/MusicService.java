@@ -377,4 +377,51 @@ public interface MusicService {
      * @param songID 歌曲編號
      */
     public Song listenSong (long songID);
+    
+    
+    //瀏覽專輯Profile頁
+    
+    /**
+     * 查詢創作人專輯
+     * @param albumID 專輯編號
+     * @param creatorID 創作人編號
+     */
+    public ArrayList queryCreatorAlbums(long albumID);
+    
+    /**
+     * 查詢專輯的歌曲      
+     * @param albumID 專輯編號
+     */
+    public Song[] querySongSet(long albumID);
+    
+    /**
+     * 查詢專輯簡介
+     * @param albumID 專輯編號
+     */
+    public Album queryAlbumIntroduction(long albumID);
+    
+    /**
+     * 新增專輯評論(迴響)    <=先擱著，因為有用到facebook
+     * @param albumID 專輯編號
+     */
+    public void addAlbumComment(long albumID,String albumComment);
+    
+    /**
+     * 查詢創作人下的其他專輯      
+     * @param albumID 專輯編號
+     * @param albumID 專輯編號
+     */
+    public Album[] queryOtherAlbum(long albumID,long creatorID);
+    
+    /**
+     * 查詢歌詞        (目前頁面上還沒有)
+     * @param songID 歌曲編號
+     */
+    public Song querySongLyrics(long songID);
+    
+    /**
+     * 加入歌曲試聽
+     * @param songID 歌曲編號
+     */
+    public Song addSongAudition(long songID);
 }
