@@ -8,16 +8,16 @@
 <body>
 <p class="topic">上傳圖片</p>
 <form name="upload" enctype="multipart/form-data" method="post">
- <input type="hidden" name="memberId" value=${memberId}><br><br>
-上傳一張代表您的圖片作為在GSibefamous的顯示圖片。
-<p><input type="file" name="file" size="20" /> 
-<p> <input type="submit" value="上傳" onclick="add(${memberId})"> 
-<input type="reset" value="稍後上傳" onclick="window.close()"> 
+	 <input type="hidden" name="userID" value=${member.id}><br><br>
+	上傳一張代表您的圖片作為在GSibefamous的顯示圖片。
+	<p><input type="file" name="file" size="20" /> 
+	<p> <input type="submit" value="上傳" onclick="add()"> 
+	<input type="reset" value="稍後上傳" onclick="window.close()"> 
 </form>
 </body>
 <script type="text/javascript">
-function add(memberId){
-	document.upload.action="${pageContext.request.contextPath}/handleUploadPicture.do?memberId="+memberId;
+function add(){
+	document.upload.action="${pageContext.request.contextPath}/handleUploadPicture.do";
 	document.upload.submit();
 }
 </script>

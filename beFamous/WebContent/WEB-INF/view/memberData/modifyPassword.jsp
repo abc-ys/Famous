@@ -8,12 +8,13 @@
 <body>
 <h4>變更密碼</h4>
 <form name="form">
-	 <input type="hidden" name="oldPassword" value=${password}><br><br>
-	目前密碼: <input type="text" name="password"><br><br>
-	新密碼: <input type="text" name="newPassword"><br><br>
+	<input type="hidden" name="userID" value=${member.id}>
+ 	<input type="hidden" name="oldPassword" value=${member.password}>
+	目前密碼: <input type="password" name="password"><br><br>
+	新密碼: <input type="password" name="newPassword"><br><br>
 	長度最少6個字元。<br><br>
-	確認密碼: <input type="text" name="confirmPassword"><br><br>
-	<input type="button"  value="確定修改" onclick="modify('${password}')">
+	確認密碼: <input type="password" name="confirmPassword"><br><br>
+	<input type="button"  value="確定修改" onclick="modify('${member.password}')">
 	<input type="button"  value="不想改了" onclick="window.close()">
 </form>	
 </body>

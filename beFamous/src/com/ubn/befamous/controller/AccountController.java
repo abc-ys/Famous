@@ -20,6 +20,9 @@ import com.ubn.befamous.entity.ShoppingCartDetail;
 @SessionAttributes
 public class AccountController {
 	
+	@Autowired
+	private PersonService personService;
+	
 	@RequestMapping("/myAccount")
 	public ModelAndView queryMemberTotalData(String memberID) 
 	{
@@ -83,46 +86,23 @@ public class AccountController {
 
 		return new ModelAndView("queryGSiBonus","account",list);
 	}
-	//帳戶資料編輯頁
+	
+
+	//帳戶資料編輯頁(傳入參數"userID"待新增!!!)
 	@RequestMapping("/editMemberAccount")
-	public ModelAndView queryAccountData(String memberID, Model model) 
+	public ModelAndView queryAccountData() 
 	{
 		System.out.println("queryAccountData==>");
-		System.out.println("	memberID="+memberID);
-		Creator creator = new Creator();
-		creator.setAccountName("劉為駿");
-		creator.setAccountNO("1234567");
-		creator.setAddress("台北市");
-		creator.setCellPhone("0999999999");
-		creator.setBankBranch("台中分行");
-		creator.setBankName("台灣銀行");
-		creator.setTel("0422222222");
-		creator.setIdentityNO("N111111111");
-		model.addAttribute("member",memberID);
-		model.addAttribute("account",creator);
-		
-		return new ModelAndView("editMemberAccount");
-		
+		long userID = 1;
+		return new ModelAndView("editMemberAccount", "member",this.personService.queryMember(userID));
+				
 	}
 	//修改帳戶資料編輯頁的修改並呈現修改後結果
 	@RequestMapping("/saveAccountData")
-	public ModelAndView saveAccountData(String memberID, String accountName, String accountNo, String bankName, String bankBranch, String identityNO, String address, String tel, String cellPhone, Model model ) 
+	public String saveAccountData(long userID, String accountName, String accountNO, String bankName, String bankBranch, String identityNO, String address, String tel, String cellPhone) 
 	{
 		System.out.println("saveAccountData==>");
-		System.out.println("	memberID="+memberID+", accountName="+accountName+", accountNo="+accountNo+", bankName="+bankName+", bankBranch="+bankBranch+", identityNO="+identityNO+", address="+address+", tel="+tel+", cellPhone="+cellPhone);
-		Creator creator = new Creator();
-		creator.setAccountName(accountName);
-		creator.setAccountNO(accountNo);
-		creator.setAddress(address);
-		creator.setCellPhone(cellPhone);
-		creator.setBankBranch(bankBranch);
-		creator.setBankName(bankName);
-		creator.setTel(tel);
-		creator.setIdentityNO(identityNO);
-		
-		model.addAttribute("account",creator);
-		
-		return new ModelAndView("saveAccountData");
-		
+		this.personService.updateAccountData(userID, accountName, accountNO, bankName, bankBranch, identityNO, address, tel, cellPhone);
+		return "redirect:editMemberAccount.do";	
 	}
 }

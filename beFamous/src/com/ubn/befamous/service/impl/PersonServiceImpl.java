@@ -390,4 +390,93 @@ public class PersonServiceImpl implements PersonService{
 	}
 	
 	
+	public ArrayList queryMember(long userID) {
+		
+		ArrayList list = new ArrayList();	
+		Query query = this.sessionFactory.getCurrentSession().createQuery("FROM Member where id = :userID");
+		query.setParameter("userID", userID);
+		
+		Object person = query.uniqueResult();
+		if (person instanceof Creator) {
+			Creator creator = (Creator)person;
+			list.add(creator);
+		}else{
+		GeneralMember generalMember = (GeneralMember)person;
+			list.add(generalMember);
+		}
+		return list;
+	}
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void updateMember(long userID,String identityName,String userName,String location,String city,String birthday, String sex,String webSite,String subscribeStatus,String introduction,String likeMusicTypes,String likeSingers){
+		if(identityName.equals("1")){
+			GeneralMember generalMember = this.generalMemberDAO.find(userID);
+			generalMember.setIdentityName(identityName);
+			generalMember.setUserName(userName);
+			generalMember.setLocation(location);
+			generalMember.setCity(city);
+			generalMember.setBirthday(birthday);
+			generalMember.setSex(sex);
+			generalMember.setWebSite(webSite);
+			generalMember.setSubscribeStatus(subscribeStatus);
+			generalMember.setIntroduction(introduction);
+			this.generalMemberDAO.update(generalMember);			
+		}else{
+			Creator creator =  this.creatorDAO.find(userID);
+			creator.setIdentityName(identityName);
+			creator.setUserName(userName);
+			creator.setLocation(location);
+			creator.setCity(city);
+			creator.setBirthday(birthday);
+			creator.setSex(sex);
+			creator.setWebSite(webSite);
+			creator.setSubscribeStatus(subscribeStatus);
+			creator.setIntroduction(introduction);
+			creator.setLikeMusicType(likeMusicTypes);
+			creator.setLikeSinger(likeSingers);
+			this.creatorDAO.update(creator);			
+		}
+		
+	}
+	
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void updatePassword(long userID, String password) {
+		Member member = this.memberDAO.find(userID);
+		member.setPassword(password);
+		this.memberDAO.update(member);
+	}
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void updateEmail(long userID, String email) {
+		Member member = this.memberDAO.find(userID);
+		member.setEmail(email);
+		this.memberDAO.update(member);		
+	}
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void deleteMemberPicture(long userID) {
+		Member member = this.memberDAO.find(userID);
+		member.setPicture("");
+		this.memberDAO.update(member);	
+	}
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void handleUploadPicture(long userID, String picture){
+		Member member = this.memberDAO.find(userID);
+		member.setPicture(picture);
+		this.memberDAO.update(member);	
+	}
+
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void updateAccountData(long userID, String accountName, String accountNO, String bankName, String bankBranch, String identityNO, String address, String tel, String cellPhone) {
+		Creator creator =  this.creatorDAO.find(userID);
+		creator.setAccountName(accountName);
+		creator.setAccountNO(accountNO);
+		creator.setBankName(bankName);
+		creator.setBankBranch(bankBranch);
+		creator.setIdentityNO(identityNO);
+		creator.setCellPhone(cellPhone);
+		creator.setAddress(address);
+		creator.setTel(tel);
+		this.creatorDAO.update(creator);		
+	}
 }
