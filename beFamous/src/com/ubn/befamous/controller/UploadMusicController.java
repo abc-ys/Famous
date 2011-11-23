@@ -270,10 +270,8 @@ public class UploadMusicController {
 						if (writeToFile) {
 							// 副檔名
 							String formatName = fileName.substring(fileName.length() - 4,fileName.length());
-						    fileName = (albumID + formatName).toLowerCase();
+						    fileName = ("album_"+albumID + formatName).toLowerCase();
 							//fileName = FilenameUtils.getName(fileName);
-						      
-							cover=fileName;
 							
 							System.out.println("fileName to be saved=" + fileName + "<br />");
 							String extension = FilenameUtils.getExtension(fileName);
@@ -297,7 +295,6 @@ public class UploadMusicController {
 		} catch (FileUploadBase.SizeLimitExceededException ex1) {
 			System.out.println("上傳檔案超過最大檔案允許大小" + yourMaxRequestSize / (1024 * 1024) + "MB !");
 		}
-		
 
 		System.out.println("albumID==>"+albumID);
 		System.out.println("albumType==>"+albumType);
@@ -310,6 +307,8 @@ public class UploadMusicController {
 		System.out.println("cover2==>"+cover2);
 		System.out.println("introduction==>"+introduction);
 		System.out.println("status==>"+status);	
+		
+		cover="images/"+fileName;
 		
 		musicService.updateAlbum(creatorId,albumID, albumType, name, date, brand, musicCategory, tag, cover, cover2, introduction, status);
 		
@@ -451,7 +450,7 @@ public class UploadMusicController {
 				System.out.println("上傳檔案超過最大檔案允許大小" + yourMaxRequestSize / (1024 * 1024) + "MB !");
 			}
 			
-			albumCover=fileName;
+			albumCover="images/"+fileName;
 			System.out.println(" creatorId="+creatorId+", albumType="+albumType+", albumName="+albumName+", albumBrand="+albumBrand+", musicCategory="+musicCategory+", albumTag="+albumTag+", albumIntroduction="+albumIntroduction+", albumStatus="+albumStatus+", albumCover="+albumCover+", defaultCover="+defaultCover);
 			
 			long albumID = musicService.saveAlbum(creatorId,albumType,albumName,albumBrand,musicCategory,albumTag,albumIntroduction,albumStatus,albumCover,defaultCover);
@@ -556,6 +555,7 @@ public class UploadMusicController {
 			}
 			}
 			System.out.println("fileName=="+fileName);
+			fileName = "file/"+fileName;
 			
 			long songID = musicService.saveSong(albumId, creatorId, fileName);
 			
