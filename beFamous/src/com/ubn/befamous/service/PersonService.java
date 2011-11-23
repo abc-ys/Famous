@@ -1,11 +1,21 @@
 package com.ubn.befamous.service;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.hibernate.Query;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.ubn.befamous.entity.Admin;
 import com.ubn.befamous.entity.Album;
 import com.ubn.befamous.entity.LikeCreator;
 import com.ubn.befamous.entity.Member;
 import com.ubn.befamous.entity.News;
+import com.ubn.befamous.entity.Question;
 
 public interface PersonService {
 
@@ -91,6 +101,8 @@ public interface PersonService {
 			           String actionName,String startDate,String endDate,
 			           String url,String createDate,String actionContent);
 	
+	//Lucy寫的
+	
 	/*
 	 * 查詢會員資料
 	 */
@@ -126,4 +138,23 @@ public interface PersonService {
 	 */
 	public void updateAccountData(long userID, String accountName, String accountNO, String bankName, String bankBranch, String identityNO, String address, String tel, String cellPhone);
 	
+	
+	//怡秀寫的     201111-22
+	//客服-提問頁-儲存問題
+	public void saveQuestion(String productType,String userIdentity,String name,String email,String tel,String questionType,String questionContent);
+			
+	//客服-管理者的問題管理第一個頁面    
+	public Question[] queryQuestion(String startDate,String endDate,String productType,String email,String questionType);
+			
+	//客服-查詢管理者的名稱
+	public Admin queryAdminName(long adminId);
+		
+	//客服-查詢問題的細節
+	public Question queryQuestionDetail(long questionID);
+			
+	//客服-儲存回覆
+	public Question saveAnswer(long questionID,long adminId,String answerContent,String adminName);
+		
+	//客服-儲存備註
+	public Question saveNote(long questionID,long adminId,String noteContent,String adminName);
 }

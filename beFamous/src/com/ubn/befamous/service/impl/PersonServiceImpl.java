@@ -8,6 +8,7 @@ import java.util.Set;
 
 import javax.persistence.PrimaryKeyJoinColumn;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Propagation;
 
 
 import com.ubn.befamous.dao.IBaseDao;
+import com.ubn.befamous.entity.Admin;
 import com.ubn.befamous.entity.Album;
 import com.ubn.befamous.entity.Audition;
 import com.ubn.befamous.entity.Creator;
@@ -34,6 +36,7 @@ import com.ubn.befamous.entity.Member;
 import com.ubn.befamous.entity.News;
 import com.ubn.befamous.entity.Offense;
 import com.ubn.befamous.entity.ProductionCategory;
+import com.ubn.befamous.entity.Question;
 import com.ubn.befamous.entity.Song;
 import com.ubn.befamous.service.PersonService;
 
@@ -87,6 +90,14 @@ public class PersonServiceImpl implements PersonService{
 	@Qualifier("friendDAO")
 	private IBaseDao<Friend, Long> friendDAO;
 	
+	@Autowired
+	@Qualifier("questionDAO")
+	private IBaseDao<Question, Long> questionDAO;
+	
+	@Autowired
+	@Qualifier("adminDAO")
+	private IBaseDao<Admin, Long> adminDAO;
+	
 	
 	public ArrayList queryMemberData(long userID){
 		/*Session session = sessionFactory.getCurrentSession();
@@ -129,13 +140,13 @@ public class PersonServiceImpl implements PersonService{
 	
 	public void addFriend(long addMemberID ,long userID,String message){
 		Session session = sessionFactory.getCurrentSession();
-		String pattern = "yyyy-MM-dd";
+		String pattern = "yyyyMMddHHmmss";
 		String inviteDate = DateFormatUtils.format(new Date(), pattern);
 
 		Friend friend = new Friend();
 		Set<Friend> setFriend = new HashSet<Friend>();
-		friend.setInviter(String.valueOf(userID));
-		friend.setFriend(String.valueOf(addMemberID));
+		//friend.setInviter(String.valueOf(userID));
+		//friend.setFriend(String.valueOf(addMemberID));
 		friend.setInviteDate(inviteDate);
 		setFriend.add(friend);
 		
@@ -266,7 +277,7 @@ public class PersonServiceImpl implements PersonService{
 	
 	
 	public void addFan(long addMemberID,long userID){
-		String pattern = "yyyy-MM-dd";
+		String pattern = "yyyyMMddHHmmss";
 		String currentDate = DateFormatUtils.format(new Date(), pattern);
 		
 		Creator creator = new Creator();
@@ -277,7 +288,7 @@ public class PersonServiceImpl implements PersonService{
 		
 		Set<Fan> FanSet = new HashSet<Fan>();
 		Fan fan = new Fan();
-		fan.setFan(addMemberID);
+		//fan.setFan(addMemberID);
 		fan.setAddDate(currentDate);
 		FanSet.add(fan);
 		
@@ -289,9 +300,9 @@ public class PersonServiceImpl implements PersonService{
 		
 		Set<LikeCreator> LikeCreatorSet = new HashSet<LikeCreator>();
 		LikeCreator likeCreator = new LikeCreator();
-		likeCreator.setCreatorLiked(String.valueOf(addMemberID));
+		//likeCreator.setCreatorLiked(String.valueOf(addMemberID));
 		likeCreator.setCreateDate(currentDate);
-		likeCreator.setCreateUser(String.valueOf(userID));
+		//likeCreator.setCreateUser(String.valueOf(userID));
 		LikeCreatorSet.add(likeCreator);
 		
 		GeneralMember generalMember = new GeneralMember();
@@ -389,6 +400,7 @@ public class PersonServiceImpl implements PersonService{
 		
 	}
 	
+	//Lucy寫的
 	
 	public ArrayList queryMember(long userID) {
 		
@@ -479,4 +491,137 @@ public class PersonServiceImpl implements PersonService{
 		creator.setTel(tel);
 		this.creatorDAO.update(creator);		
 	}
+	
+	
+	//怡秀寫start 2011-11-22
+	
+	//客服-提問頁-儲存問題
+	public void saveQuestion(String productType,String userIdentity,String name,String email,String tel,String questionType,String questionContent){
+		String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");   //今天日期時間
+		
+		Question question = new Question();
+		question.setProductionType(productType);
+		question.setUserIdentity(userIdentity);
+		question.setUserName(name);
+		question.setEmail(email);
+		question.setTel(tel);
+		question.setQuestionType(questionType);
+		question.setQuestionContent(questionContent);
+		question.setCreateDate(datetime);
+		if(userIdentity.equals("1")){
+			question.setCreateUser("會員-"+name);
+		}else{
+			question.setCreateUser("非會員-"+name);
+		}
+		question.setQuestionDate(datetime);
+		question.setHandleStatus("1");
+		
+		this.questionDAO.save(question);
+	}
+		
+	//客服-管理者的問題管理第一個頁面     (時間yyyy-mm-dd還沒轉型成yyyymmdd)
+	public Question[] queryQuestion(String startDate,String endDate,String productType,String email,String questionType){
+		/*
+		startDate= DateFormatUtils.format(Long.parseLong(startDate), "yyyyMMddHHmmss");
+		endDate= DateFormatUtils.format(Long.parseLong(endDate), "yyyyMMddHHmmss");*/
+		
+		StringBuilder queryString = new StringBuilder();
+		queryString.append("from Question a where (a.handleStatus = :handleStatus)");
+		if (StringUtils.isNotEmpty(startDate)
+				&& StringUtils.isNotEmpty(endDate)) {
+			queryString.append("and (a.questionDate  between :startDate and :endDate)");
+		}
+		if (StringUtils.isNotEmpty(questionType)) {
+			queryString.append("and (a.questionType=:questionType)");
+		}
+		if (StringUtils.isNotEmpty(productType)) {
+			queryString.append("and (a.productionType = :productType)");
+		}
+		if (StringUtils.isNotEmpty(email)) {
+			queryString.append("and (a.email = :email)");
+		}
+
+		System.out.println("Q="+queryString);
+		Query query = this.sessionFactory.getCurrentSession().createQuery(queryString.toString());
+		System.out.println("A="+startDate+","+endDate);
+		if(StringUtils.isNotEmpty(startDate)&&StringUtils.isNotEmpty(endDate)){
+			System.out.println("2="+queryString);
+			query.setString("startDate", startDate);
+			System.out.println("3="+queryString);
+			
+			query.setString("endDate", endDate);
+		}
+		if(StringUtils.isNotEmpty(productType)){
+		query.setString("productType", productType);
+		}
+		if(StringUtils.isNotEmpty(email)){
+		query.setString("email", email);
+		}
+		if(StringUtils.isNotEmpty(questionType)){
+		query.setString("questionType", questionType);
+		}
+		query.setString("handleStatus", "1");
+		
+		List<Question> resultList=(List<Question>)query.list();
+		Question[] questionset = new Question[resultList.size()];
+		
+			int i=0;
+			for (Question as:resultList) {
+				questionset[i]=as;
+				System.out.println("ssss==>"+questionset[i].getId());
+				i++;
+			}
+		return questionset;
+	}
+		
+	//客服-查詢管理者的名稱
+	public Admin queryAdminName(long adminId){
+		Admin q=this.adminDAO.find(adminId);
+		return q;
+	}
+	
+	//客服-查詢問題的細節
+	public Question queryQuestionDetail(long questionID){
+		Question q=this.questionDAO.find(questionID);
+		return q;
+	}
+		
+	//客服-儲存回覆
+	@Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
+	public Question saveAnswer(long questionID,long adminId,String answerContent,String adminName){
+		String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");   //今天日期時間  yyyyMMddhhmmss
+		
+		Question q=this.questionDAO.find(questionID);
+		q.setAnswerContent(answerContent);
+		q.setAnswerDate(datetime);
+		q.setHandleStatus("2");
+		q.setModifier(String.valueOf(adminId));
+		q.setAnswerPerson(adminName);
+		q.setModifyDate(datetime);
+		
+		this.questionDAO.update(q);
+		
+		Question q2=this.questionDAO.find(questionID);
+		return q2;
+	}
+	
+	//客服-儲存備註
+	@Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
+	public Question saveNote(long questionID,long adminId,String noteContent,String adminName){
+		String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");   //今天日期時間  yyyyMMddhhmmss
+		
+		Question q=this.questionDAO.find(questionID);
+		q.setNoteContent(noteContent);
+		q.setNoteDate(datetime);
+		q.setHandleStatus("2");
+		q.setModifier(String.valueOf(adminId));
+		q.setNotePerson(adminName);
+		q.setModifyDate(datetime);
+		
+		this.questionDAO.update(q);
+		
+		Question q2=this.questionDAO.find(questionID);
+		return q2;
+	}
+	
 }
