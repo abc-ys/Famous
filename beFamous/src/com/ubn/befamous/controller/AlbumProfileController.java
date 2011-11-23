@@ -1,9 +1,12 @@
 package com.ubn.befamous.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,125 +20,39 @@ import com.ubn.befamous.entity.Creator;
 import com.ubn.befamous.entity.MusicCategory;
 import com.ubn.befamous.entity.Song;
 import com.ubn.befamous.entity.SongPrice;
+import com.ubn.befamous.service.MusicService;
 
 
 @Controller
 @SessionAttributes
 public class AlbumProfileController {
 	
+	@Autowired
+	 MusicService musicService;
+	
+	
 	//瀏覽專輯profile
 	@RequestMapping(value = "/queryAlbumData", method = RequestMethod.GET)
-	public ModelAndView queryAlbumData(@RequestParam String albumid) {
+	public ModelAndView queryAlbumData(long albumid) {
 		System.out.println("albumid"+albumid);
 		
 		ModelAndView mav = new ModelAndView("queryAlbumData");
 		
-		ArrayList list = new ArrayList();
+		ArrayList list = musicService.queryCreatorAlbums(albumid);
 		
-		Creator creator = new Creator();
-		MusicCategory musicCategory = new MusicCategory();
-		
-		//歌曲
-		Song song = new Song();
-		SongPrice songPrice = new SongPrice();
-		songPrice.setPrice("30");
-		songPrice.setDiscountBonus("15");
-		songPrice.setDiscountPrice("15");
-		song.setName("第一首");
-		song.setSongPrice(songPrice);
-		
-		Song song2 = new Song();
-		songPrice.setPrice("30");
-		songPrice.setDiscountBonus("15");
-		songPrice.setDiscountPrice("15");
-		song2.setName("第二首");
-		song2.setSongPrice(songPrice);
-		
-		
-		musicCategory.setName("rock");
-		creator.setAccountName("kevin");
-		creator.setAccountNO("12345678");
-		
-		Album album = new Album();
-		album.setName("bird");
-		album.setAlbumID(1234567);
-		album.setCreator(creator);
-		album.setBrand("UBN");
-		album.setCover("images/title_01.gif");
-		album.setType("MP3");
-		album.setDate("2011/10/25");
-		album.setMusicCategory(musicCategory);
-		album.setIntroduction("This is very good album!");
-		
-		
-		Set<Song> songList = new HashSet();
-		songList.add(song);
-		songList.add(song2);
-		album.setSongSet(songList);
-		
-		
-		//推薦專輯
-		Album album3 = new Album();
-		album3.setName("bird");
-		album3.setAlbumID(1234567);
-		album3.setCreator(creator);
-		album3.setBrand("UBN");
-		album3.setCover("image/image001.png");
-		album3.setType("MP3");
-		album3.setDate("2011/10/25");
-		album3.setMusicCategory(musicCategory);
-		album3.setIntroduction("This is very good album!");
-		Album[] recommandAlbum = {album3}; 
-		
-		
-		mav.addObject("album", album);
-		mav.addObject("songList", songList);
 		mav.addObject("price", "30");
-		mav.addObject("discountBonus", "15");
-		mav.addObject("discountPrice", "15");
-		mav.addObject("discountPrice", "15");
-		mav.addObject("recommandAlbum", recommandAlbum);
-		
-		
-		list.add(album);
-		list.add(song);
+		mav.addObject("discountPrice", "20");
+		mav.addObject("discountBonus", "10");
+		mav.addObject("album", list);
 		return mav;
 
 	} 
 	
 	//查詢歌曲清單
 	@RequestMapping(value = "/querySongList")
-	public ModelAndView querySongList() {
-		//歌曲
+	public ModelAndView querySongList(long albumID) {
 		
-		Creator creator = new Creator();
-		creator.setAccountName("kevin");
-		creator.setAccountNO("12345678");
-		creator.setUserName("kevin");
-		Album album = new Album();
-		album.setName("鳥");
-		album.setAlbumID(1234567);
-		album.setCreator(creator);
-		album.setBrand("UBN");
-		album.setCover("image/image001.png");
-		album.setType("MP3");
-		album.setDate("2011/10/25");
-		album.setIntroduction("This is very good album!");
-		
-		
-		Song song = new Song();
-		SongPrice songPrice = new SongPrice();
-		songPrice.setPrice("30");
-		songPrice.setDiscountBonus("15");
-		songPrice.setDiscountPrice("15");
-		song.setName("AAA");
-		song.setSongPrice(songPrice);
-        song.setAlbum(album);
-		Song song2 = new Song();
-		song2.setName("AAA");
-		song2.setSongPrice(songPrice);
-		song2.setAlbum(album);
-		Song[] arSong = {song,song2};
+		Song[] arSong = musicService.querySongSet(albumID);
 		
 		return new ModelAndView("querySongList","arSong",arSong);
 		
@@ -143,27 +60,10 @@ public class AlbumProfileController {
 	
 	//其他專輯
 	@RequestMapping(value = "/queryOtherAlbum")
-	public ModelAndView queryOtherAlbum() {
+	public ModelAndView queryOtherAlbum(long albumID,long creatorID) {
 		ModelAndView mav = new ModelAndView("queryOtherAlbum");
-		Creator creator = new Creator();
-		creator.setAccountName("kevin");
-		creator.setAccountNO("12345678");
-		creator.setUserName("kevin");
-		MusicCategory musicCategory = new MusicCategory();
-		musicCategory.setName("rock");
 		
-		//其他專輯
-		Album album3 = new Album();
-		album3.setName("bird");
-		album3.setAlbumID(1234567);
-		album3.setCreator(creator);
-		album3.setBrand("UBN");
-		album3.setCover("image/image001.png");
-		album3.setType("MP3");
-		album3.setDate("2011/10/25");
-		album3.setMusicCategory(musicCategory);
-		album3.setIntroduction("This is very good album!");
-		Album[] arOtherAlbum = {album3}; 
+		Album[] arOtherAlbum = musicService.queryOtherAlbum(albumID, creatorID);
 		
 		mav.addObject("arOtherAlbum", arOtherAlbum);
 		
@@ -175,70 +75,23 @@ public class AlbumProfileController {
 	@RequestMapping(value = "/queryPromotionAlbum")
 	public ModelAndView queryPromotionAlbum() {
 		
-		Creator creator = new Creator();
-		creator.setAccountName("kevin");
-		creator.setAccountNO("12345678");
-		creator.setUserName("kevin");
-		MusicCategory musicCategory = new MusicCategory();
-		musicCategory.setName("rock");
+		Album[] arAlbum = musicService.queryPromotionAlbums();
+		for(Album a:arAlbum){
+			System.out.println(a.getCreator().getUserName());
+		}
 		
-		Album album = new Album();
-		album.setName("bird");
-		album.setAlbumID(1234567);
-		album.setCreator(creator);
-		album.setBrand("UBN");
-		album.setCover("image/image001.png");
-		album.setType("MP3");
-		album.setDate("2011/10/25");
-		album.setMusicCategory(musicCategory);
-		album.setIntroduction("This is very good album!");
-		Album album2 = new Album();
-		album2.setName("bird2");
-		album2.setAlbumID(1234567);
-		album2.setCreator(creator);
-		album2.setBrand("UBN2");
-		album2.setCover("image/image002.png");
-		album2.setType("MP3");
-		album2.setDate("2011/10/25");
-		album2.setMusicCategory(musicCategory);
-		album2.setIntroduction("This is very good album!");
-		
-		Album[] arAlbum = {album,album2};
 		return new ModelAndView("queryPromotionAlbum","arAlbum",arAlbum);
 	}
 	
 	//最新專輯
 	@RequestMapping(value = "/queryNewAlbum")
 	public ModelAndView queryNewAlbum(Model model) {
+		String datetime = DateFormatUtils.format(new Date(), "yyyy-MM-dd");   //現在日期時間
+		Album[] arAlbum = musicService.queryNewAlbums(datetime);
 		
-		Creator creator = new Creator();
-		creator.setAccountName("kevin");
-		creator.setAccountNO("12345678");
-		creator.setUserName("kevin");
-		MusicCategory musicCategory = new MusicCategory();
-		musicCategory.setName("rock");
-		
-		Album album = new Album();
-		album.setName("鳥");
-		album.setAlbumID(1234567);
-		album.setCreator(creator);
-		album.setBrand("UBN");
-		album.setCover("image/image001.png");
-		album.setType("MP3");
-		album.setDate("2011/10/25");
-		album.setMusicCategory(musicCategory);
-		album.setIntroduction("This is very good album!");
-		Album album2 = new Album();
-		album2.setName("bird2");
-		album2.setAlbumID(1234567);
-		album2.setCreator(creator);
-		album2.setBrand("UBN2");
-		album2.setCover("image/image002.png");
-		album2.setType("MP3");
-		album2.setDate("2011/10/25");
-		album2.setMusicCategory(musicCategory);
-		album2.setIntroduction("This is very good album!");
-		Album[] arAlbum = {album,album2};
+		for(Album a:arAlbum){
+			System.out.println(a.getCover());
+		}
 		
 		model.addAttribute("arAlbum", arAlbum);
 		return new ModelAndView("queryNewAlbum");
@@ -249,34 +102,13 @@ public class AlbumProfileController {
 	@RequestMapping(value = "/queryNewAlbumsForMusicCategory")
 	public ModelAndView queryNewAlbumsForMusicCategory() {
 		
-		Creator creator = new Creator();
-		creator.setAccountName("kevin");
-		creator.setAccountNO("12345678");
-		creator.setUserName("kevin");
-		MusicCategory musicCategory = new MusicCategory();
-		musicCategory.setName("rock");
+		long musicCatrgoryID = 1;
+		Album[] arAlbum = musicService.queryNewAlbumsForMusicCatrgory(musicCatrgoryID);
 		
-		Album album = new Album();
-		album.setName("日不落");
-		album.setAlbumID(1234567);
-		album.setCreator(creator);
-		album.setBrand("UBN");
-		album.setCover("image/image001.png");
-		album.setType("MP3");
-		album.setDate("2011/10/25");
-		album.setMusicCategory(musicCategory);
-		album.setIntroduction("This is very good album!");
-		Album album2 = new Album();
-		album2.setName("bird2");
-		album2.setAlbumID(1234567);
-		album2.setCreator(creator);
-		album2.setBrand("UBN2");
-		album2.setCover("image/image002.png");
-		album2.setType("MP3");
-		album2.setDate("2011/10/25");
-		album2.setMusicCategory(musicCategory);
-		album2.setIntroduction("This is very good album!");
-		Album[] arAlbum = {album,album2};
+		for(Album a:arAlbum){
+			System.out.println(a.getCover());
+		}
+		
 		return new ModelAndView("queryNewAlbumsForMusicCategory","arAlbum",arAlbum);
 	}
 	
@@ -294,22 +126,22 @@ public class AlbumProfileController {
 		
 		Album album = new Album();
 		album.setName("日不落");
-		album.setAlbumID(1234567);
+		album.setId(1234567);
 		album.setCreator(creator);
 		album.setBrand("UBN");
 		album.setCover("image/image001.png");
 		album.setType("MP3");
-		album.setDate("2011/10/25");
+		album.setCreateDate("2011/10/25");
 		album.setMusicCategory(musicCategory);
 		album.setIntroduction("This is very good album!");
 		Album album2 = new Album();
 		album2.setName("bird2");
-		album2.setAlbumID(1234567);
+		album2.setId(1234567);
 		album2.setCreator(creator);
 		album2.setBrand("UBN2");
 		album2.setCover("image/image002.png");
 		album2.setType("MP3");
-		album2.setDate("2011/10/25");
+		album2.setCreateDate("2011/10/25");
 		album2.setMusicCategory(musicCategory);
 		album2.setIntroduction("This is very good album!");
 		Album[] arAlbum = {album,album2};
@@ -331,22 +163,22 @@ public class AlbumProfileController {
 		
 		Album album = new Album();
 		album.setName("日不落");
-		album.setAlbumID(1234567);
+		album.setId(1234567);
 		album.setCreator(creator);
 		album.setBrand("UBN");
 		album.setCover("image/image001.png");
 		album.setType("MP3");
-		album.setDate("2011/10/25");
+		album.setCreateDate("2011/10/25");
 		album.setMusicCategory(musicCategory);
 		album.setIntroduction("This is very good album!");
 		Album album2 = new Album();
 		album2.setName("bird2");
-		album2.setAlbumID(1234567);
+		album2.setId(1234567);
 		album2.setCreator(creator);
 		album2.setBrand("UBN2");
 		album2.setCover("image/image002.png");
 		album2.setType("MP3");
-		album2.setDate("2011/10/25");
+		album2.setCreateDate("2011/10/25");
 		album2.setMusicCategory(musicCategory);
 		album2.setIntroduction("This is very good album!");
 		Album[] arAlbum = {album,album2};
@@ -371,8 +203,8 @@ public class AlbumProfileController {
 		album.setCover("image/image001.png");	
 		album.setName("ccc");
 		album.setCreator(creator);
-		album.setDate("2011.10.25");
-		album.setAlbumID(1234567);
+		album.setCreateDate("2011.10.25");
+		album.setId(1234567);
 		
 		song.setName("AAA");
 		song.setSongPrice(songPrice);
@@ -410,14 +242,14 @@ public class AlbumProfileController {
 		album.setCover("image/image001.png");	
 		album.setName("ccc");
 		album.setCreator(creator);
-		album.setDate("2011.10.25");
-		album.setAlbumID(1234567);
+		album.setCreateDate("2011.10.25");
+		album.setId(1234567);
 		Album album2 = new Album();
 		album.setCover("image/image001.png");	
 		album.setName("ccc");
 		album.setCreator(creator);
-		album.setDate("2011.10.25");
-		album.setAlbumID(1234567);
+		album.setCreateDate("2011.10.25");
+		album.setId(1234567);
 		Set<Album> set = new HashSet();
 		set.add(album);
 		set.add(album2);
@@ -446,22 +278,22 @@ public class AlbumProfileController {
 		
 		Album album = new Album();
 		album.setName("日不落國");
-		album.setAlbumID(1234567);
+		album.setId(1234567);
 		album.setCreator(creator);
 		album.setBrand("UBN");
 		album.setCover("image/image001.png");
 		album.setType("MP3");
-		album.setDate("2011/10/25");
+		album.setCreateDate("2011/10/25");
 		album.setMusicCategory(musicCategory);
 		album.setIntroduction("This is very good album!");
 		Album album2 = new Album();
 		album2.setName("東風破");
-		album2.setAlbumID(1234567);
+		album2.setId(1234567);
 		album2.setCreator(creator);
 		album2.setBrand("UBN2");
 		album2.setCover("image/image002.png");
 		album2.setType("MP3");
-		album2.setDate("2011/10/25");
+		album2.setCreateDate("2011/10/25");
 		album2.setMusicCategory(musicCategory);
 		album2.setIntroduction("This is very good album!");
 		Album[] arAlbum = {album,album2};
@@ -486,8 +318,8 @@ public class AlbumProfileController {
 		album.setCover("image/image001.png");	
 		album.setName("ccc");
 		album.setCreator(creator);
-		album.setDate("2011.10.25");
-		album.setAlbumID(1234567);
+		album.setCreateDate("2011.10.25");
+		album.setId(1234567);
 		
 		song.setName("淚海");
 		song.setSongPrice(songPrice);
@@ -525,14 +357,14 @@ public class AlbumProfileController {
 		album.setCover("image/image001.png");	
 		album.setName("ccc");
 		album.setCreator(creator);
-		album.setDate("2011.10.25");
-		album.setAlbumID(1234567);
+		album.setCreateDate("2011.10.25");
+		album.setId(1234567);
 		Album album2 = new Album();
 		album.setCover("image/image001.png");	
 		album.setName("ccc");
 		album.setCreator(creator);
-		album.setDate("2011.10.25");
-		album.setAlbumID(1234567);
+		album.setCreateDate("2011.10.25");
+		album.setId(1234567);
 		Set<Album> set = new HashSet();
 		set.add(album);
 		set.add(album2);
