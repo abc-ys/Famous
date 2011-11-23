@@ -402,6 +402,7 @@ public class PersonServiceImpl implements PersonService{
 	
 	//Lucy寫的
 	
+	//查詢會員資料
 	public ArrayList queryMember(long userID) {
 		
 		ArrayList list = new ArrayList();	
@@ -419,6 +420,7 @@ public class PersonServiceImpl implements PersonService{
 		return list;
 	}
 
+	//更新會員資料
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void updateMember(long userID,String identityName,String userName,String location,String city,String birthday, String sex,String webSite,String subscribeStatus,String introduction,String likeMusicTypes,String likeSingers){
 		if(identityName.equals("1")){
@@ -447,37 +449,42 @@ public class PersonServiceImpl implements PersonService{
 			creator.setLikeMusicType(likeMusicTypes);
 			creator.setLikeSinger(likeSingers);
 			this.creatorDAO.update(creator);			
-		}
-		
+		}		
 	}
 	
+	//更新會員密碼
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void updatePassword(long userID, String password) {
 		Member member = this.memberDAO.find(userID);
 		member.setPassword(password);
 		this.memberDAO.update(member);
 	}
-
+	
+	//更新會員信箱
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void updateEmail(long userID, String email) {
 		Member member = this.memberDAO.find(userID);
 		member.setEmail(email);
 		this.memberDAO.update(member);		
 	}
-
+	
+	//刪除會員圖片
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void deleteMemberPicture(long userID) {
 		Member member = this.memberDAO.find(userID);
 		member.setPicture("");
 		this.memberDAO.update(member);	
 	}
+	
+	//更新會員圖片
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void handleUploadPicture(long userID, String picture){
 		Member member = this.memberDAO.find(userID);
 		member.setPicture(picture);
 		this.memberDAO.update(member);	
 	}
-
+	
+	//更新會員帳戶資料
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void updateAccountData(long userID, String accountName, String accountNO, String bankName, String bankBranch, String identityNO, String address, String tel, String cellPhone) {
 		Creator creator =  this.creatorDAO.find(userID);
@@ -624,4 +631,159 @@ public class PersonServiceImpl implements PersonService{
 		return q2;
 	}
 	
+	//Lucy@20111123
+	//儲存創作人刊登的訊息
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)	
+	public void saveNews(long userID, String newsName, String newsSouce, String content, String onStatus) {
+		
+		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
+		Creator creator = (Creator) this.memberDAO.find(userID);
+		News news = new News();
+		news.setCreateDate(date);
+		news.setNewsName(newsName);
+		news.setContent(content);
+		news.setNewsSouce(newsSouce);
+		news.setOnStatus(onStatus);
+		creator.getNews().add(news);
+		if(onStatus.equals("1")){
+			news.setOnDate(date);			
+		}
+		this.newsDAO.save(news);
+			
+	}
+	//創作人查詢刊登訊息
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public News[] queryNews(long userID, String onStatus) {		
+		
+		Query query = this.sessionFactory.getCurrentSession().createQuery("select n from Creator c join c.news n where c.id =:v1 and n.onStatus = :v2 and n.dropDate is null");
+		query.setLong("v1", userID);
+		query.setParameter("v2", onStatus);
+		List<News> newsSet = (List<News>)query.list();		
+		News[] newsList = newsSet.toArray(new News[newsSet.size()]);
+				
+		return  newsList;
+	}
+
+	//刪除刊登訊息
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void deleteNews(long newsID) {
+		this.newsDAO.delete(newsID);
+	}
+
+	//查詢訊息明細
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public News queryNewsDetail(long newsID) {
+		News news = this.newsDAO.find(newsID);
+		return news;
+	}
+
+	//儲存創作人更新的訊息
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void updateNews(long newsID, String newsName, String newsSouce, String content, String onStatus) {
+		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
+		News news = this.newsDAO.find(newsID);
+		news.setNewsName(newsName);
+		news.setContent(content);
+		news.setNewsSouce(newsSouce);
+		news.setOnStatus(onStatus);
+		if(onStatus.equals("1")){
+			news.setOnDate(date);			
+		}
+		this.newsDAO.update(news);
+	}
+
+	//儲存管理者新增的訊息
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void saveManagerNews(long adminID, String newsCategory, String newsName, String picture, String newsSouce, String onDate, String content, String onStatus) {
+		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
+		News news = new News();
+		news.setNewsCategory(newsCategory);
+		news.setCreateDate(date);
+		news.setNewsName(newsName);
+		news.setContent(content);
+		news.setNewsSouce(newsSouce);
+		news.setPicture(picture);
+		news.setCreateUser(String.valueOf(adminID));
+		news.setOnDate(onDate);
+		news.setOnStatus(onStatus);
+		this.newsDAO.save(news);		
+	}
+	
+	//管理者查詢刊登訊息(起始頁面)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public News[] queryFirstNewsList(){
+		String nowDate = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
+		Date tempDate = DateUtils.addDays(new Date(), -14);
+		String date = DateFormatUtils.format(tempDate, "yyyyMMddhhmmss");
+		Query query = this.sessionFactory.getCurrentSession().createQuery("from News where(createUser is not null)and(createDate between :date and :nowDate)and(dropDate is null)");
+		query.setParameter("nowDate", nowDate);
+		query.setParameter("date", date);		
+		List<News> newsSet = (List<News>)query.list();		
+		News[] newsList = newsSet.toArray(new News[newsSet.size()]);
+		return newsList;
+	}
+	
+	//管理者查詢刊登訊息(查詢條件)
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public News[] queryNewsList(String newsCategory, String newsName,
+			String MOPEND, String MCLOSED, String onStatus, String newsSource) 
+	{		
+		StringBuffer tempQuery = new StringBuffer();
+		tempQuery.append("from News where createUser is not null and dropDate is null ");
+		
+		if(!newsCategory.isEmpty()){
+			tempQuery.append("and newsCategory = :newsCategory ");
+		}
+		if (!newsName.isEmpty()){
+			tempQuery.append("and newsName = :newsName ");
+		}
+		if (!MOPEND.isEmpty()&&!MCLOSED.isEmpty()){
+			tempQuery.append("and createDate between :MOPEND and :MCLOSED ");
+		}
+		if (!onStatus.isEmpty()){
+			tempQuery.append("and onStatus = :onStatus ");
+		}
+		if (!newsSource.isEmpty()){
+			tempQuery.append("and newsSource = :newsSource ");
+		}		
+		
+		Query query = this.sessionFactory.getCurrentSession().createQuery(tempQuery.toString());
+		if(!newsCategory.isEmpty()){
+			query.setParameter("newsCategory", newsCategory);
+		}
+		if (!newsName.isEmpty()){
+			query.setParameter("newsName", newsName);
+		}
+		if (!MOPEND.isEmpty()&&!MCLOSED.isEmpty()){
+			String sDate = MOPEND.replaceAll("-", "");
+			sDate = sDate+"000000";
+			String eDate = MCLOSED.replaceAll("-", "");
+			eDate = eDate+"235959";		
+			query.setParameter("MOPEND", sDate);
+			query.setParameter("MCLOSED", eDate);
+		}
+		if (!onStatus.isEmpty()){
+			query.setParameter("onStatus", onStatus);
+		}
+		if (!newsSource.isEmpty()){
+			query.setParameter("newsSource", newsSource);
+		}		
+		
+		List<News> newsSet = (List<News>)query.list();		
+		News[] newsList = newsSet.toArray(new News[newsSet.size()]);
+		return newsList;
+	}
+
+	//儲存管理者更新的訊息
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void updateManagerNews(long newsID, String newsCategory, String newsName, String picture, String newsSouce, String onDate, String content){
+		News news = this.newsDAO.find(newsID);
+		news.setNewsCategory(newsCategory);
+		news.setNewsName(newsName);
+		news.setPicture(picture);
+		news.setContent(content);
+		news.setNewsSouce(newsSouce);
+		news.setOnDate(onDate);		
+		this.newsDAO.update(news);
+	}
 }

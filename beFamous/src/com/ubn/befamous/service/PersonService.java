@@ -103,39 +103,25 @@ public interface PersonService {
 	
 	//Lucy寫的
 	
-	/*
-	 * 查詢會員資料
-	 */
+	//查詢會員資料
 	public ArrayList queryMember(long userID);
 	
-	/*
-	 * 更新會員資料
-	 */
+	//更新會員資料
 	public void updateMember(long userID,String identityName,String userName,String location,String city,String birthday, String sex,String webSite,String subscribeStatus,String introduction,String likeMusicTypes,String likeSingers);
 	
-	/*
-	 * 更新會員密碼
-	 */
+	//更新會員密碼
 	public void updatePassword(long userID, String password);
 	
-	/*
-	 * 更新會員信箱
-	 */
+	//更新會員信箱
 	public void updateEmail(long userID, String email);
 	
-	/*
-	 * 刪除會員圖片
-	 */
+	//刪除會員圖片
 	public void deleteMemberPicture(long userID);	
 	
-	/*
-	 * 刪除會員圖片
-	 */
+	//更新會員圖片/
 	public void handleUploadPicture(long userID, String picture);
 		
-	/*
-	 * 更新會員帳戶資料
-	 */
+	//更新會員帳戶資料
 	public void updateAccountData(long userID, String accountName, String accountNO, String bankName, String bankBranch, String identityNO, String address, String tel, String cellPhone);
 	
 	
@@ -157,4 +143,34 @@ public interface PersonService {
 		
 	//客服-儲存備註
 	public Question saveNote(long questionID,long adminId,String noteContent,String adminName);
+		
+	//Lucy@20111123
+	
+	//儲存創作人刊登的訊息/
+	public void saveNews(long userID, String newsName, String newsSouce, String content, String onStatus);
+	
+	//創作人查詢刊登訊息
+	public News[] queryNews(long userID, String onStatus);	
+	
+	//刪除刊登訊息
+	public void deleteNews(long newsID);	
+	
+	//查詢訊息明細
+	public News queryNewsDetail(long newsID);
+	
+	//儲存創作人更新的訊息
+	public void updateNews(long newsID, String newsName, String newsSouce, String content, String onStatus);
+	
+	//儲存管理者新增的訊息
+	public void saveManagerNews(long adminID, String newsCategory, String newsName, String picture, String newsSouce, String onDate, String content, String onStatus);
+	
+	//管理者查詢刊登訊息(起始頁面)
+	public News[] queryFirstNewsList();
+	
+	//管理者查詢刊登訊息(查詢條件)/
+	public News[] queryNewsList(String newsCategory, String newsName, String MOPEND, String MCLOSED, String onStatus, String newsSource);
+	
+	//儲存管理者更新的訊息
+	public void updateManagerNews(long newsID, String newsCategory, String newsName, String picture, String newsSouce, String onDate, String content);
+	
 }

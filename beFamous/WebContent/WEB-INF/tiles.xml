@@ -262,6 +262,10 @@
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/news/queryManagerNews.jsp" />
 	</definition>
+	<definition name="queryManagerNewsData" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/news/queryManagerNews.jsp" />
+	</definition>
 	<definition name="editNewsData" extends="general.definition">
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/news/editManagerNews.jsp" />
@@ -604,6 +608,10 @@
 		<put-attribute name="body" value="/WEB-INF/view/news/modifyNews.jsp" />
 	</definition>	
 	<definition name="queryNews" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/news/queryNews.jsp" />
+	</definition>
+	<definition name="queryNewsData" extends="general.definition">
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/news/queryNews.jsp" />
 	</definition>

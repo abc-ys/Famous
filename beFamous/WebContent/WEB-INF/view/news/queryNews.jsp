@@ -11,48 +11,57 @@
 <h4>訊息刊登管理</h4>
 這裡有您所刊登的訊息，以方便您管理。<br><br>
 <form name="form" method="post">
-狀態:<select name="status" id="status">
-<option value="開放" selected="selected">開放</option>
-<option value="草稿">草稿</option>
-</select><br><br>
+狀態:&nbsp;
+	<c:if test="${onStatus ==1}">
+		<select name="onStatus" id="onStatus">
+			<option value="1" selected="selected">開放</option>
+			<option value="2">草稿</option>
+		</select>
+	</c:if>
+	<c:if test="${onStatus ==2}">
+		<select name="onStatus" id="onStatus">
+			<option value="1">開放</option>
+			<option value="2" selected="selected">草稿</option>
+		</select>
+	</c:if>
+<br><br>
 <input type="button" value="查詢" onclick="queryNews()">
-<input type="hidden" name="status">
+<input type="hidden" name="userID" value=${userID}>
 </form>
 <p>
 <h4>查詢結果</h4>
-<form name="form2" method="post">
-<input type="button" value="新增訊息" onclick="addNews()"><input type="button" value="刪除訊息" onclick="delNews()">
-<table border="1" BorderColor="#000000" cellpadding="0" cellspacing="0">
-	<tr><td Width="50" Height="35" valign="top"><font size="2">序號</font></td>
-	<td valign="top" Width="50"><font size="2"></font></td>
-	<td valign="top" Width="100"><font size="2">日期</font></td>
-	<td valign="top" Width="100"><font size="2">訊息標題</font></td>
-	<td valign="top" Width="100"><font size="2">消息來源</font></td>
-	<td valign="top" Width="100"><font size="2">狀態</font></td>
-	<td valign="top" Width="100"><font size="2">曝光數</font></td>
-	<td valign="top" Width="100"><font size="2">編輯</font></td></tr>
-	<c:forEach var="hm" items="${newsList}" varStatus="status">
-		<tr><td valign="top" Width="50"><font size="2">${status.index+1}</font></td>
-		<td valign="top" Width="50"><font size="2"><input type="checkbox" name="check" id="check" value=${hm[0].newsId}></font></td>	
-		<td valign="top" Width="100"><font size="2">${hm[0].createDate}</font></td>		
-		<td valign="top" Width="100"><font size="2">${hm[0].newsName}</font></td>	
-		<td valign="top" Width="100"><font size="2">${hm[0].newsSouce}</font></td>	
-		<td valign="top" Width="100"><font size="2">${hm[0].onStatus}</font></td>
-		<td valign="top" Width="100"><font size="2">${hm[1]}</font></td>
-		<td valign="top" Width="100"><font size="2"><input type="button" value="編輯" onclick="modifyNews(${hm[0].newsId})"></font></td></tr>
-	</c:forEach>
-	<input type="hidden" name="delList">
-	<input type="hidden" name="ststus" value=${status}>
-	</form> 
-</table>
-
+<form name="form2" method="post">	
+	<input type="button" value="新增訊息" onclick="addNews()"><input type="button" value="刪除訊息" onclick="delNews()">
+	<table border="1" BorderColor="#000000" cellpadding="0" cellspacing="0">
+		<tr><td Width="50" Height="35" valign="top"><center><font size="2">序號</font></center></td>
+		<td valign="top" Width="50"><center><font size="2"></font></center></td>
+		<td valign="top" Width="100"><center><font size="2">日期</font></center></td>
+		<td valign="top" Width="100"><center><font size="2">訊息標題</font></center></td>
+		<td valign="top" Width="100"><center><font size="2">消息來源</font></center></td>
+		<td valign="top" Width="100"><center><font size="2">狀態</font></center></td>
+		<td valign="top" Width="100"><center><font size="2">曝光數</font></center></td>
+		<td valign="top" Width="100"><center><font size="2">編輯</font></center></td></tr>
+		<c:forEach var="hm" items="${newsList}" varStatus="status">
+			<tr><td valign="top" Width="50"><center><font size="2">${status.index+1}</font></center></td>
+			<td valign="top" Width="50"><center><font size="2"><input type="checkbox" name="del" id="del" value=${hm.id}></font></center></td>	
+			<td valign="top" Width="100"><center><font size="2">${hm.createDate}</font></center></td>		
+			<td valign="top" Width="100"><center><font size="2">${hm.newsName}</font></center></td>	
+			<td valign="top" Width="100"><center><font size="2">${hm.newsSouce}</font></center></td>
+			<c:if test="${hm.onStatus == 1}"><td valign="top" Width="100"><center><font size="2">開放</font></center></td></c:if>
+			<c:if test="${hm.onStatus == 2}"><td valign="top" Width="100"><center><font size="2">草稿</font></center></td></c:if>
+			<td valign="top" Width="100"><center><font size="2">${hm.hit}</font></center></td>
+			<td valign="top" Width="100"><center><font size="2"><center><input type="button" value="編輯" onclick="modifyNews('${userID}','${hm.id}')"></font></center></td></tr>
+		</c:forEach>
+		<input type="hidden" name="userID" value=${userID}>
+		<input type="hidden" name="onStatus" value=${onStatus}>
+		<input type="hidden" name="delList">	 
+	</table>
+</form>
 
 </body>
 <script type="text/javascript">
 function queryNews(){
-	var status =$('#status :selected').text();
-	document.form.status.value = status;
-	document.form.action="${pageContext.request.contextPath}/queryNews.do";
+	document.form.action="${pageContext.request.contextPath}/queryNewsData.do";
 	document.form.submit();  
 }
 
@@ -61,20 +70,16 @@ function addNews(){
 	document.form.submit();  
 }
 function delNews(){	
-	if($("#check").attr('checked')==undefined){
-		alert("請選擇欲刪除訊息");
-		return false;
-	}else{
-		var delList = new Array();
-		$('input:checkbox:checked[name="check"]').each(function(i) { delList[i] = this.value; });
-		document.form2.delList.value = delList;
-		document.form2.action="${pageContext.request.contextPath}/delNews.do";
-		document.form2.submit(); 
-	}
+	var delList = new Array();
+	$('input:checkbox:checked[name="del"]').each(function(i) { delList[i] = this.value; });
+	document.form2.delList.value = delList;
+	document.form2.action="${pageContext.request.contextPath}/delNews.do";
+	document.form2.submit(); 
+	
 	 
 }
-function modifyNews(newsID){
-	window.open("${pageContext.request.contextPath}/modifyNews.do?newsID="+newsID,'son','location=no,scrollbars=no,toolbar=no,directories=no,menubar=no,directories=no,status=no,titlebar=no');		
+function modifyNews(userID, newsID){
+	window.open("${pageContext.request.contextPath}/modifyNews.do?userID="+userID+"&newsID="+newsID,'son','location=no,scrollbars=no,toolbar=no,directories=no,menubar=no,directories=no,status=no,titlebar=no');		
 }
 </script>
 </html>
