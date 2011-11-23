@@ -10,6 +10,7 @@ import org.hibernate.Query;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.ubn.befamous.entity.Ad;
 import com.ubn.befamous.entity.Admin;
 import com.ubn.befamous.entity.Album;
 import com.ubn.befamous.entity.LikeCreator;
@@ -139,7 +140,10 @@ public interface PersonService {
 	public void updateAccountData(long userID, String accountName, String accountNO, String bankName, String bankBranch, String identityNO, String address, String tel, String cellPhone);
 	
 	
-	//怡秀寫的     201111-22
+	//怡秀寫的     2011-11-22
+	
+	//線上客服
+	
 	//客服-提問頁-儲存問題
 	public void saveQuestion(String productType,String userIdentity,String name,String email,String tel,String questionType,String questionContent);
 			
@@ -157,4 +161,26 @@ public interface PersonService {
 		
 	//客服-儲存備註
 	public Question saveNote(long questionID,long adminId,String noteContent,String adminName);
+	
+	
+	//廣告管理
+	
+	//新增管理者廣告
+	public void saveManagerAd(long adminId,String bannerType,String actionName,String picture,String startDate,String endDate,String url,String onDate,String offDate,String createDate);
+	
+	//查詢廣告詳細資料
+	public Ad queryAdDetail(long adID);
+	
+	//修改廣告資料
+	public Ad modifyAd(long adID,long adminID,String bannerType,String actionName,String picture,String fileName,String startDate,String endDate,String url,String onDate,String offDate);
+	
+	//查詢廣告清單
+	public Ad[] queryAd(String bannerType,String actionName,String upStartDate,String upEndDate,String downStartDate,String downEndDate);
+	
+	//查詢創作者的廣告清單
+	public Ad[] queryCreatorAd(String startDate,String endDate,String checkStatus,String albumAmount);
+	
+	//儲存備註
+	public void saveNote(long creatorAdID,String checkStatus,String reason,long adminID);
+	
 }

@@ -21,6 +21,8 @@ import org.springframework.transaction.annotation.Propagation;
 
 
 import com.ubn.befamous.dao.IBaseDao;
+import com.ubn.befamous.entity.Ad;
+import com.ubn.befamous.entity.AdType;
 import com.ubn.befamous.entity.Admin;
 import com.ubn.befamous.entity.Album;
 import com.ubn.befamous.entity.Audition;
@@ -49,6 +51,14 @@ public class PersonServiceImpl implements PersonService{
 	
 	@Autowired
 	private  SessionFactory sessionFactory;
+	
+	@Autowired
+	@Qualifier("adDAO")
+	private IBaseDao<Ad, Long> adDAO;
+	
+	@Autowired
+	@Qualifier("adTypeDAO")
+	private IBaseDao<AdType, Long> adTypeDAO;
 	
 	@Autowired
 	@Qualifier("auditionDAO")
@@ -519,11 +529,11 @@ public class PersonServiceImpl implements PersonService{
 		this.questionDAO.save(question);
 	}
 		
-	//客服-管理者的問題管理第一個頁面     (時間yyyy-mm-dd還沒轉型成yyyymmdd)
+	//客服-管理者的問題管理第一個頁面    
 	public Question[] queryQuestion(String startDate,String endDate,String productType,String email,String questionType){
-		/*
-		startDate= DateFormatUtils.format(Long.parseLong(startDate), "yyyyMMddHHmmss");
-		endDate= DateFormatUtils.format(Long.parseLong(endDate), "yyyyMMddHHmmss");*/
+		
+		startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
+		endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
 		
 		StringBuilder queryString = new StringBuilder();
 		queryString.append("from Question a where (a.handleStatus = :handleStatus)");
@@ -622,6 +632,191 @@ public class PersonServiceImpl implements PersonService{
 		
 		Question q2=this.questionDAO.find(questionID);
 		return q2;
+	}
+	
+	
+	//廣告管理
+	
+	//新增管理者廣告
+	public void saveManagerAd(long adminId,String bannerType,String actionName,String picture,String startDate,String endDate,String url,String onDate,String offDate,String createDate){
+		String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");   //今天日期時間  yyyyMMddHHmmss
+		
+		startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
+		endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
+		onDate= StringUtils.replaceChars(onDate, "-", "")+"000000";
+		offDate= StringUtils.replaceChars(offDate, "-", "")+"235959";
+		
+		AdType adType = this.adTypeDAO.find(Long.parseLong(bannerType));
+		
+		Ad ad = new Ad();
+		ad.setAdminCreator(String.valueOf(adminId));
+		ad.setCreateDate(datetime);
+		ad.setAdType(adType);
+		ad.setPicture(picture);
+		ad.setActivityStartDate(startDate);
+		ad.setActivityEndDate(endDate);
+		ad.setWebsite(url);
+		ad.setOnDate(onDate);
+		ad.setOffDate(offDate);
+		ad.setOnStatus("1");
+		ad.setCheckStatus("2");
+		ad.setActivityName(actionName);
+		
+		this.adDAO.save(ad);
+	}
+		
+	//查詢廣告詳細資料
+	public Ad queryAdDetail(long adID){
+		Ad a = this.adDAO.find(adID);
+		return a;
+	}
+		
+	//修改廣告資料
+	@Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
+	public Ad modifyAd(long adID,long adminID,String bannerType,String actionName,String picture,String fileName,String startDate,String endDate,String url,String onDate,String offDate){
+		String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");   //今天日期時間  yyyyMMddHHmmss
+		
+		startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
+		endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
+		onDate= StringUtils.replaceChars(onDate, "-", "")+"000000";
+		offDate= StringUtils.replaceChars(offDate, "-", "")+"235959";
+		
+		Ad a = this.adDAO.find(adID);
+		
+		AdType adType = this.adTypeDAO.find(Long.parseLong(bannerType));
+		
+		a.setModifier(String.valueOf(adminID));
+		a.setModifyDate(datetime);
+		a.setAdType(adType);
+		a.setActivityName(actionName);
+		if("".equals(fileName)){
+			a.setPicture(picture);
+		}else{
+			a.setPicture(fileName);
+		}
+		a.setActivityStartDate(startDate);
+		a.setActivityEndDate(endDate);
+		a.setWebsite(url);
+		a.setOnDate(onDate);
+		a.setOffDate(offDate);
+		
+		this.adDAO.update(a);
+		return a;
+	}
+		
+	//查詢廣告清單
+	public Ad[] queryAd(String bannerType,String actionName,String upStartDate,String upEndDate,String downStartDate,String downEndDate){
+		if (StringUtils.isNotEmpty(upStartDate)&& StringUtils.isNotEmpty(upEndDate)) {
+		upStartDate= StringUtils.replaceChars(upStartDate, "-", "")+"000000";
+		upEndDate= StringUtils.replaceChars(upEndDate, "-", "")+"235959";}
+		if (StringUtils.isNotEmpty(downStartDate)&& StringUtils.isNotEmpty(downEndDate)) {
+		downStartDate= StringUtils.replaceChars(downStartDate, "-", "")+"000000";
+		downEndDate= StringUtils.replaceChars(downEndDate, "-", "")+"235959";}
+		
+		System.out.println("upStartDate==>"+upStartDate+", upEndDate==>"+upEndDate+", downStartDate==>"+downStartDate+", downEndDate==>"+downEndDate);
+		
+		StringBuilder queryString = new StringBuilder();
+		queryString.append("from Ad a where (a.onStatus = :onStatus)");
+		if (StringUtils.isNotEmpty(upStartDate)
+				&& StringUtils.isNotEmpty(upEndDate)) {
+			queryString.append("and (a.onDate  between :startDate and :endDate)");
+		}
+		if (StringUtils.isNotEmpty(downStartDate)
+				&& StringUtils.isNotEmpty(downEndDate)) {
+			queryString.append("and (a.offDate  between :startDate and :endDate)");
+		}
+		if (StringUtils.isNotEmpty(bannerType)) {
+			queryString.append("and (a.adType.id=:bannerType)");
+		}
+		if (StringUtils.isNotEmpty(actionName)) {
+			queryString.append("and (a.activityName = :activityName)");
+		}
+
+		Query query = this.sessionFactory.getCurrentSession().createQuery(queryString.toString());
+		
+		if(StringUtils.isNotEmpty(upStartDate)&&StringUtils.isNotEmpty(upEndDate)){
+			query.setString("startDate", upStartDate);
+			query.setString("endDate", upEndDate);
+		}
+		if (StringUtils.isNotEmpty(downStartDate)
+				&& StringUtils.isNotEmpty(downEndDate)) {
+			query.setString("startDate", downStartDate);
+			query.setString("endDate", downEndDate);
+		}
+		if (StringUtils.isNotEmpty(bannerType)) {
+			query.setString("bannerType", bannerType);
+		}
+		if (StringUtils.isNotEmpty(actionName)) {
+			query.setString("activityName", actionName);
+		}
+		query.setString("onStatus", "1");
+		
+		List<Ad> resultList=(List<Ad>)query.list();
+		Ad[] ADset = new Ad[resultList.size()];
+		
+			int i=0;
+			for (Ad as:resultList) {
+				ADset[i]=as;
+				System.out.println("ssss==>"+ADset[i].getId());
+				i++;
+			}
+		
+		return ADset;
+	}
+		
+	//查詢創作者的廣告清單      (專輯數的條件還沒加)
+	public Ad[] queryCreatorAd(String startDate,String endDate,String checkStatus,String albumAmount){
+		if(StringUtils.isNotEmpty(startDate)&& StringUtils.isNotEmpty(endDate)){
+		startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
+		endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";}
+		
+		if(StringUtils.isEmpty(checkStatus)){
+		checkStatus="1";}
+		
+		StringBuilder queryString = new StringBuilder();
+		queryString.append("from Ad a where (a.checkStatus = :checkStatus) and (a.memberCreator is not null)");
+		if (StringUtils.isNotEmpty(startDate)&& StringUtils.isNotEmpty(endDate)) {
+			queryString.append("and (:startDate  between a.activityStartDate and a.activityEndDate) and (:endDate between a.activityStartDate and a.activityEndDate)");
+		}
+		/*if (StringUtils.isNotEmpty(albumAmount)) {
+			queryString.append("and (a.activityName = :albumAmount)");
+		}*/
+
+		Query query = this.sessionFactory.getCurrentSession().createQuery(queryString.toString());
+		
+		if (StringUtils.isNotEmpty(startDate)&& StringUtils.isNotEmpty(endDate)) {
+			query.setString("startDate", startDate);
+			query.setString("endDate", endDate);
+		}
+		/*if (StringUtils.isNotEmpty(albumAmount)) {
+			query.setString("albumAmount", albumAmount);
+		}*/
+		query.setString("checkStatus", checkStatus);
+		
+		List<Ad> resultList=(List<Ad>)query.list();
+		Ad[] ADset = new Ad[resultList.size()];
+		
+			int i=0;
+			for (Ad as:resultList) {
+				ADset[i]=as;
+				System.out.println("ssss==>"+ADset[i].getId());
+				i++;
+			}
+		
+		return ADset;
+	}
+		
+	//儲存備註
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void saveNote(long creatorAdID,String checkStatus,String reason,long adminID){
+		String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");   //今天日期時間  yyyyMMddHHmmss
+		
+		Ad a = this.adDAO.find(creatorAdID);
+		a.setModifier(String.valueOf(adminID));
+		a.setModifyDate(datetime);
+		a.setCheckStatus(checkStatus);
+		a.setNote(reason);
+		this.adDAO.update(a);
 	}
 	
 }
