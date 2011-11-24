@@ -542,15 +542,15 @@ public class PersonServiceImpl implements PersonService{
 	}
 		
 	//客服-管理者的問題管理第一個頁面    
-	public Question[] queryQuestion(String startDate,String endDate,String productType,String email,String questionType){
-		
-		startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
-		endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
+	public Question[] queryQuestion(String startDate,String endDate,String productType,String email,String questionType){		
 		
 		StringBuilder queryString = new StringBuilder();
 		queryString.append("from Question a where (a.handleStatus = :handleStatus)");
 		if (StringUtils.isNotEmpty(startDate)
 				&& StringUtils.isNotEmpty(endDate)) {
+			startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
+			endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
+			
 			queryString.append("and (a.questionDate  between :startDate and :endDate)");
 		}
 		if (StringUtils.isNotEmpty(questionType)) {
