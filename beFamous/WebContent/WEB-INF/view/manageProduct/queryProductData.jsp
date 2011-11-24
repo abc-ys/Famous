@@ -54,17 +54,18 @@
 		<td><center><font size="2">${hm2.name}</font></center></td>
 		<td><center><font size="2">${hm2.productionClassification.name}</font></center></td>
 		<td><center><font size="2">${hm2.companyName}</font></center></td>
-		<td><center><INPUT type="checkbox" name="status"></center></td>
+		<c:if test="${empty hm2.status}"><td><center><font size="2"></font></center></td></c:if>
+		<c:if test="${hm2.status==1}"><td><center><font size="2">已上架</font></center></td></c:if>
+		<c:if test="${hm2.status==2}"><td><center><font size="2">未上架</font></center></td></c:if>
 		<td><center><font size="2">${hm2.amount}</font></center></td>
 		<td><center><input type=text name="realPrice" size="3" value=${hm2.sdCardPrice.price}></center></td>
 		<td><center><input type=text name="specialPrice" size="3" value=${hm2.sdCardPrice.specialPrice}></center></td>
 		<td><center><font size="2">${hm2.sdCardPrice.discountPrice}元+&nbsp;${hm2.sdCardPrice.discountBonus}點</font></center></td>
-		<td><center><font size="2">${hm2.reward}</font></center></td>
+		<td><center><font size="2">付款金額x${hm2.reward}</font></center></td>
 		<td><center><font size="2"><a href="javascript:editData(${hm2.id})">編輯</a></font></center></td>
 	</tr>
 	</c:forEach>
 </table>
-<input type="submit" value="儲存修改" onclick="saveModify()"/>
 </form>
 </body>
 <script>
@@ -78,10 +79,6 @@ function change(){
 }
 function editData(productId){
     document.fm2.action="${pageContext.request.contextPath}/productDetailData.do?productId="+productId;
-    document.fm2.submit();
-}
-function saveModify(){ 
-    document.fm2.action="${pageContext.request.contextPath}/saveModify.do";
     document.fm2.submit();
 }
 </script>

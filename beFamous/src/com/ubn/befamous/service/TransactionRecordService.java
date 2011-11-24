@@ -74,34 +74,81 @@ public interface TransactionRecordService{
 	public OrderDetail[] queryCashRcdDetail(long transactionId);
 	public void downloadReturnList();
 	
-	//檢舉管理
-	public ArrayList queryOffenseCategory(long productionCategoryId);
-	public void addOffense(long userId, long productionCategoryId, long offenseTypeId, String reason);
-	public ArrayList queryUnHandle();
-	public ArrayList updateAlbumHide(long adminId, long albumId);
-	public ArrayList updateSongHide(long adminId, long songId);
-	public Offense[] queryOffenseReason(long productionCategoryId);
-	public Album[] queryAutoHide();
-	public ArrayList queryAutoHideByDate(String type,String year, String month, String creator);
-	public void canceAlbumHide(long adminId, long albumId);
-	public void canceSonglHide(long adminId, long songId);
-	public Album[] queryAlreadyHide(String type);
-	public ArrayList queryAlreadyHideByDate(String year, String month, String creator);
-	public Offense[] queryOffenseByUser(long userId);
-	public void updateIncorrectOffense(long adminId, long offenseId);
-	
-	
-	//商品管理
-	public void addProduct(File file);
-	public ProductionClassification[] queryProductionClassification();
-	public void addProductionClassification(String productionClassificationName);
-	public void editProductionClassification(long productionClassificationId, String productionClassificationName);
-	public ProductionClassification[] deleteProductionClassification(long roductionClassificationId);
-	public ArrayList queryProduct();
-	public ArrayList queryProductInfo(long roductionClassificationId);
-	public void updateProductBatch(long productionClassificationId, String condition, double rate);
-	public ArrayList queryProductDetail(long productId);
-	public long saveModify(long productId, String realPrice,String specialPrice, String status, long productionClassificationId);
-	public long updateProduct(long productId, String productName,long newProductionClassificationId, String transactionType,String realPrice,String specialPrice, String discountPrice, String discountBonus, String giveBonus, String stock, String status, String keyword, String memo, long productionClassificationId);
-	
+	//Lucy@20111124	
+		//檢舉管理-新增檢舉介面
+		public ArrayList queryOffenseCategory(long productionCategoryId);
+		
+		//檢舉管理-儲存檢舉內容
+		public void addOffense(long userId, long productionCategoryId, long offenseTypeId, String reason);
+		
+		//檢舉管理-檢視被檢舉的專輯和歌曲
+		public ArrayList queryUnHandle();
+		
+		//檢舉管理-隱藏專輯
+		public void updateAlbumHide(long adminId, long albumId);
+		
+		//檢舉管理-隱藏歌曲
+		public void updateSongHide(long adminId, long songId);
+		
+		//檢舉管理-查詢檢舉理由 
+		public Offense[] queryOffenseReason(long productionCategoryId);
+		
+		//檢舉管理-更新檢舉狀態(不正當檢舉)
+		public void updateIncorrectOffense(long adminId, long offenseId);
+		
+		//檢舉管理-查詢被系統自動隱藏的專輯/歌曲(起始查詢)
+		public ArrayList queryAutoHide();
+		
+		//檢舉管理-查詢被系統自動隱藏的專輯/歌曲(根據查詢條件)
+		public ArrayList queryAutoHideByDate(String type,String year, String month, String creator);
+		
+		//檢舉管理-取消隱藏狀態 
+		public void cancelHide(long adminId, long hiddenId);
+		
+		//檢舉管理-確認隱藏狀態
+		public void comfirmHide(long adminId, long hiddenId);
+		
+		//檢舉管理-查詢已被隱藏的專輯(起始查詢)
+		public ArrayList queryAlreadyHide();
+		
+		//檢舉管理-查詢已被隱藏的專輯/歌曲(根據查詢條件)
+		public ArrayList queryAlreadyHideByDate(String type,String year, String month, String creator);
+		
+		//檢舉管理-查詢會員檢舉清單 
+		public Offense[] queryOffenseByUser(long userId);
+		
+		
+		//商品管理-新增商品 
+		public void addProduct(File file);
+		
+		//商品管理-查詢商品類別 
+		public ProductionClassification[] queryProductionClassification();
+		
+		//商品管理-新增商品類別
+		public void addProductionClassification(String productionClassificationName);
+		
+		//商品管理-編輯商品類別
+		public void editProductionClassification(long productionClassificationId, String productionClassificationName);
+		
+		//商品管理-刪除商品類別
+		public ProductionClassification[] deleteProductionClassification(long roductionClassificationId);
+		
+		//商品管理-查詢商品
+		public ArrayList queryProduct();
+		
+		//商品管理-查詢商品資訊
+		public ArrayList queryProductInfo(long roductionClassificationId);
+		
+		//商品管理-批次更新商品
+		public void updateProductBatch(long productionClassificationId, String condition, double rate);
+		
+		//商品管理-查詢商品細節
+		public ArrayList queryProductDetail(long productId);
+		
+		//商品管理-更新商品資訊(查詢商品資訊頁)
+		//public long saveModify(long productId, String realPrice,String specialPrice, String status, long productionClassificationId);
+		
+		//商品管理-更新商品資訊(查詢商品細節頁)
+		public long updateProduct(long adminId, long productId, String productName,long newProductionClassificationId, String transactionType,String realPrice,String specialPrice, String discountPrice, String discountBonus, String giveBonus, String stock, String status, String keyword, String memo, long productionClassificationId);
+		
 }

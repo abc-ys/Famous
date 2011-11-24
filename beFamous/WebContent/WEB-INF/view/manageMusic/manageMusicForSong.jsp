@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %> 
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -17,12 +18,13 @@
 	創作人:&nbsp<input type="text" name="name" size="10"><br><br>
 	音樂類別:&nbsp<select name="musicType">
 			<option value="" ></option>
-			<c:forEach var="hm" items="${MusicCategory}">
-			<option value="${hm.name}" >${hm.name}</option>
+			<c:forEach var="hm" items="${musicCategory}">
+			<option value="${hm.id}" >${hm.name}</option>
 			</c:forEach>
 		</select><br><br>
-	<center><input type="button" value="查詢" onclick="querySong()">&nbsp&nbsp<input type="reset" value="全部清除"></center>
+	<center><input type="button" value="查詢" onclick="querySong('${adminID}')">&nbsp&nbsp<input type="reset" value="全部清除"></center>
 <p>
+<c:if test="${Song != ''}">
 查詢結果
 <table border="1" BorderColor="#000000" cellpadding="0" cellspacing="0">
 <tr><td Width="30" Height="35" valign="top"><font size="2">編號</font></td>
@@ -38,44 +40,53 @@
 	<td valign="top" Width="50"><font size="2">標籤</font></td>
 	<td valign="top" Width="50"><font size="2">隱藏</font></td>
 	<td valign="top" Width="50"><font size="2">隱藏理由</font></td></tr>
-	<c:forEach var="hm" items="${song}"  varStatus="status">
+	
+	<c:forEach var="hm" items="${Song}"  varStatus="status">
 	<td Height="35"><font size="2">${status.index+1}</font></td>
-	<td><font size="2">${hm.songID}</font></td>
+	<td><font size="2">${hm.pid}</font></td>
 	<td><font size="2"><a href="javascript:void(0)')">${hm.name}</a></font></td>	
-	<td><font size="2"><a href="javascript:album('${hm.album.albumID}')">${hm.album.name}</a></font></td>	
-	<td><font size="2"><a href="javascript:creator('${hm.album.creator.memberId}')">${hm.album.creator.userName}</a></font></td>
-	<td><font size="2"><a href="javascript:lyrics('${hm.songID}')">歌詞</a></font></td>
+	<td><font size="2"><a href="javascript:album('${hm.album.pid}')">${hm.album.name}</a></font></td>	
+	<td><font size="2"><a href="javascript:creator('${hm.album.creator.id}','${adminID}')">${hm.album.creator.userName}</a></font></td>
+	<td><font size="2"><a href="javascript:lyrics('${hm.pid}')">歌詞</a></font></td>
 	<td><font size="2">${hm.musicCategory.name}</font></td>
-	<td><font size="2">${hm.date}</font></td>
+	<td><font size="2">
+	<fmt:parseDate var="dateObj" value="${hm.createDate}" type="DATE" pattern="yyyyMMddHHmmss"/> 
+	<fmt:formatDate value='${dateObj}' pattern='yyyy-MM-dd' /></font></td>
 	<td><font size="2">${hm.songPrice.price}</font></td>
 	<td><font size="2">${hm.songPrice.discountPrice}</font></td>
 	<td><font size="2">${hm.tag}</font></td>
-	<c:forEach var="hm2" items="${hm.offense}">
-	<td><font size="2">${hm2.hidden.modifyDate}已隱藏 by${hm2.hidden.modifyUser}
-	<br><a href="javascript:hiddenSong('${hm.songID}')">隱藏</a>
-	<br><a href="javascript:cancleHiddenSong('${hm.songID}')">取消隱藏</a></font></td>	
-	<td><font size="2">${hm2.hidden.hiddenReason}</font></td><tr>
-	</c:forEach> 
+	
+	<c:if test="${hm.hidden.id != null}"><c:if test="${hm.hidden.endDate == null}"><td><font size="2">
+	<fmt:parseDate var="dateObj" value="${hm.hidden.modifyDate}" type="DATE" pattern="yyyyMMddHHmmss"/> 
+	<fmt:formatDate value='${dateObj}' pattern='yyyy-MM-dd' />已隱藏 by${hm.hidden.modifier.adminName}</font>
+	<br><font size="2"><a href="javascript:cancleHiddenSong('${hm.pid}','${adminID}')">取消隱藏</a></font></td>
+	<td><font size="2">${hm.hidden.hiddenReason}</font></td><tr>
+	</c:if></c:if>
+	<br><c:if test="${hm.hidden.id == null||hm.hidden.endDate != null}">
+	<td><font size="2"><a href="javascript:hiddenSong('${hm.pid}','${adminID}')">隱藏</a></font></td>
+	<td><font size="2"></font></td></c:if>
+	<tr>
 	</c:forEach> 
 </table>
+</c:if>
 </form>
 </body>
 <script type="text/javascript">
-function querySong(){   
-	document.fm.action="${pageContext.request.contextPath}/querySong.do";
+function querySong(adminID){   
+	document.fm.action="${pageContext.request.contextPath}/querySong.do?adminID="+adminID;
   	document.fm.submit();
 }
 function album(albumId){
 	window.open("${pageContext.request.contextPath}/queryAlbumData.do?albumid="+albumId);
 }
-function creator(memberId){
-	window.open("${pageContext.request.contextPath}/manageCreatorDetail/get/123456/"+memberId+".do");
+function creator(memberId,adminId){
+	window.open("${pageContext.request.contextPath}/manageCreatorDetail/get/"+adminId+"/"+memberId+".do");
 }
-function hiddenSong(songId){
-	window.open("${pageContext.request.contextPath}/hiddenForSong.do?songID="+songId+"&mType=song",'son','height=300,width=400,location=no,scrollbars=no,toolbar=no,directories=no,menubar=no,directories=no,status=no,titlebar=no');	
+function hiddenSong(songId,adminID){
+	window.open("${pageContext.request.contextPath}/hiddenForSong.do?songID="+songId+"&mType=song&adminID="+adminID,'son','height=300,width=400,location=no,scrollbars=no,toolbar=no,directories=no,menubar=no,directories=no,status=no,titlebar=no');	
 }
-function cancleHiddenSong(songId){
-	document.fm.action="${pageContext.request.contextPath}/cancleHiddenSong.do?songID="+songId;
+function cancleHiddenSong(songId,adminID){
+	document.fm.action="${pageContext.request.contextPath}/cancleHiddenSong.do?songID="+songId+"&adminID="+adminID;
   	document.fm.submit();
 }
 function lyrics(songId){

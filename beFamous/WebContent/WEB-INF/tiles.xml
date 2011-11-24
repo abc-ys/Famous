@@ -191,11 +191,9 @@
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/manageOffense/systemAutoHidden.jsp" />
 	</definition>
-	<definition name="queryHiddenAlbum" extends="iframe.definition">
-		<put-attribute name="body" value="/WEB-INF/view/manageOffense/hiddenAlbum.jsp" />
-	</definition>
-	<definition name="queryHiddenSong" extends="iframe.definition">
-		<put-attribute name="body" value="/WEB-INF/view/manageOffense/hiddenSong.jsp" />
+	<definition name="queryHiddenList" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageOffense/systemAutoHidden.jsp" />
 	</definition>
 	<definition name="offense" extends="iframe.definition">
 		<put-attribute name="body" value="/WEB-INF/view/manageOffense/offense.jsp" />
@@ -207,11 +205,9 @@
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/manageOffense/hiddened.jsp" />
 	</definition>
-	<definition name="hiddenedAlbum" extends="iframe.definition">
-		<put-attribute name="body" value="/WEB-INF/view/manageOffense/hiddenedAlbum.jsp" />
-	</definition>
-	<definition name="hiddenedSong" extends="iframe.definition">
-		<put-attribute name="body" value="/WEB-INF/view/manageOffense/hiddenedSong.jsp" />
+	<definition name="queryHiddenedList" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageOffense/hiddened.jsp" />
 	</definition>
 	
 	<!-- 關鍵字管理 -->

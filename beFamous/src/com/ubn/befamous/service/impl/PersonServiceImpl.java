@@ -10,6 +10,7 @@ import javax.persistence.PrimaryKeyJoinColumn;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -21,6 +22,8 @@ import org.springframework.transaction.annotation.Propagation;
 
 
 import com.ubn.befamous.dao.IBaseDao;
+import com.ubn.befamous.entity.Ad;
+import com.ubn.befamous.entity.AdType;
 import com.ubn.befamous.entity.Admin;
 import com.ubn.befamous.entity.Album;
 import com.ubn.befamous.entity.Audition;
@@ -49,6 +52,18 @@ public class PersonServiceImpl implements PersonService{
 	
 	@Autowired
 	private  SessionFactory sessionFactory;
+	
+	@Autowired
+	@Qualifier("newsDAO")
+	private IBaseDao<News, Long> newsDAO;
+	
+	@Autowired
+	@Qualifier("adDAO")
+	private IBaseDao<Ad, Long> adDAO;
+	
+	@Autowired
+	@Qualifier("adTypeDAO")
+	private IBaseDao<AdType, Long> adTypeDAO;
 	
 	@Autowired
 	@Qualifier("auditionDAO")
@@ -404,11 +419,11 @@ public class PersonServiceImpl implements PersonService{
 	
 	//查詢會員資料
 	public ArrayList queryMember(long userID) {
-		
+			
 		ArrayList list = new ArrayList();	
 		Query query = this.sessionFactory.getCurrentSession().createQuery("FROM Member where id = :userID");
 		query.setParameter("userID", userID);
-		
+			
 		Object person = query.uniqueResult();
 		if (person instanceof Creator) {
 			Creator creator = (Creator)person;
@@ -451,7 +466,7 @@ public class PersonServiceImpl implements PersonService{
 			this.creatorDAO.update(creator);			
 		}		
 	}
-	
+		
 	//更新會員密碼
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void updatePassword(long userID, String password) {
@@ -459,7 +474,7 @@ public class PersonServiceImpl implements PersonService{
 		member.setPassword(password);
 		this.memberDAO.update(member);
 	}
-	
+		
 	//更新會員信箱
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void updateEmail(long userID, String email) {
@@ -467,7 +482,7 @@ public class PersonServiceImpl implements PersonService{
 		member.setEmail(email);
 		this.memberDAO.update(member);		
 	}
-	
+		
 	//刪除會員圖片
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void deleteMemberPicture(long userID) {
@@ -475,7 +490,7 @@ public class PersonServiceImpl implements PersonService{
 		member.setPicture("");
 		this.memberDAO.update(member);	
 	}
-	
+		
 	//更新會員圖片
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void handleUploadPicture(long userID, String picture){
@@ -483,7 +498,7 @@ public class PersonServiceImpl implements PersonService{
 		member.setPicture(picture);
 		this.memberDAO.update(member);	
 	}
-	
+		
 	//更新會員帳戶資料
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void updateAccountData(long userID, String accountName, String accountNO, String bankName, String bankBranch, String identityNO, String address, String tel, String cellPhone) {
@@ -526,16 +541,22 @@ public class PersonServiceImpl implements PersonService{
 		this.questionDAO.save(question);
 	}
 		
-	//客服-管理者的問題管理第一個頁面     (時間yyyy-mm-dd還沒轉型成yyyymmdd)
-	public Question[] queryQuestion(String startDate,String endDate,String productType,String email,String questionType){
-		/*
-		startDate= DateFormatUtils.format(Long.parseLong(startDate), "yyyyMMddHHmmss");
-		endDate= DateFormatUtils.format(Long.parseLong(endDate), "yyyyMMddHHmmss");*/
+	//客服-管理者的問題管理第一個頁面    
+	public Question[] queryQuestion(String startDate,String endDate,String productType,String email,String questionType){		
+		if (StringUtils.isNotEmpty(startDate)
+				&& StringUtils.isNotEmpty(endDate)) {
+			startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
+			endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
+		}
+		
 		
 		StringBuilder queryString = new StringBuilder();
 		queryString.append("from Question a where (a.handleStatus = :handleStatus)");
 		if (StringUtils.isNotEmpty(startDate)
 				&& StringUtils.isNotEmpty(endDate)) {
+			startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
+			endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
+			
 			queryString.append("and (a.questionDate  between :startDate and :endDate)");
 		}
 		if (StringUtils.isNotEmpty(questionType)) {
@@ -631,11 +652,197 @@ public class PersonServiceImpl implements PersonService{
 		return q2;
 	}
 	
+	
+	//廣告管理
+	
+	//新增管理者廣告
+	public void saveManagerAd(long adminId,String bannerType,String actionName,String picture,String startDate,String endDate,String url,String onDate,String offDate,String createDate){
+		String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");   //今天日期時間  yyyyMMddHHmmss
+		
+		startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
+		endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
+		onDate= StringUtils.replaceChars(onDate, "-", "")+"000000";
+		offDate= StringUtils.replaceChars(offDate, "-", "")+"235959";
+		
+		AdType adType = this.adTypeDAO.find(Long.parseLong(bannerType));
+		
+		Ad ad = new Ad();
+		ad.setAdminCreator(String.valueOf(adminId));
+		ad.setCreateDate(datetime);
+		ad.setAdType(adType);
+		ad.setPicture(picture);
+		ad.setActivityStartDate(startDate);
+		ad.setActivityEndDate(endDate);
+		ad.setWebsite(url);
+		ad.setOnDate(onDate);
+		ad.setOffDate(offDate);
+		ad.setOnStatus("1");
+		ad.setCheckStatus("2");
+		ad.setActivityName(actionName);
+		
+		this.adDAO.save(ad);
+	}
+		
+	//查詢廣告詳細資料
+	public Ad queryAdDetail(long adID){
+		Ad a = this.adDAO.find(adID);
+		return a;
+	}
+		
+	//修改廣告資料
+	@Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
+	public Ad modifyAd(long adID,long adminID,String bannerType,String actionName,String picture,String fileName,String startDate,String endDate,String url,String onDate,String offDate){
+		String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");   //今天日期時間  yyyyMMddHHmmss
+		
+		startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
+		endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
+		onDate= StringUtils.replaceChars(onDate, "-", "")+"000000";
+		offDate= StringUtils.replaceChars(offDate, "-", "")+"235959";
+		
+		Ad a = this.adDAO.find(adID);
+		
+		AdType adType = this.adTypeDAO.find(Long.parseLong(bannerType));
+		
+		a.setModifier(String.valueOf(adminID));
+		a.setModifyDate(datetime);
+		a.setAdType(adType);
+		a.setActivityName(actionName);
+		if("".equals(fileName)){
+			a.setPicture(picture);
+		}else{
+			a.setPicture(fileName);
+		}
+		a.setActivityStartDate(startDate);
+		a.setActivityEndDate(endDate);
+		a.setWebsite(url);
+		a.setOnDate(onDate);
+		a.setOffDate(offDate);
+		
+		this.adDAO.update(a);
+		return a;
+	}
+		
+	//查詢廣告清單
+	public Ad[] queryAd(String bannerType,String actionName,String upStartDate,String upEndDate,String downStartDate,String downEndDate){
+		if (StringUtils.isNotEmpty(upStartDate)&& StringUtils.isNotEmpty(upEndDate)) {
+		upStartDate= StringUtils.replaceChars(upStartDate, "-", "")+"000000";
+		upEndDate= StringUtils.replaceChars(upEndDate, "-", "")+"235959";}
+		if (StringUtils.isNotEmpty(downStartDate)&& StringUtils.isNotEmpty(downEndDate)) {
+		downStartDate= StringUtils.replaceChars(downStartDate, "-", "")+"000000";
+		downEndDate= StringUtils.replaceChars(downEndDate, "-", "")+"235959";}
+		
+		System.out.println("upStartDate==>"+upStartDate+", upEndDate==>"+upEndDate+", downStartDate==>"+downStartDate+", downEndDate==>"+downEndDate);
+		
+		StringBuilder queryString = new StringBuilder();
+		queryString.append("from Ad a where (a.onStatus = :onStatus)");
+		if (StringUtils.isNotEmpty(upStartDate)
+				&& StringUtils.isNotEmpty(upEndDate)) {
+			queryString.append("and (a.onDate  between :startDate and :endDate)");
+		}
+		if (StringUtils.isNotEmpty(downStartDate)
+				&& StringUtils.isNotEmpty(downEndDate)) {
+			queryString.append("and (a.offDate  between :startDate and :endDate)");
+		}
+		if (StringUtils.isNotEmpty(bannerType)) {
+			queryString.append("and (a.adType.id=:bannerType)");
+		}
+		if (StringUtils.isNotEmpty(actionName)) {
+			queryString.append("and (a.activityName = :activityName)");
+		}
+
+		Query query = this.sessionFactory.getCurrentSession().createQuery(queryString.toString());
+		
+		if(StringUtils.isNotEmpty(upStartDate)&&StringUtils.isNotEmpty(upEndDate)){
+			query.setString("startDate", upStartDate);
+			query.setString("endDate", upEndDate);
+		}
+		if (StringUtils.isNotEmpty(downStartDate)
+				&& StringUtils.isNotEmpty(downEndDate)) {
+			query.setString("startDate", downStartDate);
+			query.setString("endDate", downEndDate);
+		}
+		if (StringUtils.isNotEmpty(bannerType)) {
+			query.setString("bannerType", bannerType);
+		}
+		if (StringUtils.isNotEmpty(actionName)) {
+			query.setString("activityName", actionName);
+		}
+		query.setString("onStatus", "1");
+		
+		List<Ad> resultList=(List<Ad>)query.list();
+		Ad[] ADset = new Ad[resultList.size()];
+		
+			int i=0;
+			for (Ad as:resultList) {
+				ADset[i]=as;
+				System.out.println("ssss==>"+ADset[i].getId());
+				i++;
+			}
+		
+		return ADset;
+	}
+		
+	//查詢創作者的廣告清單      (專輯數的條件還沒加)
+	public Ad[] queryCreatorAd(String startDate,String endDate,String checkStatus,String albumAmount){
+		if(StringUtils.isNotEmpty(startDate)&& StringUtils.isNotEmpty(endDate)){
+		startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
+		endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";}
+		
+		if(StringUtils.isEmpty(checkStatus)){
+		checkStatus="1";}
+		
+		StringBuilder queryString = new StringBuilder();
+		queryString.append("from Ad a where (a.checkStatus = :checkStatus) and (a.memberCreator is not null)");
+		if (StringUtils.isNotEmpty(startDate)&& StringUtils.isNotEmpty(endDate)) {
+			queryString.append("and (:startDate  between a.activityStartDate and a.activityEndDate) and (:endDate between a.activityStartDate and a.activityEndDate)");
+		}
+		/*if (StringUtils.isNotEmpty(albumAmount)) {
+			queryString.append("and (a.activityName = :albumAmount)");
+		}*/
+
+		Query query = this.sessionFactory.getCurrentSession().createQuery(queryString.toString());
+		
+		if (StringUtils.isNotEmpty(startDate)&& StringUtils.isNotEmpty(endDate)) {
+			query.setString("startDate", startDate);
+			query.setString("endDate", endDate);
+		}
+		/*if (StringUtils.isNotEmpty(albumAmount)) {
+			query.setString("albumAmount", albumAmount);
+		}*/
+		query.setString("checkStatus", checkStatus);
+		
+		List<Ad> resultList=(List<Ad>)query.list();
+		Ad[] ADset = new Ad[resultList.size()];
+		
+			int i=0;
+			for (Ad as:resultList) {
+				ADset[i]=as;
+				System.out.println("ssss==>"+ADset[i].getId());
+				i++;
+			}
+		
+		return ADset;
+	}
+		
+	//儲存備註
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void saveNote(long creatorAdID,String checkStatus,String reason,long adminID){
+		String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");   //今天日期時間  yyyyMMddHHmmss
+		
+		Ad a = this.adDAO.find(creatorAdID);
+		a.setModifier(String.valueOf(adminID));
+		a.setModifyDate(datetime);
+		a.setCheckStatus(checkStatus);
+		a.setNote(reason);
+		this.adDAO.update(a);
+	}
+	
+	
 	//Lucy@20111123
 	//儲存創作人刊登的訊息
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)	
 	public void saveNews(long userID, String newsName, String newsSouce, String content, String onStatus) {
-		
+			
 		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
 		Creator creator = (Creator) this.memberDAO.find(userID);
 		News news = new News();
@@ -660,7 +867,7 @@ public class PersonServiceImpl implements PersonService{
 		query.setParameter("v2", onStatus);
 		List<News> newsSet = (List<News>)query.list();		
 		News[] newsList = newsSet.toArray(new News[newsSet.size()]);
-				
+					
 		return  newsList;
 	}
 
@@ -708,7 +915,7 @@ public class PersonServiceImpl implements PersonService{
 		news.setOnStatus(onStatus);
 		this.newsDAO.save(news);		
 	}
-	
+		
 	//管理者查詢刊登訊息(起始頁面)
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public News[] queryFirstNewsList(){
@@ -722,11 +929,11 @@ public class PersonServiceImpl implements PersonService{
 		News[] newsList = newsSet.toArray(new News[newsSet.size()]);
 		return newsList;
 	}
-	
+		
 	//管理者查詢刊登訊息(查詢條件)
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public News[] queryNewsList(String newsCategory, String newsName,
-			String MOPEND, String MCLOSED, String onStatus, String newsSource) 
+		String MOPEND, String MCLOSED, String onStatus, String newsSource) 
 	{		
 		StringBuffer tempQuery = new StringBuffer();
 		tempQuery.append("from News where createUser is not null and dropDate is null ");
@@ -746,7 +953,7 @@ public class PersonServiceImpl implements PersonService{
 		if (!newsSource.isEmpty()){
 			tempQuery.append("and newsSource = :newsSource ");
 		}		
-		
+			
 		Query query = this.sessionFactory.getCurrentSession().createQuery(tempQuery.toString());
 		if(!newsCategory.isEmpty()){
 			query.setParameter("newsCategory", newsCategory);
@@ -786,4 +993,5 @@ public class PersonServiceImpl implements PersonService{
 		news.setOnDate(onDate);		
 		this.newsDAO.update(news);
 	}
+	
 }

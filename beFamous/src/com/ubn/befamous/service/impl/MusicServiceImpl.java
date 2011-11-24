@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.Query;
@@ -17,14 +18,17 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ubn.befamous.dao.IBaseDao;
+import com.ubn.befamous.entity.Admin;
 import com.ubn.befamous.entity.Album;
 import com.ubn.befamous.entity.Creator;
+import com.ubn.befamous.entity.Hidden;
 import com.ubn.befamous.entity.InelegantKeyword;
 import com.ubn.befamous.entity.Keyword;
 import com.ubn.befamous.entity.Member;
 import com.ubn.befamous.entity.MemberStatus;
 import com.ubn.befamous.entity.MusicCategory;
 import com.ubn.befamous.entity.News;
+import com.ubn.befamous.entity.Question;
 import com.ubn.befamous.entity.RecommendActivity;
 import com.ubn.befamous.entity.Song;
 import com.ubn.befamous.entity.SongPrice;
@@ -68,6 +72,14 @@ public class MusicServiceImpl implements MusicService{
 	@Autowired
 	@Qualifier("memberDAO")
 	private IBaseDao<Member, Long> memberDAO;
+	
+	@Autowired
+	@Qualifier("adminDAO")
+	private IBaseDao<Admin, Long> adminDAO;
+	
+	@Autowired
+	@Qualifier("hiddenDAO")
+	private IBaseDao<Hidden, Long> hiddenDAO;
 	
 	
 	//瀏覽專輯與排行榜 - 怡秀write-1115
@@ -1034,20 +1046,268 @@ public class MusicServiceImpl implements MusicService{
     }
     
     /**
-     * 查詢歌詞      (目前頁面上還沒有)
-     * @param songID 歌曲編號
-     */
-    public Song querySongLyrics(long songID){
-    	Song s = new Song();
-    	return s;
-    }
-    
-    /**
      * 加入歌曲試聽
      * @param songID 歌曲編號
      */
     public Song addSongAudition(long songID){
     	Song s = new Song();
+    	return s;
+    }
+    
+    //管理音樂上傳
+    
+    /**
+     * 查詢音樂類別
+     */
+    public MusicCategory[] queryAllMusicCategory(){
+    	MusicCategory[] mc = this.musicCategoryDAO.findAll();
+    	return mc;
+    }
+    
+    /**
+     * 查詢專輯
+     * @param albumType 專輯類型
+     * @param startDate 專輯公開開始日期
+     * @param endDate 專輯公開結束日期
+     * @param creatorName 創作人姓名
+     * @param musicCatrgory 音樂分類
+     */
+    public Album[] queryForAlbums(String albumType,String startDate,String endDate,String creatorName,String musicCatrgory){
+    	if (StringUtils.isNotEmpty(startDate)
+				&& StringUtils.isNotEmpty(endDate)) {
+			startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
+			endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
+		}
+		
+		StringBuilder queryString = new StringBuilder();
+		queryString.append("from Album a where (1=1)");   
+		if(StringUtils.isNotBlank(startDate)&& StringUtils.isNotBlank(endDate)) {
+			startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
+			endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
+			
+			queryString.append("and (a.createDate  between :startDate and :endDate)");
+			
+		}
+		if (StringUtils.isNotBlank(albumType)) {
+			queryString.append("and (a.type=:albumType)");
+		}
+		if (StringUtils.isNotBlank(creatorName)) {
+			queryString.append("and (a.creator.userName = :creatorName)");
+		}
+		if (StringUtils.isNotBlank(musicCatrgory)) {
+			queryString.append("and (a.musicCategory.id = :musicCatrgory)");
+		}
+
+		
+		Query query = this.sessionfactory.getCurrentSession().createQuery(queryString.toString());
+
+		if(StringUtils.isNotBlank(startDate)&& StringUtils.isNotBlank(endDate)) {
+			query.setString("startDate", startDate);
+			query.setString("endDate", endDate);
+		}
+		if (StringUtils.isNotBlank(albumType)) {
+		query.setString("albumType", albumType);
+		}
+		if (StringUtils.isNotBlank(creatorName)) {
+		query.setString("creatorName", creatorName);
+		}
+		if (StringUtils.isNotBlank(musicCatrgory)) {
+		query.setString("musicCatrgory", musicCatrgory);
+		}
+		
+		List<Album> resultList=(List<Album>)query.list();
+		Album[] albumSet = new Album[resultList.size()];
+		
+			int i=0;
+			for (Album as:resultList) {
+				albumSet[i]=as;
+				System.out.println("ssss==>"+albumSet[i].getPid());
+				i++;
+			}
+    	return albumSet;
+    }
+
+    /**
+     * 隱藏專輯
+     * @param albumID 專輯編號
+     * @param adminID 管理者編號
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
+    public Hidden hideAlbum(long albumID,long adminID){
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");  //建立當天日期時間
+    	
+    	Admin admin = this.adminDAO.find(adminID);
+    	
+    	Hidden hidden = new Hidden();
+    	Album a = this.albumDAO.find(albumID);
+    	a.setHidden(hidden);
+    	hidden.setAlbum(a);
+    	hidden.setCreateDate(datetime);
+    	hidden.setCreateUser(admin);
+    	hidden.setStartDate(datetime);
+    	this.hiddenDAO.save(hidden);
+    	this.albumDAO.update(a);
+    	
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("from Hidden a where a.album.pid = :albumID");
+		query.setLong("albumID", albumID);
+		Hidden h = (Hidden)query.uniqueResult();
+    	
+    	return h;
+    }
+    
+    /**
+     * 取消隱藏專輯,更新專輯隱藏狀態
+     * @param albumID 專輯編號
+     * @param adminID 管理者編號
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
+    public void displayAlbum(long albumID,long adminID){
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");  //建立當天日期時間
+    	
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("from Hidden a where a.album.pid = :albumID");
+		query.setLong("albumID", albumID);
+		Hidden h = (Hidden)query.uniqueResult();
+		Admin admin = this.adminDAO.find(adminID);
+		h.setModifier(admin);
+		h.setModifyDate(datetime);
+		h.setEndDate(datetime);
+		this.hiddenDAO.update(h);
+    }
+    
+    /**
+     * 儲存專輯的隱藏原因
+     * @param albumHiddenID 專輯隱藏編號
+     * @param albumHiddenReason 專輯隱藏原因
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
+    public void saveAlbumHiddenReason(long albumHiddenID,String albumHiddenReason,long adminID){
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");  //建立當天日期時間
+    	
+    	Hidden h = this.hiddenDAO.find(albumHiddenID);
+    	Admin admin = this.adminDAO.find(adminID);
+    	h.setModifier(admin);
+    	h.setModifyDate(datetime);
+    	h.setHiddenReason(albumHiddenReason);
+    	this.hiddenDAO.update(h);
+    }
+    
+    /**
+     * 查詢歌曲
+     * @param albumName 專輯名稱
+     * @param creatorName 創作人名稱
+     * @param musicCatrgory 音樂類別
+     */
+    public Song[] queryForSongs(String albumName,String creatorName,String musicCatrgory){
+		
+		StringBuilder queryString = new StringBuilder();
+		queryString.append("from Song a where (1=1)");   
+		
+		if (StringUtils.isNotBlank(albumName)) {
+			queryString.append("and (a.album.name=:albumName)");
+		}
+		if (StringUtils.isNotBlank(creatorName)) {
+			queryString.append("and (a.album.creator.userName = :creatorName)");
+		}
+		if (StringUtils.isNotBlank(musicCatrgory)) {
+			queryString.append("and (a.musicCategory.id = :musicCatrgory)");
+		}
+
+		
+		Query query = this.sessionfactory.getCurrentSession().createQuery(queryString.toString());
+
+		if (StringUtils.isNotBlank(albumName)) {
+		query.setString("albumName", albumName);
+		}
+		if (StringUtils.isNotBlank(creatorName)) {
+		query.setString("creatorName", creatorName);
+		}
+		if (StringUtils.isNotBlank(musicCatrgory)) {
+		query.setString("musicCatrgory", musicCatrgory);
+		}
+		
+		List<Song> resultList=(List<Song>)query.list();
+		Song[] songSet = new Song[resultList.size()];
+		
+			int i=0;
+			for (Song as:resultList) {
+				songSet[i]=as;
+				System.out.println("ssss==>"+songSet[i].getPid());
+				i++;
+			}
+    	
+    	return songSet;
+    }
+    
+    /**
+     * 隱藏歌曲
+     * @param songID 歌曲編號
+     * @param adminID 管理者編號
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
+    public Hidden hideSong(long songID,long adminID){
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");  //建立當天日期時間
+    	
+    	Admin admin = this.adminDAO.find(adminID);
+    	
+    	Hidden hidden = new Hidden();
+    	Song a = this.songDAO.find(songID);
+    	a.setHidden(hidden);
+    	hidden.setSong(a);
+    	hidden.setCreateDate(datetime);
+    	hidden.setCreateUser(admin);
+    	hidden.setStartDate(datetime);
+    	this.hiddenDAO.save(hidden);
+    	this.songDAO.update(a);
+    	
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("from Hidden a where a.song.pid = :songID");
+		query.setLong("songID", songID);
+		Hidden h = (Hidden)query.uniqueResult();
+    	
+    	return h;
+    }
+    
+    /**
+     * 取消隱藏歌曲,更新歌曲隱藏狀態
+     * @param songID 歌曲編號
+     * @param adminID 管理者編號
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
+    public void displaySong(long songID,long adminID){
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");  //建立當天日期時間
+    	
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("from Hidden a where a.song.pid = :songID");
+		query.setLong("songID", songID);
+		Hidden h = (Hidden)query.uniqueResult();
+		Admin admin = this.adminDAO.find(adminID);
+		h.setModifier(admin);
+		h.setModifyDate(datetime);
+		h.setEndDate(datetime);
+		this.hiddenDAO.update(h);
+    }
+    
+    /**
+     * 儲存歌曲的隱藏原因
+     * @param songHiddenID 歌曲隱藏編號
+     * @param songHiddenReason 歌曲隱藏原因
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
+    public void saveSongHiddenReason(long songHiddenID,String songHiddenReason,long adminID){
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");  //建立當天日期時間
+    	
+    	Hidden h = this.hiddenDAO.find(songHiddenID);
+    	Admin admin = this.adminDAO.find(adminID);
+    	h.setModifier(admin);
+    	h.setModifyDate(datetime);
+    	h.setHiddenReason(songHiddenReason);
+    	this.hiddenDAO.update(h);
+    }
+    
+    /**
+     * 查詢歌詞
+     * @param songID 歌曲編號
+     */
+    public Song querySongLyrics(long songID){
+    	Song s =this.songDAO.find(songID);
     	return s;
     }
 }

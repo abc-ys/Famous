@@ -178,12 +178,12 @@ public class ManageProductDataController {
 		return this.queryproductdata(productionClassificationId);
 	}
 	
-	//商品管理-儲存修改 (怪怪的!!!)
+	/*//商品管理-儲存商品頁修改
 	@RequestMapping("/saveModify")
 	public ModelAndView savemodify(long productId, String status, String realPrice, String specialPrice, long productionClassificationId) {
 		this.transactionRecordService.saveModify(productId, realPrice, specialPrice, status, productionClassificationId);
 		return this.queryproductdata(productionClassificationId);
-	}
+	}*/
 	
 	//商品管理-編輯商品詳細資料頁
 	@RequestMapping("/productDetailData")
@@ -194,8 +194,8 @@ public class ManageProductDataController {
 	
 	//商品管理-儲存修改商品詳細資料頁
 	@RequestMapping("/updateProductDetailData")
-	public ModelAndView updatedata(long productId, String productName,long newProductionClassificationId, String transactionType, String realPrice,String specialPrice, String discountPrice, String discountBonus, String giveBonus, String stock, String status, String keyword, String memo, long productionClassificationId) {	
-		this.transactionRecordService.updateProduct(productId, productName, newProductionClassificationId, transactionType, realPrice, specialPrice, discountPrice, discountBonus, giveBonus, stock, status, keyword, memo, productionClassificationId);
+	public ModelAndView updatedata(long adminId, long productId, String productName,long newProductionClassificationId, String transactionType, String realPrice,String specialPrice, String discountPrice, String discountBonus, String giveBonus, String stock, String status, String keyword, String memo, long productionClassificationId) {	
+		this.transactionRecordService.updateProduct(adminId, productId, productName, newProductionClassificationId, transactionType, realPrice, specialPrice, discountPrice, discountBonus, giveBonus, stock, status, keyword, memo, productionClassificationId);
 		return this.queryproductdata(productionClassificationId);
 	}
 }

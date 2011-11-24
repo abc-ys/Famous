@@ -40,24 +40,25 @@
 特惠價:&nbsp;售價x<input type="text" size="5" name="specialPrice" value="">&nbsp;&nbsp;&nbsp;
 Bonus購買額:&nbsp;<input type="text" size="5" name="discountPrice" value="${production[0].sdCardPrice.discountPrice}">元+&nbsp;<input type="text" size="5" name="discountBonus" value="${production[0].sdCardPrice.discountBonus}">點
 <p>
-贈送bonus:&nbsp;付款金額x<input type="text" size="5" name="giveBonus" value=""><p>
+贈送bonus:&nbsp;付款金額x<input type="text" size="5" name="giveBonus" value="${production[0].reward}"><p>
 商品庫存:&nbsp;<input type="text" size="5" name="stock" value="${production[0].amount}"><p>
 上架:&nbsp;
 <c:if test="${empty production[0].status}">
-	<INPUT type=radio name=status value="上架">是
-	<INPUT type=radio name=status value="下架">否<p>
+	<INPUT type=radio name=status value="1">是
+	<INPUT type=radio name=status value="2">否<p>
 </c:if>
 <c:if test="${production[0].status==1}">
-	<INPUT type=radio name=status value="上架" checked>是
-	<INPUT type=radio name=status value="下架">否<p>
+	<INPUT type=radio name=status value="1" checked>是
+	<INPUT type=radio name=status value="2">否<p>
 </c:if>
 <c:if test="${production[0].status==2}">
-	<INPUT type=radio name=status value="上架">是
-	<INPUT type=radio name=status value="下架" checked>否<p>
+	<INPUT type=radio name=status value="1">是
+	<INPUT type=radio name=status value="2" checked>否<p>
 </c:if>
 商品關鍵字:&nbsp;<input type="text" size="20" name="keyword" value="${production[0].keyWord}"><p>
 商品簡介:&nbsp;<textarea cols=60 rows=6 name=memo>${production[0].introduction}</textarea><p>
 <input type="hidden" name="productionClassificationId" value="${production[0].productionClassification.id}">
+<input type="hidden" name="adminId" value="2">
 <center><input type="submit" value="儲存修改" onclick="saveData()"/></center>
 </form>
 </body>

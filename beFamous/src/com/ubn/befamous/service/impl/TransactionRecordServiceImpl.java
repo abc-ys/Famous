@@ -444,513 +444,592 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 		
 	}	
 	
-	/**
-	 * 新增檢舉介面*/
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList queryOffenseCategory(long productionCategoryId) {
-		OffenseType[] offenseType = this.offenseTypeDAO.findAll();		
-		ArrayList list = new ArrayList();		
-		list.add(offenseType);
-		list.add(productionCategoryId);
-		return list;
-	}
+	//檢舉管理-新增檢舉介面
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public ArrayList queryOffenseCategory(long productionCategoryId) {
+			OffenseType[] offenseType = this.offenseTypeDAO.findAll();		
+			ArrayList list = new ArrayList();		
+			list.add(offenseType);
+			list.add(productionCategoryId);
+			return list;
+		}
 
-	/**
-	 * 儲存檢舉內容*/
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void addOffense(long userId, long productionCategoryId, long offenseTypeId,
-			String reason) {	
-		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
-		Member member = this.memberDAO.find(userId);
-		OffenseType offenseType =this.offenseTypeDAO.find(offenseTypeId);
-		
-		Offense offense = new Offense(); //建立檢舉
-		offense.setCreateDate(date);
-		offense.setMember(member);		
-		offense.setReason(reason);
-		offense.setOffenseType(offenseType);
-		
-		//根據產品類別編號找尋產品(專輯/歌曲)
-		Query query = this.sessionFactory.getCurrentSession().createQuery("FROM ProductionCategory p where p.pid = :id");
-		query.setParameter("id", productionCategoryId);
-		Object product = query.uniqueResult();
-		if (product instanceof Song) {
-			Song song = (Song)product;
-			offense.setSong(song);
-		}else{
-			Album album = (Album)product;
-			offense.setAlbum(album);
-		}	
-					
-		this.offenseDAO.save(offense);
-	}
-
-	/**
-	 * 檢視被檢舉的專輯/歌曲 */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList queryUnHandle() {
-		
-		Query query = this.sessionFactory.getCurrentSession().createQuery("select distinct a from Offense o join o.album a left join a.hidden h where h is null order by o.createDate desc");
-		List<Album> albums = (List<Album>)query.list();
-		Album[] albunList = albums.toArray(new Album[albums.size()]);
-		
-		Query query2 = this.sessionFactory.getCurrentSession().createQuery("select distinct s from Offense o join o.song s left join s.hidden h where h is null order by o.createDate desc");
-		List<Song> songs = (List<Song>)query2.list();
-		Song[] songList = songs.toArray(new Song[songs.size()]);
+		//檢舉管理-儲存檢舉內容
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public void addOffense(long userId, long productionCategoryId, long offenseTypeId,
+				String reason) {	
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
+			Member member = this.memberDAO.find(userId);
+			OffenseType offenseType =this.offenseTypeDAO.find(offenseTypeId);
 			
-		ArrayList list = new ArrayList();
-		list.add(albunList);
-		list.add(songList);
-		return list;
-	}
+			Offense offense = new Offense(); //建立檢舉
+			offense.setCreateDate(date);
+			offense.setMember(member);		
+			offense.setReason(reason);
+			offense.setOffenseType(offenseType);
+			offense.setOffenseStatus("1");
+			offense.setCreateUser(String.valueOf(userId));
+			//根據產品類別編號找尋產品(專輯/歌曲)
+			Query query = this.sessionFactory.getCurrentSession().createQuery("FROM ProductionCategory p where p.pid = :id");
+			query.setParameter("id", productionCategoryId);
+			Object product = query.uniqueResult();
+			if (product instanceof Song) {
+				Song song = (Song)product;
+				offense.setSong(song);
+			}else{
+				Album album = (Album)product;
+				offense.setAlbum(album);
+			}	
+						
+			this.offenseDAO.save(offense);
+		}
 
-	/**
-	 *更新專輯隱藏狀態 */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList updateAlbumHide(long adminId, long albumId) {
-		Album album = this.albumDAO.find(albumId);
-		Admin createUser = this.adminDAO.find(adminId);
-		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
-		
-		Hidden hidden = new Hidden();
-		hidden.setAlbum(album);
-		hidden.setCreateDate(date);
-		hidden.setStartDate(date);
-		hidden.setCreateUser(createUser);		
-		this.hiddenDAO.save(hidden);
-		
-		album.setHidden(hidden);
-		this.albumDAO.update(album);
-		
-		ArrayList list = this.queryUnHandle(); 
-		return list;
-	}
-
-	/**
-	 *更新歌曲隱藏狀態 */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList updateSongHide(long adminId, long songId) {
-	
-		Song song = this.songDAO.find(songId);
-		Admin createUser = this.adminDAO.find(adminId);
-		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
-		
-		Hidden hidden = new Hidden();
-		hidden.setSong(song);
-		hidden.setCreateDate(date);
-		hidden.setStartDate(date);
-		hidden.setCreateUser(createUser);		
-		this.hiddenDAO.save(hidden);
-		
-		song.setHidden(hidden);
-		this.songDAO.update(song);
-		
-		ArrayList list = this.queryUnHandle(); 
-		return list;
-	}
-
-	/**
-	 *查詢檢舉理由 */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Offense[] queryOffenseReason(long productionCategoryId) {
-		Offense[] offenseList;
-		Set<Offense> offenseSet = new HashSet();
-		Query query = this.sessionFactory.getCurrentSession().createQuery("from ProductionCategory p where p.id =:v1");
-		query.setParameter("v1", productionCategoryId);
-		Object product = query.uniqueResult();
-		
-		if (product instanceof Song) {
-			Song song = (Song)product;
-			offenseSet = song.getOffense();		
-		}else{
-			Album album = (Album)product;
-			System.out.println("  "+album.getId());
-			offenseSet = album.getOffense();			
-		}	
-		offenseList = offenseSet.toArray(new Offense[offenseSet.size()]);
-		return offenseList;
-	}
-	
-	/**
-	 *查詢被系統自動隱藏的專輯/歌曲(起始查詢) */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Album[] queryAutoHide() {
-		Query query = this.sessionFactory.getCurrentSession().createQuery("select distinct a from Hidden h " +
-				"join h.album a where h.endDate is null and h.createUser='1'");
-		List<Album> albums = (List<Album>)query.list();
-		Album[] albunList = albums.toArray(new Album[albums.size()]);
-		return albunList;
-	}
-
-	/**
-	 *查詢被系統自動隱藏的專輯/歌曲(根據查詢條件) */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList queryAutoHideByDate(String type, String year, String month,
-			String creator) {
-		
-		Integer y = Integer.valueOf(year); //year轉型為Integer，以便查詢。
-		Integer m = Integer.valueOf(month); //month轉型為Integer，以便查詢。
-		System.out.println(y);
-		System.out.println(m);
-		List albums = new ArrayList();
-		List songs = new ArrayList();
-		
-		ArrayList list = new ArrayList();
-		list.add(type);
-		
-		if (type.equals("1")){ //type=1為專輯
-			Query query2 = this.sessionFactory.getCurrentSession().createQuery("select distinct a from Hidden h " +
-					"join h.album a  where (h.endDate is null) and (h.createUser='1') or " +
-					"((year(h.createDate) in (:year)) and (month(h.createDate) in (:month))) or " +
-					"(a.creator.userName in (:creator))");	
-			query2.setParameter("creator", creator);
-			query2.setParameter("year",y);
-			query2.setParameter("month",m);
+		//檢舉管理-檢視被檢舉的專輯和歌曲
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public ArrayList queryUnHandle() {
 			
-			 albums = (List<Album>)query2.list();
-			 list.add(albums);
+			Query query = this.sessionFactory.getCurrentSession().createQuery("select a, COUNT(a) from Offense o join o.album a left join a.hidden h where h is null group by a order by o.createDate desc");
+			List<Object[]> albums = (List<Object[]>)query.list();
 			
-		}else{			
-			Query query3 = this.sessionFactory.getCurrentSession().createQuery("select distinct s from Hidden h " +
-					"join h.song s  where (h.endDate is null) and (h.createUser='1') or " +
-					"((year(h.createDate) in (:year)) and (month(h.createDate) in (:month))) or " +
-					"(s.album.creator.userName in (:creator))");	
-			query3.setParameter("creator", creator);
-			query3.setParameter("year",y);
-			query3.setParameter("month",m);
+			Query query2 = this.sessionFactory.getCurrentSession().createQuery("select s, COUNT(s) from Offense o join o.song s left join s.hidden h where h is null group by s order by o.createDate desc");
+			List<Song> songs = (List<Song>)query2.list();
 			
-			songs = (List<Song>)query3.list();
+			ArrayList list = new ArrayList();
+			list.add(albums);
 			list.add(songs);
+			return list;
 		}
-		return list;
-	}
 
-	/**
-	 *取消專輯隱藏狀態 */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void canceAlbumHide(long adminId, long albumId) {
-	
-		Album album = this.albumDAO.find(albumId);
-		Admin modifier = this.adminDAO.find(adminId);
-		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
-		
-		Hidden hidden = this.hiddenDAO.find(album.getHidden().getId());
-		hidden.setEndDate(date);
-		hidden.setModifyDate(date);
-		hidden.setModifier(modifier);
-		this.hiddenDAO.save(hidden);
-		
-		album.setHidden(hidden);
-		this.albumDAO.update(album);
-	}
+		//檢舉管理-隱藏專輯
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public void updateAlbumHide(long adminId, long albumId) {
+			Album album = this.albumDAO.find(albumId);
+			Admin createUser = this.adminDAO.find(adminId);
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
+			
+			Hidden hidden = new Hidden();
+			hidden.setAlbum(album);
+			hidden.setCreateDate(date);
+			hidden.setStartDate(date);
+			hidden.setCreateUser(createUser);		
+			this.hiddenDAO.save(hidden);
+			
+			album.setHidden(hidden);
+			this.albumDAO.update(album);
+		}
 
-	/**
-	 *取消歌曲隱藏狀態 */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void canceSonglHide(long adminId, long songId) {
-	
-		Song song = this.songDAO.find(songId);
-		Admin modifier = this.adminDAO.find(adminId);
-		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
+		//檢舉管理-隱藏歌曲
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public void updateSongHide(long adminId, long songId) {
 		
-		Hidden hidden = this.hiddenDAO.find(song.getHidden().getId());
-		hidden.setEndDate(date);
-		hidden.setModifyDate(date);
-		hidden.setModifier(modifier);
-		this.hiddenDAO.save(hidden);
-		
-		song.setHidden(hidden);
-		this.songDAO.update(song);
-	}
+			Song song = this.songDAO.find(songId);
+			Admin createUser = this.adminDAO.find(adminId);
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
+			
+			Hidden hidden = new Hidden();
+			hidden.setSong(song);
+			hidden.setCreateDate(date);
+			hidden.setStartDate(date);
+			hidden.setCreateUser(createUser);		
+			this.hiddenDAO.save(hidden);
+			
+			song.setHidden(hidden);
+			this.songDAO.update(song);
+		}
 
-	/**
-	 *查詢已被隱藏的專輯/歌曲(起始查詢) (尚未完成)*/
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Album[] queryAlreadyHide(String type) {
-		Query query = this.sessionFactory.getCurrentSession().createQuery("select distinct a from Hidden h " +
-				"join h.album a where h.endDate is null and h.createUser='1'");
-		List<Album> albums = (List<Album>)query.list();
-		Album[] albunList = albums.toArray(new Album[albums.size()]);
-		return albunList;
-	}
+		//檢舉管理-查詢檢舉理由 
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public Offense[] queryOffenseReason(long productionCategoryId) {
+			Offense[] offenseList;
+			Set<Offense> offenseSet = new HashSet();
+			Object product = this.productionCategoryDAO.find(productionCategoryId);		
+			if (product instanceof Song) {
+				Song song = (Song)product;
+				offenseSet = song.getOffense();		
+			}else{
+				Album album = (Album)product;
+				offenseSet = album.getOffense();			
+			}	
+			offenseList = offenseSet.toArray(new Offense[offenseSet.size()]);
+			return offenseList;
+		}
+			
+		//檢舉管理-更新檢舉狀態(不正當檢舉)
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public void updateIncorrectOffense(long adminId, long offenseId) {
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
+			Offense offense = this.offenseDAO.find(offenseId);
+			offense.setModifier(String.valueOf(adminId));
+			offense.setModifyDate(date);
+			offense.setOffenseStatus("2");
+			this.offenseDAO.update(offense);
+		}
+			
+		//檢舉管理-查詢被系統自動隱藏的專輯/歌曲(起始查詢)
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public ArrayList queryAutoHide() {
+			
+			Query query = this.sessionFactory.getCurrentSession().createQuery("select a, COUNT(o) from Album a join a.offense o left join a.hidden h where (o.modifier is null) and (h.endDate is null) and (h.createUser.id='1')");
+			List<Object[]> albums = (List<Object[]>)query.list();
+			
+			//Query query2 = this.sessionFactory.getCurrentSession().createQuery("select s, COUNT(o) from Song s join s.offense o left join s.hidden h where (o.modifier is null) and (h.endDate is null) and (h.createUser.id='1')");
+			//List<Song> songs = (List<Song>)query2.list();
+			
+			ArrayList list = new ArrayList();
+			list.add(albums);
+			//list.add(songs);
+			return list;
+		}
 
-	/**
-	 *查詢已被隱藏的專輯/歌曲(根據查詢條件) */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList queryAlreadyHideByDate(String year, String month,
-			String creator) {
+		//檢舉管理-查詢被系統自動隱藏的專輯/歌曲(根據查詢條件)
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public ArrayList queryAutoHideByDate(String type, String year, String month,
+				String creator) {		
+			List albums = new ArrayList();
+			List songs = new ArrayList();
+			StringBuffer tempQuery = new StringBuffer();
+			ArrayList list = new ArrayList();
+			
+			if (type.equals("1")){ //type=1為專輯		
+				
+				tempQuery.append("select a, COUNT(o) from Album a join a.offense o left join a.hidden h where (o.modifier is null) and (h.endDate is null) and (h.createUser.id='1')");
+				
+				if (!year.isEmpty()&&!month.isEmpty()){
+					tempQuery.append("and ((year(h.createDate) in (:year)) and (month(h.createDate) in (:month))) ");
+				}
+				if (!creator.isEmpty()){
+					tempQuery.append("and a.creator.userName in (:creator) ");
+				}	
+				
+				Query query = this.sessionFactory.getCurrentSession().createQuery(tempQuery.toString());
+			
+				if (!year.isEmpty()&&!month.isEmpty()){
+					Integer y = Integer.valueOf(year); //year轉型為Integer，以便查詢。
+					Integer m = Integer.valueOf(month); //month轉型為Integer，以便查詢。
+					System.out.println("=============="+y);
+					System.out.println("=============="+m);
+					query.setParameter("year", y);
+					query.setParameter("month", m);
+				}
+				if (!creator.isEmpty()){
+					query.setParameter("creator", creator);
+				}
+				 albums = (List<Album>)query.list();
+				 list.add(albums);
+				
+			}else{
+				
+				tempQuery.append("select s, COUNT(o) from Song s join s.offense o left join s.hidden h where (o.modifier is null) and (h.endDate is null) and (h.createUser.id='1')");
+				
+				if (!year.isEmpty()&&!month.isEmpty()){
+					tempQuery.append("and ((year(h.createDate) in (:year)) and (month(h.createDate) in (:month))) ");
+				}
+				if (!creator.isEmpty()){
+					tempQuery.append("and s.album.creator.userName in (:creator) ");
+				}	
+				
+				Query query = this.sessionFactory.getCurrentSession().createQuery(tempQuery.toString());
+			
+				if (!year.isEmpty()&&!month.isEmpty()){
+					Integer y = Integer.valueOf(year); //year轉型為Integer，以便查詢。
+					Integer m = Integer.valueOf(month); //month轉型為Integer，以便查詢。
+					System.out.println("=============="+y);
+					System.out.println("=============="+m);
+					query.setParameter("year", y);
+					query.setParameter("month", m);
+				}
+				if (!creator.isEmpty()){
+					query.setParameter("creator", creator);
+				}
+				songs = (List<Song>)query.list();
+				list.add(songs);
+			}
+			return list;
+		}
 		
-		return null;
-	}
+		//檢舉管理-取消隱藏狀態 
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public void cancelHide(long adminId, long hiddenId) {
+		
+			Hidden hidden = this.hiddenDAO.find(hiddenId);
+			Admin modifier = this.adminDAO.find(adminId);
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
+			hidden.setEndDate(date);
+			hidden.setDropDate(date);
+			hidden.setModifier(modifier);
+			this.hiddenDAO.update(hidden);		
+		}
+		
+		//檢舉管理-確認隱藏狀態
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public void comfirmHide(long adminId, long hiddenId) {
+			Hidden hidden = this.hiddenDAO.find(hiddenId);
+			Admin modifier = this.adminDAO.find(adminId);
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
+			hidden.setModifier(modifier);
+			hidden.setModifyDate(date);
+			hidden.setCreateUser(modifier);
+			this.hiddenDAO.update(hidden);		
+		}
+		
+		//檢舉管理-查詢已被隱藏的專輯(起始查詢)
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public ArrayList queryAlreadyHide() {
+			System.out.println("查詢已被隱藏的專輯");		
+			String nowDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
+			Integer year = Integer.valueOf(nowDate.substring(0,4)); //year轉型為Integer，以便查詢。
+			Integer month = Integer.valueOf(nowDate.substring(4,6));//month轉型為Integer，以便查詢。
+			System.out.println("year="+year+", month="+month);
+			Query query = this.sessionFactory.getCurrentSession().createQuery("select a, COUNT(o) from Album a " +
+					"join a.hidden h left join a.offense o where (h.endDate is null) and (h.createUser!= 1) and" +
+					" (o.modifier is null) and (year(h.createDate) in (:year)) and (month(h.createDate) in" +
+					" (:month)) order by a");
+			query.setParameter("year", year);
+			query.setParameter("month", month);
+			
+			List<Object[]> albums = (List<Object[]>)query.list();
+			
+			/*Query query2 = this.sessionFactory.getCurrentSession().createQuery("select s, COUNT(o) from Hidden h join h.song s left join s.offense o where h.endDate is null and h.createUser!='1' and ((year(h.createDate) in (:year)) and (month(h.createDate) in (:month))) ");
+			query2.setParameter("year", year);
+			query2.setParameter("month", month);	
+			List<Song> songs = (List<Song>)query2.list();*/		
+			ArrayList list = new ArrayList();
+			list.add(albums);
+			//list.add(songs);
+			return list;
+		}
 
-	/**
-	 *查詢會員檢舉清單 */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Offense[] queryOffenseByUser(long userId) {
-		Query query = this.sessionFactory.getCurrentSession().createQuery("from Offense o where o.member.id = :userId");
-		query.setParameter("userId", userId);
-		List<Offense> offenseSet = (List<Offense>)query.list();
-		Offense[] offenseList = offenseSet.toArray(new Offense[offenseSet.size()]);
-		return offenseList;
-	}
+		//檢舉管理-查詢已被隱藏的專輯/歌曲(根據查詢條件)
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public ArrayList queryAlreadyHideByDate(String type, String year, String month,
+				String creator) {		
+			List albums = new ArrayList();
+			List songs = new ArrayList();
+			StringBuffer tempQuery = new StringBuffer();
+			ArrayList list = new ArrayList();
+			
+			if (type.equals("1")){ //type=1為專輯		
+				
+				tempQuery.append("select a, COUNT(o) from Album a " +
+					"join a.hidden h left join a.offense o where (h.endDate is null) and (h.createUser!= 1) and" +
+					" (o.modifier is null) ");
+				
+				if (!year.isEmpty()&&!month.isEmpty()){
+					tempQuery.append("and ((year(h.createDate) in (:year)) and (month(h.createDate) in (:month))) ");
+				}
+				if (!creator.isEmpty()){
+					tempQuery.append("and a.creator.userName in (:creator) ");
+				}	
+				
+				Query query = this.sessionFactory.getCurrentSession().createQuery(tempQuery.toString());
+			
+				if (!year.isEmpty()&&!month.isEmpty()){
+					Integer y = Integer.valueOf(year); //year轉型為Integer，以便查詢。
+					Integer m = Integer.valueOf(month); //month轉型為Integer，以便查詢。
+					System.out.println("=============="+y);
+					System.out.println("=============="+m);
+					query.setParameter("year", y);
+					query.setParameter("month", m);
+				}
+				if (!creator.isEmpty()){
+					query.setParameter("creator", creator);
+				}
+				 albums = (List<Album>)query.list();
+				 list.add(albums);
+				
+			}else{
+				
+				tempQuery.append("select s, COUNT(o) from Song s " +
+					"join s.hidden h left join s.offense o where (h.endDate is null) and (h.createUser!= 1) and" +
+					" (o.modifier is null) ");
+				
+				if (!year.isEmpty()&&!month.isEmpty()){
+					tempQuery.append("and ((year(h.createDate) in (:year)) and (month(h.createDate) in (:month))) ");
+				}
+				if (!creator.isEmpty()){
+					tempQuery.append("and s.album.creator.userName in (:creator) ");
+				}	
+				
+				Query query = this.sessionFactory.getCurrentSession().createQuery(tempQuery.toString());
+			
+				if (!year.isEmpty()&&!month.isEmpty()){
+					Integer y = Integer.valueOf(year); //year轉型為Integer，以便查詢。
+					Integer m = Integer.valueOf(month); //month轉型為Integer，以便查詢。
+					System.out.println("=============="+y);
+					System.out.println("=============="+m);
+					query.setParameter("year", y);
+					query.setParameter("month", m);
+				}
+				if (!creator.isEmpty()){
+					query.setParameter("creator", creator);
+				}
+				songs = (List<Song>)query.list();
+				list.add(songs);
+			}
+			return list;
+		}
 
-	/**
-	 *更新檢舉狀態(不正當檢舉) */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void updateIncorrectOffense(long adminId, long offenseId) {
-		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
-		Offense offense = this.offenseDAO.find(offenseId);
-		offense.setModifier(String.valueOf(adminId));
-		offense.setModifyDate(date);		
-		this.offenseDAO.update(offense);
-	}
-		
-	
-	//商品管理
-	/**
-	 *新增商品 */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void addProduct(File file) {
-		
-		
-	}
+		//檢舉管理-查詢會員檢舉清單 
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public Offense[] queryOffenseByUser(long userId) {
+			Query query = this.sessionFactory.getCurrentSession().createQuery("from Offense o where o.member.id = :userId");
+			query.setParameter("userId", userId);
+			List<Offense> offenseSet = (List<Offense>)query.list();
+			Offense[] offenseList = offenseSet.toArray(new Offense[offenseSet.size()]);
+			return offenseList;
+		}
 
-	/**
-	 *查詢商品類別 */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ProductionClassification[] queryProductionClassification() {
-		ProductionClassification[] pClassificationList= this.productionClassificationDAO.findAll();	
-		return pClassificationList;
-	}
-
-	/**
-	 *新增商品類別 */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void addProductionClassification(String productionClassificationName) {
-		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
 		
-		ProductionClassification productionClassification = new ProductionClassification(); //新增一個商品分類
-		productionClassification.setCreateDate(date);
-		productionClassification.setName(productionClassificationName);
-		this.productionClassificationDAO.save(productionClassification); //儲存
-	}
-
-	/**
-	 *編輯商品類別 */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void editProductionClassification(long productionClassificationId,
-			String productionClassificationName) {
-		
-		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
-		
-		ProductionClassification productionClassification = this.productionClassificationDAO.find(productionClassificationId);
-		productionClassification.setName(productionClassificationName);
-		productionClassification.setModifyDate(date);
-		this.productionClassificationDAO.update(productionClassification);
-		
-	}
-
-	/**
-	 *刪除商品類別 */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ProductionClassification[] deleteProductionClassification(long productionClassificationId) {
-		
-		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
-		
-		ProductionClassification productionClassification = this.productionClassificationDAO.find(productionClassificationId);
-		productionClassification.setDropDate(date);
-		this.productionClassificationDAO.update(productionClassification);
-		
-		ProductionClassification[] pClassificationList= this.queryProductionClassification();
-		return pClassificationList;
-	}
-	
-	/**
-	 *查詢商品*/
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList queryProduct() {
-		
-		ProductionClassification[] proClassList = this.productionClassificationDAO.findAll();
-		ArrayList list = new ArrayList();
-		List emptyList = new ArrayList();		
-		list.add(proClassList);
-		list.add(emptyList);
-		return  list;
-	}
-
-
-	/**
-	 *查詢商品資訊 */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList queryProductInfo(long productionClassificationId) {
-		
-		ArrayList list = new ArrayList();
-		String type="";
-		
-		ProductionClassification[] proClassList = this.productionClassificationDAO.findAll();
-		list.add(proClassList);
-		
-		Query query = this.sessionFactory.getCurrentSession().createQuery("from SDCard sd where sd.productionClassification.id = :productionClassificationId");
-		query.setParameter("productionClassificationId", productionClassificationId);
-		
-		if(query.list().isEmpty()){
-			type = "PrePaid";
-			Query query2 = this.sessionFactory.getCurrentSession().createQuery("from PrePaid p where p.productionClassification.id = :productionClassificationId");
-			query2.setParameter("productionClassificationId", productionClassificationId);
-			List<PrePaid> prePaidList = (List<PrePaid>)query2.list();
-			list.add(prePaidList);
-			list.add(type);
-		}else{
-			type = "SDCard";
-			List<SDCard> sdCardList= (List<SDCard>)query.list();
-			list.add(sdCardList);
-			list.add(type);
+		//商品管理-新增商品 //尚未parseEXCEL部分
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public void addProduct(File file) {
 			
 		}
-		return list;
-		
-		
-	}
 
-	/**
-	 *批次更新商品
-	 * condition為選擇的條件(1:定價 2:贈送點數)
-	 * @return */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void updateProductBatch(long productionClassificationId, String condition, double rate) {
-		int sdPrice = 0;
-		int sdReward = 0;
-		int prePaidPrice = 0;
-		int prePaidReward = 0 ;
-		String finalPrice="";
-		String finalReward="";
-		ArrayList list = this.queryProductInfo(productionClassificationId);
-		
-		if(list.get(2).equals("SDCard")){ 
-			List<SDCard> sdCardList= (List<SDCard>) list.get(1);
-			if(condition.equals("1")){
-				for (SDCard s:sdCardList) {					
-					sdPrice = Integer.valueOf(s.getSdCardPrice().getPrice());
-					System.out.println(sdPrice);
-					BigDecimal temp = new BigDecimal(sdPrice*rate);
-					finalPrice = String.valueOf(temp.setScale(0, RoundingMode.HALF_UP));
-					s.getSdCardPrice().setPrice(finalPrice);
-					this.sdCardDAO.update(s);
-				}
-			}else if(condition.equals("2")){
-				for (SDCard s:sdCardList) {
-					sdReward = Integer.valueOf(s.getReward());
-					BigDecimal temp = new BigDecimal(sdReward*rate);
-					finalReward = String.valueOf(temp.setScale(0, RoundingMode.HALF_UP));
-					s.setReward(finalReward);
-					this.sdCardDAO.update(s);
-				}
-			}
-		}else if(list.get(2).equals("PrePaid")){	//代表list為List<PrePaid>
-			List<PrePaid> prePaidList= (List<PrePaid>) list.get(1);
-			if(condition.equals("1")){
-				for (PrePaid s:prePaidList) {
-					prePaidPrice = Integer.valueOf(s.getPrePaidPrice().getPrice());
-					
-					finalPrice = String.valueOf(prePaidPrice*rate);
-					s.getPrePaidPrice().setPrice(finalPrice);
-					this.prePaidDAO.update(s);
-				}
-			}else if(condition.equals("2")){
-				for (PrePaid s:prePaidList) {
-					prePaidReward = Integer.valueOf(s.getReward());					
-					finalReward = String.valueOf(prePaidReward*rate);
-					s.setReward(finalReward);
-					this.prePaidDAO.update(s);
-				}
-			}
+		//商品管理-查詢商品類別 
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public ProductionClassification[] queryProductionClassification() {
+			ProductionClassification[] pClassificationList= this.productionClassificationDAO.findAll();	
+			return pClassificationList;
 		}
-	}
 
-	/**
-	 *查詢商品細節 */
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList queryProductDetail(long productId) {
-		ArrayList list = new ArrayList();		
-		
-		Query query = this.sessionFactory.getCurrentSession().createQuery("FROM ProductionCategory p where p.pid = :productId");
-		query.setParameter("productId", productId);
-		Object product = query.uniqueResult();
-		if (product instanceof SDCard) {
-			SDCard sdCard = (SDCard)product;
-			list.add(sdCard);
-		}else{
-			PrePaid prePaid = (PrePaid)product;
-			list.add(prePaid);
-		}
-		
-		ProductionClassification[] proClassList = this.productionClassificationDAO.findAll();
-		list.add(proClassList);
-		
-		return list;
-	}
-
-
-	/**
-	 *更新商品資訊(查詢商品資訊頁) (修改者Modifier未加入)*/
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public long saveModify(long productId, String realPrice,
-			String specialPrice, String status, long productionClassificationId) {
-		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
-		
-		Query query = this.sessionFactory.getCurrentSession().createQuery("FROM ProductionCategory p where p.pid = :productId");
-		query.setParameter("productId", productId);
-		Object product = query.uniqueResult();
-		
-		if (product instanceof SDCard) {			
-			SDCard sdCard = (SDCard)product;
-			sdCard.setModifyDate(date);
-			sdCard.getSdCardPrice().setPrice(realPrice);			
-			sdCard.setStatus(status);
-			this.sdCardDAO.update(sdCard);	
-		}
-		return productionClassificationId;
-	}
-	
-	/**
-	 *更新商品資訊(查詢商品細節頁) (修改者Modifier未加入)*/
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public long updateProduct(long productId, String productName,
-			long newProductionClassificationId, String transactionType,
-			String realPrice, String specialPrice, String discountPrice, String discountBonus, String giveBonus,
-			String stock, String status, String keyword, String memo,
-			long productionClassificationId) {
-		
-		int rPrice = Integer.valueOf(realPrice);
-		double sRate = Double.valueOf(specialPrice);
-		String sPrice = "";
-		BigDecimal temp = new BigDecimal(rPrice*sRate);
-		sPrice = String.valueOf(temp.setScale(0, RoundingMode.HALF_UP));
-		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
-		ProductionClassification newProductionClassification = this.productionClassificationDAO.find(newProductionClassificationId);
-		Query query = this.sessionFactory.getCurrentSession().createQuery("FROM ProductionCategory p where p.pid = :productId");
-		query.setParameter("productId", productId);
-		Object product = query.uniqueResult();
-		
-		if (product instanceof SDCard) {			
-			SDCard sdCard = (SDCard)product;
-			sdCard.setModifyDate(date);
-			sdCard.setName(productName);
-			sdCard.setProductionClassification(newProductionClassification);
-			sdCard.setTransactionType(transactionType);
-			sdCard.getSdCardPrice().setPrice(realPrice);			
-			sdCard.getSdCardPrice().setSpecialPrice(sPrice);
-			sdCard.getSdCardPrice().setDiscountPrice(discountPrice);
-			sdCard.getSdCardPrice().setDiscountBonus(discountBonus);
-			sdCard.setReward(giveBonus);
-			sdCard.setAmount(stock);
-			sdCard.setStatus(status);
-			sdCard.setKeyWord(keyword);
-			sdCard.setIntroduction(memo);
-			this.sdCardDAO.update(sdCard);			
-		}else{			
+		//商品管理-新增商品類別
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public void addProductionClassification(String productionClassificationName) {
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
 			
-		}		
-		return productionClassificationId;
-	}	
+			ProductionClassification productionClassification = new ProductionClassification(); //新增一個商品分類
+			productionClassification.setCreateDate(date);
+			productionClassification.setName(productionClassificationName);
+			this.productionClassificationDAO.save(productionClassification); //儲存
+		}
+
+		//商品管理-編輯商品類別
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public void editProductionClassification(long productionClassificationId,
+				String productionClassificationName) {
+			
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
+			
+			ProductionClassification productionClassification = this.productionClassificationDAO.find(productionClassificationId);
+			productionClassification.setName(productionClassificationName);
+			productionClassification.setModifyDate(date);
+			this.productionClassificationDAO.update(productionClassification);
+			
+		}
+
+		//商品管理-刪除商品類別
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public ProductionClassification[] deleteProductionClassification(long productionClassificationId) {
+			
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
+			
+			ProductionClassification productionClassification = this.productionClassificationDAO.find(productionClassificationId);
+			productionClassification.setDropDate(date);
+			this.productionClassificationDAO.update(productionClassification);
+			
+			ProductionClassification[] pClassificationList= this.queryProductionClassification();
+			return pClassificationList;
+		}
+		
+		//商品管理-查詢商品
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public ArrayList queryProduct() {
+			
+			ProductionClassification[] proClassList = this.productionClassificationDAO.findAll();
+			ArrayList list = new ArrayList();
+			List emptyList = new ArrayList();		
+			list.add(proClassList);
+			list.add(emptyList);
+			return  list;
+		}
+
+
+		//商品管理-查詢商品資訊
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public ArrayList queryProductInfo(long productionClassificationId) {
+			
+			ArrayList list = new ArrayList();
+			String type="";
+			
+			ProductionClassification[] proClassList = this.productionClassificationDAO.findAll();
+			list.add(proClassList);
+			
+			Query query = this.sessionFactory.getCurrentSession().createQuery("from SDCard sd where sd.productionClassification.id = :productionClassificationId");
+			query.setParameter("productionClassificationId", productionClassificationId);
+			
+			if(query.list().isEmpty()){
+				type = "PrePaid";
+				Query query2 = this.sessionFactory.getCurrentSession().createQuery("from PrePaid p where p.productionClassification.id = :productionClassificationId");
+				query2.setParameter("productionClassificationId", productionClassificationId);
+				List<PrePaid> prePaidList = (List<PrePaid>)query2.list();
+				list.add(prePaidList);
+				list.add(type);
+			}else{
+				type = "SDCard";
+				List<SDCard> sdCardList= (List<SDCard>)query.list();
+				list.add(sdCardList);
+				list.add(type);
+				
+			}
+			return list;
+			
+			
+		}
+
+		//商品管理-批次更新商品
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public void updateProductBatch(long productionClassificationId, String condition, double rate) { //condition為選擇的條件(1:定價 2:贈送點數)
+			int sdPrice = 0;
+			int sdReward = 0;
+			int prePaidPrice = 0;
+			int prePaidReward = 0 ;
+			String finalPrice="";
+			String finalReward="";
+			ArrayList list = this.queryProductInfo(productionClassificationId);
+			
+			if(list.get(2).equals("SDCard")){ 
+				List<SDCard> sdCardList= (List<SDCard>) list.get(1);
+				if(condition.equals("1")){
+					for (SDCard s:sdCardList) {					
+						sdPrice = Integer.valueOf(s.getSdCardPrice().getPrice());
+						System.out.println(sdPrice);
+						BigDecimal temp = new BigDecimal(sdPrice*rate);
+						finalPrice = String.valueOf(temp.setScale(0, RoundingMode.HALF_UP));
+						s.getSdCardPrice().setPrice(finalPrice);
+						this.sdCardDAO.update(s);
+					}
+				}else if(condition.equals("2")){
+					for (SDCard s:sdCardList) {
+						sdReward = Integer.valueOf(s.getReward());
+						BigDecimal temp = new BigDecimal(sdReward*rate);
+						finalReward = String.valueOf(temp.setScale(0, RoundingMode.HALF_UP));
+						s.setReward(finalReward);
+						this.sdCardDAO.update(s);
+					}
+				}
+			}else if(list.get(2).equals("PrePaid")){	//代表list為List<PrePaid>
+				List<PrePaid> prePaidList= (List<PrePaid>) list.get(1);
+				if(condition.equals("1")){
+					for (PrePaid s:prePaidList) {
+						prePaidPrice = Integer.valueOf(s.getPrePaidPrice().getPrice());
+						
+						finalPrice = String.valueOf(prePaidPrice*rate);
+						s.getPrePaidPrice().setPrice(finalPrice);
+						this.prePaidDAO.update(s);
+					}
+				}else if(condition.equals("2")){
+					for (PrePaid s:prePaidList) {
+						prePaidReward = Integer.valueOf(s.getReward());					
+						finalReward = String.valueOf(prePaidReward*rate);
+						s.setReward(finalReward);
+						this.prePaidDAO.update(s);
+					}
+				}
+			}
+		}
+
+		//商品管理-查詢商品細節 
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public ArrayList queryProductDetail(long productId) {
+			ArrayList list = new ArrayList();		
+			
+			Query query = this.sessionFactory.getCurrentSession().createQuery("FROM ProductionCategory p where p.pid = :productId");
+			query.setParameter("productId", productId);
+			Object product = query.uniqueResult();
+			if (product instanceof SDCard) {
+				SDCard sdCard = (SDCard)product;
+				list.add(sdCard);
+			}else{
+				PrePaid prePaid = (PrePaid)product;
+				list.add(prePaid);
+			}
+			
+			ProductionClassification[] proClassList = this.productionClassificationDAO.findAll();
+			list.add(proClassList);
+			
+			return list;
+		}
+
+
+		/*//商品管理-更新商品資訊(查詢商品資訊頁) (修改者Modifier未加入)
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public long saveModify(long productId, String realPrice,
+				String specialPrice, String status, long productionClassificationId) {
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
+			
+			Query query = this.sessionFactory.getCurrentSession().createQuery("FROM ProductionCategory p where p.pid = :productId");
+			query.setParameter("productId", productId);
+			Object product = query.uniqueResult();
+			
+			if (product instanceof SDCard) {			
+				SDCard sdCard = (SDCard)product;
+				sdCard.setModifyDate(date);
+				sdCard.getSdCardPrice().setPrice(realPrice);			
+				sdCard.setStatus(status);
+				this.sdCardDAO.update(sdCard);	
+			}
+			return productionClassificationId;
+		}*/
+
+		
+		//商品管理-更新商品資訊(查詢商品細節頁) //只有SD卡和儲值的部分
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public long updateProduct(long adminId, long productId, String productName,
+				long newProductionClassificationId, String transactionType,
+				String realPrice, String specialPrice, String discountPrice, String discountBonus, String giveBonus,
+				String stock, String status, String keyword, String memo,
+				long productionClassificationId) {
+			
+			int rPrice = Integer.valueOf(realPrice);
+			String sPrice = ""; //特惠價計算
+			if(!specialPrice.isEmpty()){ //若特惠價欄位不為空才計算。
+				double sRate = Double.valueOf(specialPrice);		
+				BigDecimal temp = new BigDecimal(rPrice*sRate);
+				sPrice = String.valueOf(temp.setScale(0, RoundingMode.HALF_UP));
+			}
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
+			ProductionClassification newProductionClassification = this.productionClassificationDAO.find(newProductionClassificationId);
+			Query query = this.sessionFactory.getCurrentSession().createQuery("FROM ProductionCategory p where p.pid = :productId");
+			query.setParameter("productId", productId);
+			Object product = query.uniqueResult();
+			
+			if (product instanceof SDCard) {			
+				SDCard sdCard = (SDCard)product;
+				sdCard.setModifier(String.valueOf(adminId));
+				sdCard.setModifyDate(date);
+				sdCard.setName(productName);
+				sdCard.setProductionClassification(newProductionClassification);
+				sdCard.setTransactionType(transactionType);
+				sdCard.getSdCardPrice().setPrice(realPrice);			
+				sdCard.getSdCardPrice().setSpecialPrice(sPrice);
+				sdCard.getSdCardPrice().setDiscountPrice(discountPrice);
+				sdCard.getSdCardPrice().setDiscountBonus(discountBonus);
+				sdCard.setReward(giveBonus);
+				sdCard.setAmount(stock);
+				sdCard.setStatus(status);
+				sdCard.setKeyWord(keyword);
+				sdCard.setIntroduction(memo);
+				this.sdCardDAO.update(sdCard);			
+			}else if (product instanceof PrePaid) {
+				PrePaid prePaid = (PrePaid)product;
+				prePaid.setModifier(String.valueOf(adminId));
+				prePaid.setModifyDate(date);
+				prePaid.setName(productName);
+				prePaid.setProductionClassification(newProductionClassification);
+				prePaid.setTransactionType(transactionType);
+				prePaid.getPrePaidPrice().setPrice(realPrice);			
+				prePaid.getPrePaidPrice().setSpecialPrice(sPrice);
+				prePaid.getPrePaidPrice().setDiscountPrice(discountPrice);
+				prePaid.getPrePaidPrice().setDiscountBonus(discountBonus);
+				prePaid.setReward(giveBonus);
+				prePaid.setAmount(stock);
+				prePaid.setStatus(status);
+				prePaid.setKeyWord(keyword);
+				prePaid.setIntroduction(memo);
+				this.prePaidDAO.update(prePaid);			
+			}		
+			return productionClassificationId;
+		}
+
 }

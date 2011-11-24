@@ -17,28 +17,29 @@
 	<td valign="top" Width="100"><font size="2">隱藏</font></td></tr>
 	
 	<c:forEach var="hm" items="${offenses}" varStatus="status">
-<tr><td Height="35"><font size="2">${status.index+1}</font></td>
-	<td><font size="2">${hm[1]}</font></td>
-	<td><font size="2"><a href="javascript:void(0)" onclick="album('${hm[0].album.albumID}')">${hm[0].album.name}</a></font></td>
-	<td><font size="2"><a href="javascript:void(0)" onclick="creator('${hm[0].album.creator.memberId}')">${hm[0].album.creator.userName}</a></font></td>
-	<td><font size="2"><a href="javascript:void(0)" onclick="offenseReason('${hm[0].album.albumID}')">檢舉原因</a></font></td>
-	<td><input type="submit" value="隱藏專輯" onclick="query()"/></td></tr>
+	<tr><td Height="35"><font size="2">${status.index+1}</font></td>
+		<td><font size="2">${hm[1]}</font></td>
+		<td><font size="2"><a href="javascript:void(0)" onclick="album('${hm[0].pid}')">${hm[0].name}</a></font></td>
+		<td><font size="2"><a href="javascript:void(0)" onclick="creator('${hm[0].creator.id}')">${hm[0].creator.userName}</a></font></td>
+		<td><font size="2"><a href="javascript:void(0)" onclick="offenseReason('${hm[0].pid}')">檢舉原因</a></font></td>
+		<td><input type="submit" value="隱藏專輯" onclick="hide('${hm[0].pid}')"/></td></tr>
 	</c:forEach>
 </table>
+<input type="hidden" name="adminId" value="2">
 </form>
 </body>
 <script>
-function album(albumId){
-	window.open("${pageContext.request.contextPath}/queryAlbumData.do?albumid="+albumId);
+function album(id){
+	window.open("${pageContext.request.contextPath}/queryAlbumData.do?albumid="+id);
 }
-function creator(memberId){
-	window.open("${pageContext.request.contextPath}/manageCreatorDetail/get/123456/"+memberId+".do");
+function creator(userId){
+	window.open("${pageContext.request.contextPath}/manageCreatorDetail/get/123456/"+userId+".do");
 }
-function offenseReason(Id){
-	window.open("${pageContext.request.contextPath}/offenseReason.do?id="+Id,"parent","height=300,width=600,location=no,scrollbars=yes,toolbar=no,directories=no,menubar=no,directories=no");
+function offenseReason(productionCategoryId){
+	window.open("${pageContext.request.contextPath}/offenseReason.do?productionCategoryId="+productionCategoryId,"parent","height=300,width=600,location=no,scrollbars=yes,toolbar=no,directories=no,menubar=no,directories=no");
 }
-function query(){
-     document.fm.action="${pageContext.request.contextPath}/hiddenAlbum.do";
+function hide(albumId){
+     document.fm.action="${pageContext.request.contextPath}/hiddenAlbum.do?albumId="+albumId;
      document.fm.submit();
 }
 </script>

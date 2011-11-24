@@ -18,25 +18,29 @@
 	<td valign="top" Width="140"><font size="2">原因</font></td>
 	<td valign="top" Width="60"><font size="2">不當檢舉</font></td></tr>
 	
-	<c:forEach var="hm" items="${member.offense}" varStatus="status">
+	<c:forEach var="hm" items="${member}" varStatus="status">
 <tr><td Height="35"><font size="2">${status.index+1}</font></td>
 	<td><font size="2"><a href="javascript:void(0)">${hm.song.name}</a></font></td>
-	<td><font size="2"><a href="javascript:void(0)" onclick="album('${hm.song.album.albumID}')">${hm.song.album.name}</a></font></td>
+	<td><font size="2"><a href="javascript:void(0)" onclick="album('${hm.song.album.id}')">${hm.song.album.name}</a></font></td>
 	<td><font size="2">${hm.createDate}</font></td>
 	<td><font size="2">${hm.reason}</font></td>
-	<td><INPUT type="submit" name="offenseWrong" value="確定為不當檢舉" onclick="aaa('${member.memberId}','${hm.offenseRid}');"/></td><tr>
+	<c:if test="${hm.offenseStatus == 1}">
+		<td><INPUT type="submit" name="offenseWrong" value="不當檢舉" onclick="aaa('${hm.id}','${hm.member.id}');"/></td><tr>
+	</c:if>
 	</c:forEach>
 </table>
-
+<input type="hidden" name="adminId" value=2>
 
 </form>
 </body>
 <script>
-function creator(memberId){
-	location.href="${pageContext.request.contextPath}/manageCreatorDetail.do?memberId="+memberId;
+function album(albumId){
+	location.href="${pageContext.request.contextPath}/queryAlbumData.do?albumid="+albumId;
 }
-function aaa(memberId,offenseId){
-	document.fm.action="${pageContext.request.contextPath}/memberOffenseWrong.do?memberId="+memberId+"&offenseId="+offenseId;
+function aaa(offenseId, userId){
+	alert(offenseId);
+	alert(userId);
+	document.fm.action="${pageContext.request.contextPath}/memberOffenseWrong.do?offenseId="+offenseId+"&userId="+userId;
 	document.fm.submit();
 }
 </script>

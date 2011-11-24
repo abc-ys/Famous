@@ -43,9 +43,9 @@ pageEncoding="UTF-8"%>
   <tr> 
   <td>
     <h4>廣告管理</h4>
-    <a href="${pageContext.request.contextPath}/addAdBanner.do">新增廣告</a><br>
-    <a href="${pageContext.request.contextPath}/queryAdBanner.do">查詢廣告內容</a><br>
-    <a href="${pageContext.request.contextPath}/queryUploadAdBanner.do">查看上傳廣告內容</a><br>
+    <a href="${pageContext.request.contextPath}/addAdBanner.do?adminID=1">新增廣告</a><br>
+    <a href="${pageContext.request.contextPath}/queryAdBanner.do?adminID=1">查詢廣告內容</a><br>
+    <a href="${pageContext.request.contextPath}/queryUploadAdBanner.do?adminID=1">查看上傳廣告內容</a><br>
   </td>
   <tr> 
   <td>
@@ -55,8 +55,8 @@ pageEncoding="UTF-8"%>
   <tr> 
   <td>
     <h4>音樂管理</h4>
-    <a href="${pageContext.request.contextPath}/queryAlbum.do">查詢專輯</a><br>
-    <a href="${pageContext.request.contextPath}/querySong.do">查詢歌曲</a><br>
+    <a href="${pageContext.request.contextPath}/queryAlbum.do?adminID=1">查詢專輯</a><br>
+    <a href="${pageContext.request.contextPath}/querySong.do?adminID=1">查詢歌曲</a><br>
   </td>
   <tr> 
   <td>
@@ -67,7 +67,7 @@ pageEncoding="UTF-8"%>
   <tr> 
   <td>
     <h4>線上客服</h4>
-    <a href="${pageContext.request.contextPath}/manageQuestion.do">問題管理</a><br>
+    <a href="${pageContext.request.contextPath}/manageQuestion.do?adminId=1">問題管理</a><br>
   </td>
 </table>
 </body>
