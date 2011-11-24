@@ -10,6 +10,10 @@
 <input type="hidden" name="mType" value="${mType}">
 請填入隱藏理由:<p>
 <textarea cols=40 rows=10 name=reason></textarea><p>
+<input type="hidden" name="albumID" value="${albumID}">
+<input type="hidden" name="adminID" value="${adminID}">
+<input type="hidden" name="songID" value="${songID}">
+<input type="hidden" name="HiddenID" value="${Hidden.id}">
 <center><input type="button" value="送出"  onclick="addReason()"></center>
 </form>
 </body>

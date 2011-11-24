@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ubn.befamous.entity.Album;
 import com.ubn.befamous.entity.Creator;
+import com.ubn.befamous.entity.Hidden;
 import com.ubn.befamous.entity.InelegantKeyword;
 import com.ubn.befamous.entity.Keyword;
 import com.ubn.befamous.entity.MusicCategory;
@@ -414,14 +415,82 @@ public interface MusicService {
     public Album[] queryOtherAlbum(long albumID,long creatorID);
     
     /**
-     * 查詢歌詞        (目前頁面上還沒有)
-     * @param songID 歌曲編號
-     */
-    public Song querySongLyrics(long songID);
-    
-    /**
      * 加入歌曲試聽
      * @param songID 歌曲編號
      */
     public Song addSongAudition(long songID);
+    
+    
+    //管理音樂上傳
+    
+    /**
+     * 查詢音樂類別
+     */
+    public MusicCategory[] queryAllMusicCategory();
+    
+    /**
+     * 查詢專輯
+     * @param albumType 專輯類型
+     * @param startDate 專輯公開開始日期
+     * @param endDate 專輯公開結束日期
+     * @param creatorName 創作人姓名
+     * @param musicCatrgory 音樂分類
+     */
+    public Album[] queryForAlbums(String albumType,String startDate,String endDate,String creatorName,String musicCatrgory);
+    
+    /**
+     * 隱藏專輯
+     * @param albumID 專輯編號
+     * @param adminID 管理者編號
+     */
+    public Hidden hideAlbum(long albumID,long adminID);
+    
+    /**
+     * 取消隱藏專輯,更新專輯隱藏狀態
+     * @param albumID 專輯編號
+     * @param adminID 管理者編號
+     */
+    public void displayAlbum(long albumID,long adminID);
+    
+    /**
+     * 儲存專輯的隱藏原因
+     * @param albumHiddenID 專輯隱藏編號
+     * @param albumHiddenReason 專輯隱藏原因
+     */
+    public void saveAlbumHiddenReason(long albumHiddenID,String albumHiddenReason,long adminID);
+    
+    /**
+     * 查詢歌曲
+     * @param albumName 專輯名稱
+     * @param creatorName 創作人名稱
+     * @param musicCatrgory 音樂類別
+     */
+    public Song[] queryForSongs(String albumName,String creatorName,String musicCatrgory);
+    
+    /**
+     * 隱藏歌曲
+     * @param songID 歌曲編號
+     * @param adminID 管理者編號
+     */
+    public Hidden hideSong(long songID,long adminID);
+    
+    /**
+     * 取消隱藏歌曲,更新歌曲隱藏狀態
+     * @param songID 歌曲編號
+     * @param adminID 管理者編號
+     */
+    public void displaySong(long songID,long adminID);
+    
+    /**
+     * 儲存歌曲的隱藏原因
+     * @param songHiddenID 歌曲隱藏編號
+     * @param songHiddenReason 歌曲隱藏原因
+     */
+    public void saveSongHiddenReason(long songHiddenID,String songHiddenReason,long adminID);
+    
+    /**
+     * 查詢歌詞
+     * @param songID 歌曲編號
+     */
+    public Song querySongLyrics(long songID);
 }
