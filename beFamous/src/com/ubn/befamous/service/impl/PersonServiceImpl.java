@@ -552,49 +552,39 @@ public class PersonServiceImpl implements PersonService{
 		
 	//客服-管理者的問題管理第一個頁面    
 	public Question[] queryQuestion(String startDate,String endDate,String productType,String email,String questionType){		
-		if (StringUtils.isNotEmpty(startDate)
-				&& StringUtils.isNotEmpty(endDate)) {
+		if (StringUtils.isNotBlank(startDate)&& StringUtils.isNotBlank(endDate)) {
 			startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
 			endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
 		}
-		
 		
 		StringBuilder queryString = new StringBuilder();
 		queryString.append("from Question a where (a.handleStatus = :handleStatus)");
-		if (StringUtils.isNotEmpty(startDate)
-				&& StringUtils.isNotEmpty(endDate)) {
-			startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
-			endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
-			
+		if (StringUtils.isNotBlank(startDate)&& StringUtils.isNotBlank(endDate)) {
 			queryString.append("and (a.questionDate  between :startDate and :endDate)");
 		}
-		if (StringUtils.isNotEmpty(questionType)) {
+		if (StringUtils.isNotBlank(questionType)) {
 			queryString.append("and (a.questionType=:questionType)");
 		}
-		if (StringUtils.isNotEmpty(productType)) {
+		if (StringUtils.isNotBlank(productType)) {
 			queryString.append("and (a.productionType = :productType)");
 		}
-		if (StringUtils.isNotEmpty(email)) {
+		if (StringUtils.isNotBlank(email)) {
 			queryString.append("and (a.email = :email)");
 		}
 
-		System.out.println("Q="+queryString);
 		Query query = this.sessionFactory.getCurrentSession().createQuery(queryString.toString());
-		System.out.println("A="+startDate+","+endDate);
-		if(StringUtils.isNotEmpty(startDate)&&StringUtils.isNotEmpty(endDate)){
-			System.out.println("2="+queryString);
-			query.setString("startDate", startDate);
-			System.out.println("3="+queryString);
-			
+		
+		if(StringUtils.isNotBlank(startDate)&&StringUtils.isNotBlank(endDate)){
+			query.setString("startDate", startDate);			
 			query.setString("endDate", endDate);
 		}
-		if(StringUtils.isNotEmpty(productType)){
+		if(StringUtils.isNotBlank(productType)){
 		query.setString("productType", productType);
 		}
-		if(StringUtils.isNotEmpty(email)){
+		if(StringUtils.isNotBlank(email)){
 		query.setString("email", email);
 		}
-		if(StringUtils.isNotEmpty(questionType)){
+		if(StringUtils.isNotBlank(questionType)){
 		query.setString("questionType", questionType);
 		}
 		query.setString("handleStatus", "1");
@@ -733,10 +723,10 @@ public class PersonServiceImpl implements PersonService{
 		
 	//查詢廣告清單
 	public Ad[] queryAd(String bannerType,String actionName,String upStartDate,String upEndDate,String downStartDate,String downEndDate){
-		if (StringUtils.isNotEmpty(upStartDate)&& StringUtils.isNotEmpty(upEndDate)) {
+		if (StringUtils.isNotBlank(upStartDate)&& StringUtils.isNotBlank(upEndDate)) {
 		upStartDate= StringUtils.replaceChars(upStartDate, "-", "")+"000000";
 		upEndDate= StringUtils.replaceChars(upEndDate, "-", "")+"235959";}
-		if (StringUtils.isNotEmpty(downStartDate)&& StringUtils.isNotEmpty(downEndDate)) {
+		if (StringUtils.isNotBlank(downStartDate)&& StringUtils.isNotBlank(downEndDate)) {
 		downStartDate= StringUtils.replaceChars(downStartDate, "-", "")+"000000";
 		downEndDate= StringUtils.replaceChars(downEndDate, "-", "")+"235959";}
 		
@@ -744,36 +734,36 @@ public class PersonServiceImpl implements PersonService{
 		
 		StringBuilder queryString = new StringBuilder();
 		queryString.append("from Ad a where (a.onStatus = :onStatus)");
-		if (StringUtils.isNotEmpty(upStartDate)
-				&& StringUtils.isNotEmpty(upEndDate)) {
+		if (StringUtils.isNotBlank(upStartDate)
+				&& StringUtils.isNotBlank(upEndDate)) {
 			queryString.append("and (a.onDate  between :startDate and :endDate)");
 		}
 		if (StringUtils.isNotEmpty(downStartDate)
-				&& StringUtils.isNotEmpty(downEndDate)) {
+				&& StringUtils.isNotBlank(downEndDate)) {
 			queryString.append("and (a.offDate  between :startDate and :endDate)");
 		}
-		if (StringUtils.isNotEmpty(bannerType)) {
+		if (StringUtils.isNotBlank(bannerType)) {
 			queryString.append("and (a.adType.id=:bannerType)");
 		}
-		if (StringUtils.isNotEmpty(actionName)) {
+		if (StringUtils.isNotBlank(actionName)) {
 			queryString.append("and (a.activityName = :activityName)");
 		}
 
 		Query query = this.sessionFactory.getCurrentSession().createQuery(queryString.toString());
 		
-		if(StringUtils.isNotEmpty(upStartDate)&&StringUtils.isNotEmpty(upEndDate)){
+		if(StringUtils.isNotBlank(upStartDate)&&StringUtils.isNotBlank(upEndDate)){
 			query.setString("startDate", upStartDate);
 			query.setString("endDate", upEndDate);
 		}
-		if (StringUtils.isNotEmpty(downStartDate)
-				&& StringUtils.isNotEmpty(downEndDate)) {
+		if (StringUtils.isNotBlank(downStartDate)
+				&& StringUtils.isNotBlank(downEndDate)) {
 			query.setString("startDate", downStartDate);
 			query.setString("endDate", downEndDate);
 		}
-		if (StringUtils.isNotEmpty(bannerType)) {
+		if (StringUtils.isNotBlank(bannerType)) {
 			query.setString("bannerType", bannerType);
 		}
-		if (StringUtils.isNotEmpty(actionName)) {
+		if (StringUtils.isNotBlank(actionName)) {
 			query.setString("activityName", actionName);
 		}
 		query.setString("onStatus", "1");
@@ -793,16 +783,16 @@ public class PersonServiceImpl implements PersonService{
 		
 	//查詢創作者的廣告清單      (專輯數的條件還沒加)
 	public Ad[] queryCreatorAd(String startDate,String endDate,String checkStatus,String albumAmount){
-		if(StringUtils.isNotEmpty(startDate)&& StringUtils.isNotEmpty(endDate)){
+		if(StringUtils.isNotBlank(startDate)&& StringUtils.isNotBlank(endDate)){
 		startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
 		endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";}
 		
-		if(StringUtils.isEmpty(checkStatus)){
+		if(StringUtils.isBlank(checkStatus)){
 		checkStatus="1";}
 		
 		StringBuilder queryString = new StringBuilder();
 		queryString.append("from Ad a where (a.checkStatus = :checkStatus) and (a.memberCreator is not null)");
-		if (StringUtils.isNotEmpty(startDate)&& StringUtils.isNotEmpty(endDate)) {
+		if (StringUtils.isNotBlank(startDate)&& StringUtils.isNotBlank(endDate)) {
 			queryString.append("and (:startDate  between a.activityStartDate and a.activityEndDate) and (:endDate between a.activityStartDate and a.activityEndDate)");
 		}
 		/*if (StringUtils.isNotEmpty(albumAmount)) {
@@ -811,7 +801,7 @@ public class PersonServiceImpl implements PersonService{
 
 		Query query = this.sessionFactory.getCurrentSession().createQuery(queryString.toString());
 		
-		if (StringUtils.isNotEmpty(startDate)&& StringUtils.isNotEmpty(endDate)) {
+		if (StringUtils.isNotBlank(startDate)&& StringUtils.isNotBlank(endDate)) {
 			query.setString("startDate", startDate);
 			query.setString("endDate", endDate);
 		}
@@ -1012,8 +1002,8 @@ public class PersonServiceImpl implements PersonService{
 //		Member memberX=(Member)this.sessionFactory.getCurrentSession().get(Member.class,new Long( 2));
 //		System.out.println("memberX="+memberX.getFriend().size());
 //		
-		if (StringUtils.isNotEmpty(startDate)
-				&& StringUtils.isNotEmpty(endDate)) {
+		if (StringUtils.isNotBlank(startDate)
+				&& StringUtils.isNotBlank(endDate)) {
 			startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
 			endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
 		}
