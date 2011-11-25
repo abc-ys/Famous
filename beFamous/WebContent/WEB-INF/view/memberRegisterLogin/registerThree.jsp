@@ -20,11 +20,10 @@
 	</table>
 	<h3>註冊完成，請到您所填寫的信箱收取認證信</h3>
 	<form name="fm" method="post">
+	<input type="hidden" name="memberId" value="${memberId}">
 		<table border="0" cellpadding="0" cellspacing="0">			
 			<tr>
-			<td><img alt=""
-				src=${pageContext.request.contextPath}/${member.picture} width="100"
-				height="55"></td>
+			<td><img alt="" src="/${initParam.ImageWeb}/${member.picture}" width="200" height="100"></td>
 			<td>${member.userName}<br>${member.email}
 			</td>
 			<tr>
