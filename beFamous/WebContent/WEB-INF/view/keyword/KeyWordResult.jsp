@@ -18,8 +18,8 @@
 <tr>
 <td>
 
-<c:forEach var="hm" items="${arKeyword}" >
-${hm.name }<br>
+<c:forEach var="hm" items="${keyWordList[4]}" >
+${hm}<br>
 </c:forEach>
 </td>
  
@@ -32,10 +32,10 @@ ${hm.name }<br>
 搜尋的關鍵字:${keyWord}
 <br>
 搜尋的結果最多顯示500筆
-<a href="javascript: void(0)" onClick="display('a01');">歌曲(${fn:length(arSong)})</a>
-<a href="javascript: void(0)" onClick="display('a02');">專輯(${fn:length(arAlbum)})</a>
-<a href="javascript: void(0)" onClick="display('a03');">創作者(${fn:length(arCreator)})</a>
-<a href="javascript: void(0)" onClick="display('a04');">消息(${fn:length(arNews)})</a>
+<a href="javascript: void(0)" onClick="display('a01');">歌曲(${fn:length(keyWordList[1])})</a>
+<a href="javascript: void(0)" onClick="display('a02');">專輯(${fn:length(keyWordList[0])})</a>
+<a href="javascript: void(0)" onClick="display('a03');">創作者(${fn:length(keyWordList[2])})</a>
+<a href="javascript: void(0)" onClick="display('a04');">消息(${fn:length(keyWordList[3])})</a>
 <br></br>
 <div id="all">
   歌曲  
