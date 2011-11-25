@@ -13,6 +13,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,10 +21,14 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.ubn.befamous.entity.Member;
+import com.ubn.befamous.service.PersonService;
 
 @Controller
 @SessionAttributes
 public class MemberRegisterLoginController {
+	@Autowired
+	private PersonService personService;
+	
 	
 	//註冊步驟一
 	@RequestMapping("/registerOne")
@@ -40,26 +45,28 @@ public class MemberRegisterLoginController {
 		System.out.println("saveRegisterOne==>");
 		System.out.println("	email="+email+", userName="+userName+", password="+password+", sex="+sex+", birthday="+birthday+", location="+location);
 		
-		Member m = new Member();
-		m.setMemberId(1111);
-		
-		model.addAttribute("member", m);
-		return "redirect:registerTwo.do";
+		Member m = personService.saveMember(email, userName, password, sex, birthday, location);
+		String memberId = String.valueOf(m.getId());
+		return "redirect:registerTwo.do?memberId="+memberId;
 	}
 	
 	//註冊步驟二
 	@RequestMapping("/registerTwo")
-	public ModelAndView registerTwo()
+	public ModelAndView registerTwo(String memberId,Model model)
 	{
-		System.out.println("registerTwo==>");		
-		
+		System.out.println("registerTwo==>"+memberId);		
+		model.addAttribute("memberId", memberId);
 		return new ModelAndView("registerTwo");
 	}
 	
 	//儲存步驟二 (儲存會員上傳的圖片)
 	@RequestMapping("/saveRegisterTwo")
-	public String saveRegisterTwo(HttpServletRequest request, String memberId) throws Exception
+	public String saveRegisterTwo(HttpServletRequest request,Model model) throws Exception
 	{
+		String memberId = "";
+		String fileName="";
+		String picture2 = "";
+		
 		System.out.println("saveRegisterTwo==>");		
 		
 		int yourMaxMemorySize = 500 * 500* 1024;
@@ -68,7 +75,7 @@ public class MemberRegisterLoginController {
 		boolean writeToFile = true;
 		String allowedFileTypes = ".gif .jpg .png";
 
-		String saveDirectory = "D:/UBN_Area/ImageWeb/WebContent/image/memberPicture";
+		String saveDirectory = "D:/gitTest/ImageWeb/WebContent/image/memberPicture";
 
 		// Check that we have a file upload request
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
@@ -97,11 +104,16 @@ public class MemberRegisterLoginController {
 					String name = item.getFieldName();
 					String value = item.getString("UTF-8");
 					System.out.println(name + "=" + value + "<br />");
+					if(name.equals("memberId")){
+						memberId = value;
+					}else if(name.equals("picture2")){
+						picture2 = value;
+					}
 				} else {
 					// Process a file upload
 					//processUploadedFile(item);	
 					String fieldName = item.getFieldName();
-					String fileName = item.getName();
+					fileName = item.getName();
 					String contentType = item.getContentType();
 					boolean isInMemory = item.isInMemory();
 					long sizeInBytes = item.getSize();
@@ -140,21 +152,25 @@ public class MemberRegisterLoginController {
 		} catch (FileUploadBase.SizeLimitExceededException ex1) {
 				System.out.println("上傳檔案超過最大檔案允許大小" + yourMaxRequestSize / (1024 * 1024) + "MB !");
 		}
-		return "redirect:registerThree.do";
+		System.out.println("picture2=="+picture2);
+		if(!picture2.isEmpty()){
+			personService.updateMemberPicture(memberId, picture2);
+		}else{
+			personService.updateMemberPicture(memberId, fileName);
+		}
+		
+		return "redirect:registerThree.do?memberId="+memberId;
 	}
 	
 	//註冊步驟三
 	@RequestMapping("/registerThree")
-	public ModelAndView registerThree(Model model)
+	public ModelAndView registerThree(String memberId,Model model)
 	{
 		System.out.println("registerThree==>");		
-		Member member = new Member();
-		member.setMemberId(111);
-		member.setUserName("王大明");
-		member.setEmail("aaa.@ubn.com");
-		member.setPicture("images/lucy.jpg");
-					
+		Member member = personService.queryMemberInfo(memberId);
+		System.out.println("getUserName=="+member.getUserName());
 		model.addAttribute("member", member);
+		model.addAttribute("memberId", memberId);
 		return new ModelAndView("registerThree");
 	}
 	

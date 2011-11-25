@@ -493,4 +493,5 @@ public interface MusicService {
      * @param songID 歌曲編號
      */
     public Song querySongLyrics(long songID);
+    
 }

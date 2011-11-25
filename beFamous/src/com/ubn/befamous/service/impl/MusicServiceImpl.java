@@ -567,17 +567,76 @@ public class MusicServiceImpl implements MusicService{
     //查詢關鍵字
     
     /**
-     * 查詢關鍵字
+     * 查詢關鍵字      (關鍵字的部分還沒加依照關鍵字筆數作排序)
      * @param keyword 關鍵字
      */
     public ArrayList queryKeyword (String keyword){
-    	
     	ArrayList list = new ArrayList();
-    	//list.add(k);
-//    	list.add(a2);
-//    	list.add(s2);
-//    	list.add(c2);
-//    	list.add(k2);
+    	
+    	//專輯
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("from Album a where a.name like :keyword order by a.createDate desc");
+    	query.setString("keyword", "%"+keyword+"%");
+    	List<Album> albumList = (List<Album>)query.list();
+    	Album[] albumList2 = new Album[albumList.size()];
+		int i = 0;
+		for (Album albumList3:albumList) {
+			albumList2[i]=albumList3;
+			System.out.println("Album==>"+albumList2[i].getPid());
+			i++;
+		}
+		list.add(albumList2);
+    	
+		//歌曲
+		query = this.sessionfactory.getCurrentSession().createQuery("from Song a where (a.name like :keyword) or (a.album.name like :keyword) or (a.album.creator.userName like :keyword) order by a.createDate desc");
+    	query.setString("keyword", "%"+keyword+"%");
+    	List<Song> songList = (List<Song>)query.list();
+    	Song[] songList2 = new Song[songList.size()];
+		int j = 0;
+		for (Song songList3:songList) {
+			songList2[j]=songList3;
+			System.out.println("Song==>"+songList2[j].getPid());
+			j++;
+		}
+		list.add(songList2);
+		
+		//創作人
+		query = this.sessionfactory.getCurrentSession().createQuery("from Creator a where (a.userName like :keyword) order by a.createDate desc");
+    	query.setString("keyword", "%"+keyword+"%");
+    	List<Creator> creatorList = (List<Creator>)query.list();
+    	Creator[] creatorList2 = new Creator[creatorList.size()];
+		int k = 0;
+		for (Creator creatorList3:creatorList) {
+			creatorList2[k]=creatorList3;
+			System.out.println("Creator==>"+creatorList2[k].getId());
+			k++;
+		}
+		list.add(creatorList2);
+		
+		//消息
+		query = this.sessionfactory.getCurrentSession().createQuery("from News a where (a.newsName like :keyword) order by a.createDate desc");
+    	query.setString("keyword", "%"+keyword+"%");
+    	List<News> newsList = (List<News>)query.list();
+    	News[] newsList2 = new News[newsList.size()];
+		int n = 0;
+		for (News newsList3:newsList) {
+			newsList2[n]=newsList3;
+			System.out.println("Creator==>"+newsList2[n].getId());
+			n++;
+		}
+		list.add(newsList2);
+		
+		//熱門關鍵字
+		query = this.sessionfactory.getCurrentSession().createQuery("select distinct a.name from Keyword a ");
+    	List<String> keywordList = (List<String>)query.list();
+    	String[] keywordList2 = new String[keywordList.size()];
+    	System.out.println("keywordList.size()==>"+keywordList.size());
+		int m = 0;
+		for (String keywordList3:keywordList) {
+			keywordList2[m]=keywordList3;
+			System.out.println("Keyword==>"+keywordList2[m]);
+			m++;
+		}
+		list.add(keywordList2);
     	return list;
     }
     
@@ -586,8 +645,17 @@ public class MusicServiceImpl implements MusicService{
      * @param keyword 關鍵字
      */
     public Album[] queryKeywordForAlbums (String keyword){
-    	Album[] a = {};
-    	return a;
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("from Album a where a.name like :keyword order by a.createDate desc");
+    	query.setString("keyword", "%"+keyword+"%");
+    	List<Album> albumList = (List<Album>)query.list();
+    	Album[] albumList2 = new Album[albumList.size()];
+		int i = 0;
+		for (Album albumList3:albumList) {
+			albumList2[i]=albumList3;
+			System.out.println("Album==>"+albumList2[i].getName());
+			i++;
+		}
+    	return albumList2;
     }
     
     /**
@@ -595,8 +663,18 @@ public class MusicServiceImpl implements MusicService{
      * @param keyword 關鍵字
      */
     public Song[] queryKeywordForSongs (String keyword){
-    	Song[] s = {};
-    	return s;
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("from Song a where (a.name like :keyword) or (a.album.name like :keyword) or (a.album.creator.userName like :keyword) order by a.createDate desc");
+    	query.setString("keyword", "%"+keyword+"%");
+    	List<Song> songList = (List<Song>)query.list();
+    	Song[] songList2 = new Song[songList.size()];
+		int j = 0;
+		for (Song songList3:songList) {
+			songList2[j]=songList3;
+			System.out.println("Song==>"+songList2[j].getName());
+			j++;
+		}
+    	
+    	return songList2;
     }
     
     /**
@@ -604,8 +682,17 @@ public class MusicServiceImpl implements MusicService{
      * @param keyword 關鍵字
      */
     public Creator[] queryKeywordForCreators (String keyword){
-    	Creator[] c = {};
-    	return c;
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("from Creator a where (a.userName like :keyword) order by a.createDate desc");
+    	query.setString("keyword", "%"+keyword+"%");
+    	List<Creator> creatorList = (List<Creator>)query.list();
+    	Creator[] creatorList2 = new Creator[creatorList.size()];
+		int k = 0;
+		for (Creator creatorList3:creatorList) {
+			creatorList2[k]=creatorList3;
+			System.out.println("Creator==>"+creatorList2[k].getUserName());
+			k++;
+		}
+    	return creatorList2;
     }
     
     /**
@@ -613,8 +700,19 @@ public class MusicServiceImpl implements MusicService{
      * @param keyword 關鍵字
      */
     public News[] queryKeywordForNews (String keyword){
-    	News[] n = {};
-    	return n;
+    	//消息
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("from News a where (a.newsName like :keyword) order by a.createDate desc");
+    	query.setString("keyword", "%"+keyword+"%");
+    	List<News> newsList = (List<News>)query.list();
+    	News[] newsList2 = new News[newsList.size()];
+    	int n = 0;
+    	for (News newsList3:newsList) {
+    		newsList2[n]=newsList3;
+    		System.out.println("News==>"+newsList2[n].getNewsName());
+    		n++;
+    	}
+    	
+    	return newsList2;
     }
     
     //管理關鍵字

@@ -14,11 +14,12 @@
 
 <h3>上傳圖片</h3>
 <form name="upload" enctype="multipart/form-data" method="post">
- <input type="hidden" name="memberId" value=${member}><br><br>
+ <input type="hidden" name="memberId" value="${memberId}"><br><br>
+ <input type="hidden" name="picture2" value="image/memberPicture/111111.jpg">
 上傳一張代表您的圖片作為在GSibefamous的顯示圖片。
 <p><input type="file" name="file" size="20" /> 
-<p> <input type="submit" value="上傳" onclick="add(${member})"> 
-<input type="reset" value="稍後上傳" onclick="add(${member})"> 
+<p> <input type="button" value="上傳" onclick="add(${memberId})"> 
+<input type="button" value="稍後上傳" onclick="add(${memberId})"> 
 </form>
 </body>
 <script>
