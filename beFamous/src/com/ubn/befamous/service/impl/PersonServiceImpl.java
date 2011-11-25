@@ -36,6 +36,8 @@ import com.ubn.befamous.entity.GsiBonus;
 import com.ubn.befamous.entity.GsiMoney;
 import com.ubn.befamous.entity.LikeCreator;
 import com.ubn.befamous.entity.Member;
+import com.ubn.befamous.entity.MemberStatus;
+import com.ubn.befamous.entity.ModifyData;
 import com.ubn.befamous.entity.News;
 import com.ubn.befamous.entity.Offense;
 import com.ubn.befamous.entity.ProductionCategory;
@@ -112,6 +114,14 @@ public class PersonServiceImpl implements PersonService{
 	@Autowired
 	@Qualifier("adminDAO")
 	private IBaseDao<Admin, Long> adminDAO;
+	
+	@Autowired
+	@Qualifier("modifyDataDAO")
+	private IBaseDao<ModifyData, Long> modifyDataDAO;
+	
+	@Autowired
+	@Qualifier("memberStatusDAO")
+	private IBaseDao<MemberStatus, Long> memberStatusDAO;
 	
 	
 	public ArrayList queryMemberData(long userID){
@@ -500,7 +510,6 @@ public class PersonServiceImpl implements PersonService{
 	}
 		
 	//更新會員帳戶資料
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void updateAccountData(long userID, String accountName, String accountNO, String bankName, String bankBranch, String identityNO, String address, String tel, String cellPhone) {
 		Creator creator =  this.creatorDAO.find(userID);
 		creator.setAccountName(accountName);
@@ -843,7 +852,7 @@ public class PersonServiceImpl implements PersonService{
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)	
 	public void saveNews(long userID, String newsName, String newsSouce, String content, String onStatus) {
 			
-		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
+		String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
 		Creator creator = (Creator) this.memberDAO.find(userID);
 		News news = new News();
 		news.setCreateDate(date);
@@ -887,7 +896,7 @@ public class PersonServiceImpl implements PersonService{
 	//儲存創作人更新的訊息
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void updateNews(long newsID, String newsName, String newsSouce, String content, String onStatus) {
-		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
+		String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
 		News news = this.newsDAO.find(newsID);
 		news.setNewsName(newsName);
 		news.setContent(content);
@@ -902,7 +911,7 @@ public class PersonServiceImpl implements PersonService{
 	//儲存管理者新增的訊息
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void saveManagerNews(long adminID, String newsCategory, String newsName, String picture, String newsSouce, String onDate, String content, String onStatus) {
-		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
+		String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
 		News news = new News();
 		news.setNewsCategory(newsCategory);
 		news.setCreateDate(date);
@@ -919,9 +928,9 @@ public class PersonServiceImpl implements PersonService{
 	//管理者查詢刊登訊息(起始頁面)
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public News[] queryFirstNewsList(){
-		String nowDate = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
+		String nowDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
 		Date tempDate = DateUtils.addDays(new Date(), -14);
-		String date = DateFormatUtils.format(tempDate, "yyyyMMddhhmmss");
+		String date = DateFormatUtils.format(tempDate, "yyyyMMddHHmmss");
 		Query query = this.sessionFactory.getCurrentSession().createQuery("from News where(createUser is not null)and(createDate between :date and :nowDate)and(dropDate is null)");
 		query.setParameter("nowDate", nowDate);
 		query.setParameter("date", date);		
@@ -994,4 +1003,290 @@ public class PersonServiceImpl implements PersonService{
 		this.newsDAO.update(news);
 	}
 	
+	
+	//怡秀寫的  2011-11-24
+	//管理會員資料
+		
+	//查詢會員清單
+	public Member[] queryMemberList(String email,String identity,String startDate,String endDate,String location,String fanAmountOne,String fanAmountTwo,String friendAmountOne,String friendAmountTwo,String status){
+//		Member memberX=(Member)this.sessionFactory.getCurrentSession().get(Member.class,new Long( 2));
+//		System.out.println("memberX="+memberX.getFriend().size());
+//		
+		if (StringUtils.isNotEmpty(startDate)
+				&& StringUtils.isNotEmpty(endDate)) {
+			startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
+			endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
+		}
+		
+		StringBuilder queryString = new StringBuilder();
+		if(StringUtils.isNotBlank(fanAmountOne)&& StringUtils.isNotBlank(fanAmountTwo)) {
+			queryString.append("from Creator a where (1=1)");
+		}else{
+		   queryString.append("from Member a where (1=1) ");   
+		}
+		if(StringUtils.isNotBlank(startDate)&& StringUtils.isNotBlank(endDate)) {
+			startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
+			endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
+			
+			queryString.append(" and (a.createDate  between :startDate and :endDate)");
+			
+		}
+		if (StringUtils.isNotBlank(email)) {
+			queryString.append(" and (a.email=:email)");
+		}
+		if (StringUtils.isNotBlank(identity)) {
+			queryString.append(" and (a.identityName = :identity)");
+		}
+		if (StringUtils.isNotBlank(location)) {
+			queryString.append(" and (a.location = :location)");
+		}
+		if (StringUtils.isNotBlank(status)) {
+			queryString.append(" and (a.memberStatus.id=:status)");
+		}
+		if(StringUtils.isNotBlank(friendAmountOne)&& StringUtils.isNotBlank(friendAmountTwo)) {
+			queryString.append(" and size(a.friend) between :friendAmountOne and :friendAmountTwo");
+		}
+		if(StringUtils.isNotBlank(fanAmountOne)&& StringUtils.isNotBlank(fanAmountTwo)) {
+			queryString.append(" and size(a.fan) between :fanAmountOne and :fanAmountTwo");
+		}
+		
+		
+		Query query = this.sessionFactory.getCurrentSession().createQuery(queryString.toString());
+
+		if(StringUtils.isNotBlank(startDate)&& StringUtils.isNotBlank(endDate)) {
+			query.setString("startDate", startDate);
+			query.setString("endDate", endDate);
+		}
+		if (StringUtils.isNotBlank(email)) {
+		query.setString("email", email);
+		}
+		if (StringUtils.isNotBlank(identity)) {
+		query.setString("identity", identity);
+		}
+		if (StringUtils.isNotBlank(location)) {
+		query.setString("location", location);
+		}
+		if (StringUtils.isNotBlank(status)) {
+		query.setString("status", status);
+		}
+		if(StringUtils.isNotBlank(friendAmountOne)&& StringUtils.isNotBlank(friendAmountTwo)) {
+			query.setString("friendAmountOne", friendAmountOne);
+			query.setString("friendAmountTwo", friendAmountTwo);
+		}
+		if(StringUtils.isNotBlank(fanAmountOne)&& StringUtils.isNotBlank(fanAmountTwo)) {
+			query.setString("fanAmountOne", fanAmountOne);
+			query.setString("fanAmountTwo", fanAmountTwo);
+		}
+		
+		List<Member> resultList=(List<Member>)query.list();
+		Member[] memberSet = new Member[resultList.size()];
+		
+			int i=0;
+			for (Member as:resultList) {
+				memberSet[i]=as;
+				System.out.println("memberID==>"+memberSet[i].getId());
+				i++;
+		}
+			return memberSet;
+		
+		
+	}
+		
+	//查詢修改紀錄
+	public ModifyData[] queryModifyRecord(String userID){
+		Creator c = this.creatorDAO.find(Long.parseLong(userID));
+		ModifyData[] md = new ModifyData[c.getModifyData().size()];
+		
+		int i=0;
+		for (ModifyData as:c.getModifyData()) {
+			md[i]=as;
+			System.out.println("modifyData==>"+md[i].getContent());
+			i++;
+		}
+				
+		return md;
+	}
+		
+	//查詢會員詳細資料     
+	public ArrayList queryMemberDetailData(long userID){
+		ArrayList list = new ArrayList();	
+		
+		int fan =0;
+		int friend =0;
+		int album=0;
+		long song=0;
+		long offenseAlbum=0;
+		long offenseSong=0;
+		int offense=0;
+		
+		//會員資料
+		Query query = this.sessionFactory.getCurrentSession().createQuery("FROM Member where id = :userID");
+		query.setParameter("userID", userID);
+			
+		Object person = query.uniqueResult();
+		if (person instanceof Creator) {
+			Creator creator = (Creator)person;
+			list.add(creator);
+			System.out.println("creatorName=="+creator.getUserName());
+			fan =creator.getFan().size();                //粉絲數
+			friend = creator.getFriend().size();         //好友數
+			offense=creator.getOffense().size();      //檢舉次數
+			album=creator.getAlbum().size();           //專輯數
+			
+			query = this.sessionFactory.getCurrentSession().createQuery("select count(a) FROM Song a where a.createUser = :userID");
+			query.setString("userID", String.valueOf(userID));
+			song= (Long) query.uniqueResult();   //歌曲數
+			
+		}else{
+			GeneralMember generalMember = (GeneralMember)person;
+			list.add(generalMember);
+			friend = generalMember.getFriend().size();
+			offense=generalMember.getOffense().size();
+		}
+		list.add(fan);
+		list.add(friend);
+		list.add(offense);
+		list.add(album);
+		list.add(song);
+		
+		//GSiMoney
+	    query = this.sessionFactory.getCurrentSession().createQuery(" from GsiMoney g where g.member.id = :userID  order by createDate desc"); 
+		query.setLong("userID", userID);
+		List<GsiMoney> GsiMoneylist = (List<GsiMoney>)query.list();
+		if(GsiMoneylist.size()>0){
+			list.add(GsiMoneylist.get(0).getBalance());
+		}
+		
+		//GSiBonus
+	    query = this.sessionFactory.getCurrentSession().createQuery(" from GsiBonus g where g.member.id = :userID  order by createDate desc"); 
+		query.setLong("userID", userID);
+		List<GsiBonus> GsiBonuslist = (List<GsiBonus>)query.list();
+		if(GsiBonuslist.size()>0){
+			list.add(GsiBonuslist.get(0).getBalance());
+		}
+		
+		//被檢舉歌曲數
+		query = this.sessionFactory.getCurrentSession().createQuery("select count(a) from Offense a where a.album.creator.id = :userID"); 
+		query.setLong("userID", userID);
+		offenseSong=(Long) query.uniqueResult();   
+		System.out.println("被檢舉歌曲數"+query.uniqueResult());
+		list.add(offenseSong);
+		
+		//被檢舉專輯數
+		query = this.sessionFactory.getCurrentSession().createQuery("select count(a) from Offense a where a.song.album.creator.id = :userID"); 
+		query.setLong("userID", userID);
+		offenseAlbum=(Long) query.uniqueResult(); 
+		System.out.println("被檢舉專輯數"+query.uniqueResult());
+		list.add(offenseAlbum);
+		
+		System.out.println("fan=="+fan);
+		System.out.println("friend=="+friend);
+		System.out.println("offense=="+offense);
+		System.out.println("album=="+album);
+		System.out.println("song=="+song);
+		System.out.println("GsiBonuslist=="+GsiBonuslist.get(0).getBalance());
+		System.out.println("GsiMoneylist=="+GsiMoneylist.get(0).getBalance());
+		System.out.println("offenseSong=="+offenseSong);
+		
+		return list;
+	}
+		
+	//更新會員狀態
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void updateStatus(String userID,String adminID,String statusReason,String statusName){
+		String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");   //今天日期時間  yyyyMMddHHmmss
+		
+		MemberStatus ms = this.memberStatusDAO.find(Long.parseLong(userID));
+		ms.setModifier(adminID);
+		ms.setModifyDate(datetime);
+		ms.setStatusName(statusName);
+		ms.setStatusReason(statusReason);
+		
+		Member m = this.memberDAO.find(Long.parseLong(userID));
+		m.setMemberStatus(ms);
+		m.setModifier(adminID);
+		m.setModifyDate(datetime);
+		
+		this.memberDAO.update(m);
+		this.memberStatusDAO.update(ms);
+	}
+		
+	//更新付款資料
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void updateAccount(String memberId,String adminID,String userName,String identityNO,String address,String cellPhone,String tel,String accountName,String bankName,String bankBranch,String accountNO,String statusName){
+		String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");   //今天日期時間  yyyyMMddHHmmss
+		
+		Creator c = this.creatorDAO.find(Long.parseLong(memberId));
+		c.setAccountName(accountName);
+		c.setAccountNO(accountNO);
+		c.setAddress(address);
+		c.setBankBranch(bankBranch);
+		c.setBankName(bankName);
+		c.setCellPhone(cellPhone);
+		c.setTel(tel);
+		c.setIdentityNO(identityNO);
+		c.setModifier(adminID);
+		c.setModifyDate(datetime);
+		c.setRealName(userName);
+		if(statusName.equals("正常")){
+		MemberStatus ms = this.memberStatusDAO.find(Long.parseLong(memberId));
+		ms.setModifier(adminID);
+		ms.setModifyDate(datetime);
+		ms.setStatusName(statusName);
+		ms.setStatusReason("");
+		c.setMemberStatus(ms);}
+		this.creatorDAO.update(c);
+	}
+	
+	
+	//加入會員與會員登入
+	
+	//加入會員-儲存會員
+	public Member saveMember(String email,String userName,String password,String sex,String birthday,String location){
+		String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");   //今天日期時間  yyyyMMddHHmmss
+		
+		GeneralMember m = new GeneralMember();
+		m.setEmail(email);
+		m.setCreateDate(datetime);
+		m.setCreateUser(userName);
+		m.setUserName(userName);
+		m.setPassword(password);
+		m.setSex(sex);
+		m.setBirthday(birthday);
+		m.setLocation(location);
+		m.setIdentityName("1");
+		MemberStatus memberStatus = new MemberStatus();
+		memberStatus.setCreateDate(datetime);
+		memberStatus.setCreateUser(userName);
+		memberStatus.setStatusName("正常");
+		m.setMemberStatus(memberStatus);
+		this.generalMemberDAO.save(m);
+		this.memberStatusDAO.save(memberStatus);
+		
+		Query query = this.sessionFactory.getCurrentSession().createQuery("from Member a where (a.userName = :userName) and (a.email = :email) and (a.password = :password)");
+		query.setString("userName", userName);
+		query.setString("email", email);
+		query.setString("password", password);
+		
+		Member member = (Member)query.uniqueResult();
+		return member;
+	}
+		
+	//加入會員-上傳圖片
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public void updateMemberPicture(String userID,String fileName){
+		String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");   //今天日期時間  yyyyMMddHHmmss
+		
+		Member m = this.memberDAO.find(Long.parseLong(userID));
+		m.setPicture(fileName);
+		m.setModifier(userID);
+		m.setModifyDate(datetime);
+		this.memberDAO.update(m);
+	}
+	
+	//加入會員-查詢會員
+	public Member queryMemberInfo(String userID){
+		Member m = this.memberDAO.find(Long.parseLong(userID));
+		return m;
+	}
 }

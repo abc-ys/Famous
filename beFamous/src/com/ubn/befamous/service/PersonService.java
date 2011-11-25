@@ -15,6 +15,7 @@ import com.ubn.befamous.entity.Admin;
 import com.ubn.befamous.entity.Album;
 import com.ubn.befamous.entity.LikeCreator;
 import com.ubn.befamous.entity.Member;
+import com.ubn.befamous.entity.ModifyData;
 import com.ubn.befamous.entity.News;
 import com.ubn.befamous.entity.Question;
 
@@ -172,7 +173,7 @@ public interface PersonService {
 	
 	//Lucy@20111123
 	
-	//儲存創作人刊登的訊息/
+	//儲存創作人刊登的訊息
 	public void saveNews(long userID, String newsName, String newsSouce, String content, String onStatus);
 		
 	//創作人查詢刊登訊息
@@ -198,4 +199,36 @@ public interface PersonService {
 	
 	//儲存管理者更新的訊息
 	public void updateManagerNews(long newsID, String newsCategory, String newsName, String picture, String newsSouce, String onDate, String content);
+
+
+	//怡秀寫的  2011-11-24
+	//管理會員資料
+	
+	//查詢會員清單
+	public Member[] queryMemberList(String email,String identity,String startDate,String endDate,String location,String fanAmountOne,String fanAmountTwo,String friendAmountOne,String friendAmountTwo,String status);
+	
+	//查詢修改紀錄
+	public ModifyData[] queryModifyRecord(String userID);
+	
+	//查詢會員詳細資料
+	public ArrayList queryMemberDetailData(long userID);
+	
+	//更新會員狀態
+	public void updateStatus(String userID,String adminID,String statusReason,String statusName);
+	
+	//更新付款資料
+	public void updateAccount(String memberId,String adminID,String userName,String identityNO,String address,String cellPhone,String tel,String accountName,String bankName,String bankBranch,String accountNO,String statusName);
+	
+	
+	//加入會員與會員登入
+	
+	//加入會員-儲存會員
+	public Member saveMember(String email,String userName,String password,String sex,String birthday,String location);
+	
+	//加入會員-上傳圖片
+	public void updateMemberPicture(String userID,String fileName);
+	
+	//加入會員-查詢會員
+	public Member queryMemberInfo(String userID);
+	
 }
