@@ -419,7 +419,8 @@ public class NewsController {
 					System.out.println("上傳檔案超過最大檔案允許大小" + yourMaxRequestSize / (1024 * 1024) + "MB !");
 				}
 				picture = "image/"+fileName;
-				this.personService.updateManagerNews(newsID, newsCategory, newsName, picture, newsSouce, onDate, content);
+				long adminID = 2;
+				this.personService.updateManagerNews(adminID, newsID, newsCategory, newsName, picture, newsSouce, onDate, content);
 				return "redirect:queryManagerNews.do";
 			}
 }

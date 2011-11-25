@@ -103,7 +103,6 @@ public interface PersonService {
 			           String url,String createDate,String actionContent);
 	
 	//Lucy寫的
-	
 	//查詢會員資料
 	public ArrayList queryMember(long userID);
 		
@@ -121,10 +120,10 @@ public interface PersonService {
 		
 	//更新會員圖片/
 	public void handleUploadPicture(long userID, String picture);
-			
+		
 	//更新會員帳戶資料
 	public void updateAccountData(long userID, String accountName, String accountNO, String bankName, String bankBranch, String identityNO, String address, String tel, String cellPhone);
-	
+		
 	
 	//怡秀寫的     2011-11-22
 	
@@ -171,7 +170,6 @@ public interface PersonService {
 	
 	
 	//Lucy@20111123
-	
 	//儲存創作人刊登的訊息/
 	public void saveNews(long userID, String newsName, String newsSouce, String content, String onStatus);
 		
@@ -193,9 +191,10 @@ public interface PersonService {
 	//管理者查詢刊登訊息(起始頁面)
 	public News[] queryFirstNewsList();
 		
-	//管理者查詢刊登訊息(查詢條件)
+	//管理者查詢刊登訊息(查詢條件)/
 	public News[] queryNewsList(String newsCategory, String newsName, String MOPEND, String MCLOSED, String onStatus, String newsSource);
-	
+		
 	//儲存管理者更新的訊息
-	public void updateManagerNews(long newsID, String newsCategory, String newsName, String picture, String newsSouce, String onDate, String content);
+	public void updateManagerNews(long adminID,long newsID, String newsCategory, String newsName, String picture, String newsSouce, String onDate, String content);
+		
 }

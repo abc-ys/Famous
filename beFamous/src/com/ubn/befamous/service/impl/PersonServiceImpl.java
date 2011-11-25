@@ -419,11 +419,11 @@ public class PersonServiceImpl implements PersonService{
 	
 	//查詢會員資料
 	public ArrayList queryMember(long userID) {
-			
+		
 		ArrayList list = new ArrayList();	
 		Query query = this.sessionFactory.getCurrentSession().createQuery("FROM Member where id = :userID");
 		query.setParameter("userID", userID);
-			
+		
 		Object person = query.uniqueResult();
 		if (person instanceof Creator) {
 			Creator creator = (Creator)person;
@@ -438,8 +438,11 @@ public class PersonServiceImpl implements PersonService{
 	//更新會員資料
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void updateMember(long userID,String identityName,String userName,String location,String city,String birthday, String sex,String webSite,String subscribeStatus,String introduction,String likeMusicTypes,String likeSingers){
+		String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
 		if(identityName.equals("1")){
 			GeneralMember generalMember = this.generalMemberDAO.find(userID);
+			generalMember.setModifier(String.valueOf(userID));
+			generalMember.setModifyDate(date);
 			generalMember.setIdentityName(identityName);
 			generalMember.setUserName(userName);
 			generalMember.setLocation(location);
@@ -452,6 +455,8 @@ public class PersonServiceImpl implements PersonService{
 			this.generalMemberDAO.update(generalMember);			
 		}else{
 			Creator creator =  this.creatorDAO.find(userID);
+			creator.setModifier(String.valueOf(userID));
+			creator.setModifyDate(date);
 			creator.setIdentityName(identityName);
 			creator.setUserName(userName);
 			creator.setLocation(location);
@@ -466,43 +471,58 @@ public class PersonServiceImpl implements PersonService{
 			this.creatorDAO.update(creator);			
 		}		
 	}
-		
+	
 	//更新會員密碼
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void updatePassword(long userID, String password) {
+		String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
 		Member member = this.memberDAO.find(userID);
+		member.setModifier(String.valueOf(userID));
+		member.setModifyDate(date);
 		member.setPassword(password);
 		this.memberDAO.update(member);
 	}
-		
+	
 	//更新會員信箱
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void updateEmail(long userID, String email) {
+		String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
 		Member member = this.memberDAO.find(userID);
+		member.setModifier(String.valueOf(userID));
+		member.setModifyDate(date);
 		member.setEmail(email);
 		this.memberDAO.update(member);		
 	}
-		
+	
 	//刪除會員圖片
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void deleteMemberPicture(long userID) {
+		String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
 		Member member = this.memberDAO.find(userID);
+		member.setModifier(String.valueOf(userID));
+		member.setModifyDate(date);
 		member.setPicture("");
 		this.memberDAO.update(member);	
 	}
-		
+	
 	//更新會員圖片
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void handleUploadPicture(long userID, String picture){
+		String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
 		Member member = this.memberDAO.find(userID);
+		member.setModifier(String.valueOf(userID));
+		member.setModifyDate(date);
 		member.setPicture(picture);
 		this.memberDAO.update(member);	
 	}
-		
+	
 	//更新會員帳戶資料
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void updateAccountData(long userID, String accountName, String accountNO, String bankName, String bankBranch, String identityNO, String address, String tel, String cellPhone) {
+		String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
 		Creator creator =  this.creatorDAO.find(userID);
+		creator.setModifier(String.valueOf(userID));
+		creator.setModifyDate(date);
 		creator.setAccountName(accountName);
 		creator.setAccountNO(accountNO);
 		creator.setBankName(bankName);
@@ -839,13 +859,14 @@ public class PersonServiceImpl implements PersonService{
 	
 	
 	//Lucy@20111123
-	//儲存創作人刊登的訊息
+	//最新訊息-儲存創作人刊登的訊息
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)	
 	public void saveNews(long userID, String newsName, String newsSouce, String content, String onStatus) {
-			
-		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
+		
+		String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
 		Creator creator = (Creator) this.memberDAO.find(userID);
 		News news = new News();
+		news.setCreateUser(String.valueOf(userID));
 		news.setCreateDate(date);
 		news.setNewsName(newsName);
 		news.setContent(content);
@@ -858,7 +879,7 @@ public class PersonServiceImpl implements PersonService{
 		this.newsDAO.save(news);
 			
 	}
-	//創作人查詢刊登訊息
+	//最新訊息-創作人查詢刊登訊息
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public News[] queryNews(long userID, String onStatus) {		
 		
@@ -867,28 +888,30 @@ public class PersonServiceImpl implements PersonService{
 		query.setParameter("v2", onStatus);
 		List<News> newsSet = (List<News>)query.list();		
 		News[] newsList = newsSet.toArray(new News[newsSet.size()]);
-					
+				
 		return  newsList;
 	}
 
-	//刪除刊登訊息
+	//最新訊息-刪除刊登訊息
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void deleteNews(long newsID) {
 		this.newsDAO.delete(newsID);
 	}
 
-	//查詢訊息明細
+	//最新訊息-查詢訊息明細
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public News queryNewsDetail(long newsID) {
 		News news = this.newsDAO.find(newsID);
 		return news;
 	}
 
-	//儲存創作人更新的訊息
+	//最新訊息-儲存創作人更新的訊息
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void updateNews(long newsID, String newsName, String newsSouce, String content, String onStatus) {
-		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
+		String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
 		News news = this.newsDAO.find(newsID);
+		news.setModifier(String.valueOf(newsID));
+		news.setModifyDate(date);
 		news.setNewsName(newsName);
 		news.setContent(content);
 		news.setNewsSouce(newsSouce);
@@ -899,12 +922,13 @@ public class PersonServiceImpl implements PersonService{
 		this.newsDAO.update(news);
 	}
 
-	//儲存管理者新增的訊息
+	//最新訊息-儲存管理者新增的訊息
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public void saveManagerNews(long adminID, String newsCategory, String newsName, String picture, String newsSouce, String onDate, String content, String onStatus) {
-		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
+		String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
 		News news = new News();
 		news.setNewsCategory(newsCategory);
+		news.setCreateUser(String.valueOf(adminID));
 		news.setCreateDate(date);
 		news.setNewsName(newsName);
 		news.setContent(content);
@@ -915,13 +939,13 @@ public class PersonServiceImpl implements PersonService{
 		news.setOnStatus(onStatus);
 		this.newsDAO.save(news);		
 	}
-		
-	//管理者查詢刊登訊息(起始頁面)
+	
+	//最新訊息-管理者查詢刊登訊息(起始頁面)
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public News[] queryFirstNewsList(){
-		String nowDate = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
+		String nowDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
 		Date tempDate = DateUtils.addDays(new Date(), -14);
-		String date = DateFormatUtils.format(tempDate, "yyyyMMddhhmmss");
+		String date = DateFormatUtils.format(tempDate, "yyyyMMddHHmmss");
 		Query query = this.sessionFactory.getCurrentSession().createQuery("from News where(createUser is not null)and(createDate between :date and :nowDate)and(dropDate is null)");
 		query.setParameter("nowDate", nowDate);
 		query.setParameter("date", date);		
@@ -929,11 +953,11 @@ public class PersonServiceImpl implements PersonService{
 		News[] newsList = newsSet.toArray(new News[newsSet.size()]);
 		return newsList;
 	}
-		
-	//管理者查詢刊登訊息(查詢條件)
+	
+	//最新訊息-管理者查詢刊登訊息(查詢條件)
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 	public News[] queryNewsList(String newsCategory, String newsName,
-		String MOPEND, String MCLOSED, String onStatus, String newsSource) 
+			String MOPEND, String MCLOSED, String onStatus, String newsSource) 
 	{		
 		StringBuffer tempQuery = new StringBuffer();
 		tempQuery.append("from News where createUser is not null and dropDate is null ");
@@ -953,7 +977,7 @@ public class PersonServiceImpl implements PersonService{
 		if (!newsSource.isEmpty()){
 			tempQuery.append("and newsSource = :newsSource ");
 		}		
-			
+		
 		Query query = this.sessionFactory.getCurrentSession().createQuery(tempQuery.toString());
 		if(!newsCategory.isEmpty()){
 			query.setParameter("newsCategory", newsCategory);
@@ -981,10 +1005,13 @@ public class PersonServiceImpl implements PersonService{
 		return newsList;
 	}
 
-	//儲存管理者更新的訊息
+	//最新訊息-儲存管理者更新的訊息
 	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void updateManagerNews(long newsID, String newsCategory, String newsName, String picture, String newsSouce, String onDate, String content){
+	public void updateManagerNews(long adminID, long newsID, String newsCategory, String newsName, String picture, String newsSouce, String onDate, String content){
+		String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
 		News news = this.newsDAO.find(newsID);
+		news.setModifier(String.valueOf(adminID));
+		news.setModifyDate(date);
 		news.setNewsCategory(newsCategory);
 		news.setNewsName(newsName);
 		news.setPicture(picture);
@@ -993,5 +1020,4 @@ public class PersonServiceImpl implements PersonService{
 		news.setOnDate(onDate);		
 		this.newsDAO.update(news);
 	}
-	
 }

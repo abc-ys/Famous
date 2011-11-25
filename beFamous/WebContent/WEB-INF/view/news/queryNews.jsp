@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -44,7 +45,8 @@
 		<c:forEach var="hm" items="${newsList}" varStatus="status">
 			<tr><td valign="top" Width="50"><center><font size="2">${status.index+1}</font></center></td>
 			<td valign="top" Width="50"><center><font size="2"><input type="checkbox" name="del" id="del" value=${hm.id}></font></center></td>	
-			<td valign="top" Width="100"><center><font size="2">${hm.createDate}</font></center></td>		
+			<fmt:parseDate var="dateObj" value="${hm.createDate}" type="DATE" pattern="yyyyMMddHHmmss"/> 
+			<td valign="top" Width="100"><center><font size="2"><fmt:formatDate value='${dateObj}' pattern='yyyy-MM-dd' /></font></center></td>
 			<td valign="top" Width="100"><center><font size="2">${hm.newsName}</font></center></td>	
 			<td valign="top" Width="100"><center><font size="2">${hm.newsSouce}</font></center></td>
 			<c:if test="${hm.onStatus == 1}"><td valign="top" Width="100"><center><font size="2">開放</font></center></td></c:if>

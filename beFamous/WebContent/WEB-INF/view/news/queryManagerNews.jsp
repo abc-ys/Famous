@@ -62,7 +62,7 @@
 	<c:if test="${n.onStatus == 2}">
 	<td><font size="2"><a href="javascript:void(0)" onclick="editcontent('${n.id}')">${n.newsName}</a></font></td></c:if>	
 	<td><font size="2">${n.newsSouce}</font></td>	
-	<fmt:parseDate var="dateObj" value="${n.createDate}" type="DATE" pattern="yyyyMMddhhmmss"/> 
+	<fmt:parseDate var="dateObj" value="${n.createDate}" type="DATE" pattern="yyyyMMddHHmmss"/> 
 	<td><font size="2"><fmt:formatDate value='${dateObj}' pattern='yyyy-MM-dd' /></font></td>
 	<td><font size="2">${n.onDate}</font></td>
 	<c:if test="${n.onStatus == 1}"><td><font size="2">刊登中</font></td></c:if>
