@@ -12,6 +12,7 @@ import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -566,24 +567,25 @@ public class MemberController {
 			return new ModelAndView("handleUploadPicture");
 		}
 	
+		
 	//管理者查詢會員資料
 	@RequestMapping("/manageMember")
-	public ModelAndView queryMemberData(String orderNo, String userIdentity, String MOPEND, String MCLOSED, String location, String minFns, String maxFns, String minFds, String maxFds, String statusName, Model model) {
+	public ModelAndView queryMemberData(String adminID,String orderNo, String identity, String MOPEND, String MCLOSED, String location, String minFns, String maxFns, String minFds, String maxFds, String status, Model model) {
 		
 		System.out.println("manageMember==>");		
-		System.out.println("    orderNo="+orderNo+", userIdentity="+userIdentity+", MOPEND="+MOPEND+", MCLOSED="+MCLOSED+", location="+location+", minFns="+minFns+", maxFns="+maxFns+", minFds="+minFds+", maxFds="+maxFds+", statusName="+statusName);
+		System.out.println("    orderNo="+orderNo+", userIdentity="+identity+", MOPEND="+MOPEND+", MCLOSED="+MCLOSED+", location="+location+", minFns="+minFns+", maxFns="+maxFns+", minFds="+minFds+", maxFds="+maxFds+", statusName="+status);
 		
-		MemberStatus ms = new MemberStatus();
-		ms.setStatusName("正常");
+		Member[] member;
+		if (StringUtils.isBlank(orderNo)&& StringUtils.isBlank(identity)&& StringUtils.isBlank(MOPEND)
+				&&	StringUtils.isBlank(MCLOSED)&& StringUtils.isBlank(location)&& StringUtils.isBlank(minFns)
+				&&StringUtils.isBlank(maxFns)&& StringUtils.isBlank(minFds)&& StringUtils.isBlank(maxFds)
+				&&StringUtils.isBlank(status)) {
+			member=new Member[0];
+			System.out.println("條件為空");
+		}else{
 		
-		Member member = new Member();
-		member.setId(1111111);
-		member.setEmail("xxx@ubn.net");
-		member.setUserName("王大明");
-		member.setIdentityName("創作人");
-		member.setLocation("台灣");
-		member.setCreateDate("2011/11/11");
-		member.setMemberStatus(ms);		
+		member = personService.queryMemberList(orderNo, identity, MOPEND, MCLOSED, location, minFns, maxFns, minFds, maxFds, status);
+		}
 		int fans = 22;
 		int friends = 66;
 		
@@ -592,12 +594,11 @@ public class MemberController {
 		memberList.add(fans);
 		memberList.add(friends);
 		
-		ArrayList[] memberLists = {memberList};
-		model.addAttribute("memberLists",memberLists);
+		model.addAttribute("member",member);
+		model.addAttribute("adminID","1");
+		model.addAttribute("fans",fans);
+		model.addAttribute("friends",friends);
 		
-		Admin admin = new Admin();
-		admin.setId(1111);
-		model.addAttribute("admin",admin);
 		return new ModelAndView("queryMemberData");
 		
 	}
@@ -608,21 +609,9 @@ public class MemberController {
 		System.out.println("manageMemberNote==>");		
 		System.out.println("    memberId="+memberId);
 		
-		ModifyData md = new ModifyData();
-		md.setContent("電話修正為0922222222");
-		md.setCreateDate("2011-10-10 19:20:20");
-		//md.setCreator("xxx");
-		md.setId(001);
+		ModifyData[] md = personService.queryModifyRecord(memberId);
 		
-		ModifyData md1 = new ModifyData();
-		md1.setContent("電話修正為0933333333");
-		md1.setCreateDate("2011-10-13 13:20:20");
-		//md1.setCreator("xxx");
-		md1.setId(002);
-		
-		ModifyData[] mds = {md, md1};
-		
-		model.addAttribute("mds",mds);
+		model.addAttribute("modifyData",md);
 		return new ModelAndView("manageMemberNote");
 	}
 
@@ -633,52 +622,7 @@ public class MemberController {
 		System.out.println("manageGMemberDetail==>");		
 		System.out.println("    type="+type+", adminId="+adminId+", memberId="+memberId);
 		
-		//會員資料
-		MemberStatus ms = new MemberStatus();
-		ms.setStatusName("停權");
-		ms.setStatusReason("被檢舉次數過多");
-			
-		GeneralMember member = new GeneralMember();
-		member.setId(1111111);
-		member.setEmail("xxx@ubn.net");
-		member.setUserName("王大明");
-		member.setIdentityName("一般會員");
-		member.setLocation("台灣");
-		member.setCreateDate("2011/11/11");
-		member.setMemberStatus(ms);
-		
-		GsiMoney gsiMoney = new GsiMoney();
-		gsiMoney.setBalance("300");
-		
-		Set<GsiMoney> g = new HashSet<GsiMoney>();
-		g.add(gsiMoney);
-		
-		member.setGsiMoney(g);
-		
-		GsiBonus gsiBonus = new GsiBonus();
-		gsiBonus.setBalance("50");
-		Set<GsiBonus> b = new HashSet<GsiBonus>();
-		b.add(gsiBonus);
-		
-		member.setGsiBonus(b);
-		
-		int fans = 20;
-		int friends = 100;
-		int albums = 5;
-		int songs = 50;
-		int beOffendSongs = 10;
-		int beOffendAlbums = 3;
-		int offense = 30;
-		
-		ArrayList memberDetail = new ArrayList();
-		memberDetail.add(member);
-		memberDetail.add(fans);
-		memberDetail.add(friends);
-		memberDetail.add(albums);
-		memberDetail.add(songs);
-		memberDetail.add(beOffendSongs);
-		memberDetail.add(beOffendAlbums);
-		memberDetail.add(offense);
+		ArrayList memberDetail = personService.queryMemberDetailData(Long.parseLong(memberId));
 		
 		model.addAttribute("memberDetail",memberDetail);
 		model.addAttribute("admin",adminId);
@@ -709,80 +653,32 @@ public class MemberController {
 	@RequestMapping("/saveGMember")
 	public String saveGMember(String adminId,String memberId,String statusName, Model model) {				
 		System.out.println("saveGMember==>");		
-		System.out.println("    memberId="+memberId+", adminId="+adminId+", statusName="+statusName);
-		return "redirect:/manageGMemberDetail/modify/"+adminId+"/"+memberId+".do";
+		System.out.println("    memberId="+memberId+", adminId="+adminId);
+		String reason="";
+		if(statusName.equals("停權")){
+			Member m = personService.queryMemberInfo(memberId);
+			reason=m.getMemberStatus().getStatusReason();
+		}
+		personService.updateStatus(memberId, adminId, reason, statusName);
+		return "redirect:/manageGMemberDetail/get/"+adminId+"/"+memberId+".do";
 	}
 	
 	//儲存停權理由
 	@RequestMapping("/saveOffenseReason")
-	public ModelAndView saveOffenseReason(String adminId,String memberId,String reason, Model model) {						
+	public ModelAndView saveOffenseReason(String adminId,String memberId,String reason,String statusName, Model model) {						
 		System.out.println("saveOffenseReason==>");		
 		System.out.println("    memberId="+memberId+", adminId="+adminId+", reason="+reason);
+		personService.updateStatus(memberId, adminId, reason, statusName);
 		return new ModelAndView("saveOffenseReason");
 	}	
 	
 	//管理者查詢創作人資料詳細頁
 	@RequestMapping("/manageCreatorDetail/{type}/{adminId}/{memberId}")
 	public ModelAndView queryCreatorDetail(@PathVariable("type") String type,@PathVariable("adminId") String adminId,@PathVariable("memberId") String memberId, Model model) {
-		//會員資料
-		MemberStatus ms = new MemberStatus();
-		ms.setStatusName("正常");
-								
-		Creator creator = new Creator();
-		creator.setId(1111111);
-		creator.setEmail("xxx@ubn.net");
-		creator.setUserName("王大明");
-		creator.setIdentityName("創作人");
-		creator.setLocation("台灣");
-		creator.setCreateDate("2011/11/11");
-		creator.setMemberStatus(ms);
 		
 		
-		GsiMoney gsiMoney = new GsiMoney();
-		gsiMoney.setBalance("300");
+		ArrayList creatorDetail = personService.queryMemberDetailData(Long.parseLong(memberId));
 		
-		Set<GsiMoney> g = new HashSet<GsiMoney>();
-		g.add(gsiMoney);
-		
-		creator.setGsiMoney(g);
-		
-		GsiBonus gsiBonus = new GsiBonus();
-		gsiBonus.setBalance("50");
-		Set<GsiBonus> b = new HashSet<GsiBonus>();
-		b.add(gsiBonus);
-		
-		creator.setGsiBonus(b);
-				
-		//付款資訊
-		creator.setUserName("劉為駿");
-		creator.setIdentityNO("N111111111");
-		creator.setAddress("台北市內湖區內湖捷運站");
-		creator.setCellPhone("0999999999");		
-		creator.setTel("0422222222");
-			
-		//銀行資訊
-		creator.setAccountName("劉為駿");
-		creator.setBankName("中央銀行");
-		creator.setBankBranch("台中分行");
-		creator.setAccountNO("1234567");
-		
-		int fans = 20;
-		int friends = 100;
-		int albums = 5;
-		int songs = 50;
-		int beOffendSongs = 10;
-		int beOffendAlbums = 3;
-		int offense = 30;
-		
-		ArrayList creatorDetail = new ArrayList();
-		creatorDetail.add(creator);
-		creatorDetail.add(fans);
-		creatorDetail.add(friends);
-		creatorDetail.add(albums);
-		creatorDetail.add(songs);
-		creatorDetail.add(beOffendSongs);
-		creatorDetail.add(beOffendAlbums);
-		creatorDetail.add(offense);
 			
 		model.addAttribute("creatorDetail",creatorDetail);
 		model.addAttribute("admin",adminId);
@@ -801,7 +697,8 @@ public class MemberController {
 	public String saveCreator(String adminId,String memberId,String statusName,String accountName,String bankName,String bankBranch,String accountNO,String userName,String identityNO,String address,String cellPhone,String tel, Model model) {		
 		System.out.println("saveCreator==>");		
 		System.out.println("    memberId="+memberId+", adminId="+adminId+", statusName="+statusName+", accountName="+accountName+", bankName="+bankName+", bankBranch="+bankBranch+", accountNO="+accountNO+", userName="+userName+", identityNO="+identityNO+", address="+address+", cellPhone="+cellPhone+", tel="+tel);
-		return "redirect:/manageCreatorDetail/modify/"+adminId+"/"+memberId+".do";
+		personService.updateAccount(memberId, adminId, userName, identityNO, address, cellPhone, tel, accountName, bankName, bankBranch, accountNO, statusName);
+		return "redirect:/manageCreatorDetail/get/"+adminId+"/"+memberId+".do";
 	}
 	
 	//創作人被檢舉清單(專輯)
