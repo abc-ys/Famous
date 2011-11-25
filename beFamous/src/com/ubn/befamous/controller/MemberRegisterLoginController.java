@@ -167,7 +167,7 @@ public class MemberRegisterLoginController {
 	public ModelAndView registerThree(String memberId,Model model)
 	{
 		System.out.println("registerThree==>");		
-		Member member = personService.queryMember(memberId);
+		Member member = personService.queryMemberInfo(memberId);
 		System.out.println("getUserName=="+member.getUserName());
 		model.addAttribute("member", member);
 		model.addAttribute("memberId", memberId);
