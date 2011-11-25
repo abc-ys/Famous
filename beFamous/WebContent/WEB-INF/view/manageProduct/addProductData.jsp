@@ -9,7 +9,7 @@
 <p class="topic">新增商品資料</p>
 <form name="fm" enctype="multipart/form-data" method="post">
 <p>上傳excel檔案:&nbsp<input type="file" name="file" size="20" /> 
-<p><input type="submit" value="確定上傳" onclick="add()"> 
+<p><input type="button" value="確定上傳" onclick="add()"> 
 </form>
 </body>
 <script type="text/javascript">

@@ -11,12 +11,19 @@ import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.ubn.befamous.entity.PrePaid;
+import com.ubn.befamous.entity.PrePaidPrice;
+import com.ubn.befamous.entity.SDCard;
+import com.ubn.befamous.entity.SDCardPrice;
 import com.ubn.befamous.service.TransactionRecordService;
 
 @Controller
@@ -32,91 +39,109 @@ public class ManageProductDataController {
 	}
 	
 	//商品管理-新增商品資料-上傳檔案
-	@RequestMapping("/handleUploadFile")
-	public ModelAndView handleUploadFile(HttpServletRequest request) throws Exception {
+		@RequestMapping("/handleUploadFile")
+		public String handleUploadFile(HttpServletRequest request) throws Exception {
+			int yourMaxMemorySize = 500 * 500* 1024;
+			File yourTempDirectory = new File("/tmp");
+			int yourMaxRequestSize = 500 * 500* 1024;
+			boolean writeToFile = true;
+			String allowedFileTypes = ".xls .xlsx";
+
+			// Check that we have a file upload request
+			boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+			System.out.println("isMultipart=" + isMultipart + "<br>");
+
+			// Create a factory for disk-based file items
+			DiskFileItemFactory factory = new DiskFileItemFactory(yourMaxMemorySize, yourTempDirectory);
+			
+			// Create a new file upload handler
+			ServletFileUpload upload = new ServletFileUpload(factory);
+
+			// Set overall request size constraint
+			upload.setSizeMax(yourMaxRequestSize);
+
+			try {
+				// Parse the request
+				List items = upload.parseRequest(request);
+
+				// Process the uploaded items
+				Iterator iter = items.iterator();
+				while (iter.hasNext()) {
+					FileItem item = (FileItem) iter.next();
+
+					if (item.isFormField()) {
+						// Process a regular form field	
+						//processFormField(item);		
+						String name = item.getFieldName();
+						String value = item.getString("UTF-8");
+						System.out.println(name + "=" + value + "<br />");
+					} else {
+						// Process a file upload
+						//processUploadedFile(item);	
+						String fieldName = item.getFieldName();
+						String fileName = item.getName();
+						System.out.println("fieldName=" + fieldName + "<br />");
+						System.out.println("fileName=" + fileName + "<br />");
+
+						if (fileName != null && !"".equals(fileName)) {
+							
+				            System.out.println("=======開始匯入Excel=========");
+					        XSSFWorkbook xb ;  
+					        //String filePath = "D:/23C34000.xlsx";        
+					        xb = new XSSFWorkbook(fileName); 
+					        XSSFSheet sheet = xb.getSheetAt(0); // 取得Excel第一個sheet(從0開始)
+					        
+					        for (int i = 1; i < sheet.getPhysicalNumberOfRows() ; i++){
+					        	XSSFRow row = sheet.getRow(i); // 取得第 i Row 
+					        	    PrePaid prepaid = new PrePaid();
+							        PrePaidPrice prepaidPrice = new PrePaidPrice();
+							        SDCard sdcard = new SDCard();
+							        SDCardPrice sdcardPrice = new SDCardPrice();
+					        	    
+					        		String productName     = row.getCell(1).toString();
+					        		String classification  = ""+(int)(row.getCell(2).getNumericCellValue());
+					        		String companyName     = row.getCell(3).toString();
+					        		String amount          = ""+(int)(row.getCell(6).getNumericCellValue());
+					        		String price           = ""+(int)(row.getCell(7).getNumericCellValue());
+					        		String specialprice    = ""+(int)(row.getCell(8).getNumericCellValue());
+					        		String reward          = ""+(int)(row.getCell(10).getNumericCellValue());
+					        		String keyword         = row.getCell(13).toString();
+					        		String introduction    = row.getCell(14).toString();
+					        		
+					        		
+					        		System.out.println("productName==>"+productName);
+					        		System.out.println("classification==>"+classification);
+					        		System.out.println("price==>"+price);
+					        		System.out.println("specialprice==>"+specialprice);
+					        		System.out.println("introduction==>"+introduction);
+					        		if("1".equals(classification)){
+					        			sdcard.setName(productName);
+					        			sdcard.setCompanyName(companyName);
+					        			sdcard.setAmount(amount);
+					        			sdcard.setKeyWord(keyword);
+					        			sdcard.setIntroduction(introduction);
+					        			
+					        			sdcardPrice.setPrice(price);
+					        			sdcardPrice.setSpecialPrice(specialprice);	
+					        		}else if("2".equals(classification)){
+					        			prepaid.setName(productName);
+					        			prepaid.setReward(reward);
+					        			prepaidPrice.setPrice(price);
+					        		}
 		
-		int yourMaxMemorySize = 500 * 500* 1024;
-		File yourTempDirectory = new File("/tmp");
-		int yourMaxRequestSize = 500 * 500* 1024;
-		boolean writeToFile = true;
-		String allowedFileTypes = ".xls .xlsx";
-
-		String saveDirectory = "C:/Users/Lucy/workspace2/test";  //存放的路徑
-
-		// Check that we have a file upload request
-		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-		System.out.println("isMultipart=" + isMultipart + "<br>");
-
-		// Create a factory for disk-based file items
-		DiskFileItemFactory factory = new DiskFileItemFactory(yourMaxMemorySize, yourTempDirectory);
-		
-		// Create a new file upload handler
-		ServletFileUpload upload = new ServletFileUpload(factory);
-
-		// Set overall request size constraint
-		upload.setSizeMax(yourMaxRequestSize);
-
-		try {
-			// Parse the request
-			List items = upload.parseRequest(request);
-
-			// Process the uploaded items
-			Iterator iter = items.iterator();
-			while (iter.hasNext()) {
-				FileItem item = (FileItem) iter.next();
-
-				if (item.isFormField()) {
-					// Process a regular form field	
-					//processFormField(item);		
-					String name = item.getFieldName();
-					String value = item.getString("UTF-8");
-					System.out.println(name + "=" + value + "<br />");
-				} else {
-					// Process a file upload
-					//processUploadedFile(item);	
-					String fieldName = item.getFieldName();
-					String fileName = item.getName();
-					String contentType = item.getContentType();
-					boolean isInMemory = item.isInMemory();
-					long sizeInBytes = item.getSize();
-					System.out.println("fieldName=" + fieldName + "<br />");
-					System.out.println("fileName=" + fileName + "<br />");
-					System.out.println("contentType=" + contentType + "<br />");
-					System.out.println("isInMemory=" + isInMemory + "<br />");
-					System.out.println("sizeInBytes=" + sizeInBytes + "<br />");
-					
-				      
-					if (fileName != null && !"".equals(fileName)) {
-						if (writeToFile) {
-							// 副檔名
-							//String formatName = fileName.substring(fileName.length() - 4,fileName.length());
-							//fileName = (formatName).toLowerCase();
-							fileName = FilenameUtils.getName(fileName);
-						      
-							System.out.println("fileName to be saved=" + fileName + "<br />");
-							String extension = FilenameUtils.getExtension(fileName);
-							if (allowedFileTypes.indexOf(extension.toLowerCase()) != -1) {
-							    File uploadedFile = new File(saveDirectory,	fileName);						
-							    item.write(uploadedFile);
-							} else {
-								System.out.println("上傳的檔案不能是" + extension + "<br />");
-							}
-						} else {
-							//InputStream uploadedStream = item.getInputStream();
-							//...
-							//uploadedStream.close();
-							// Process a file upload in memory
-							byte[] data = item.get();
-							System.out.println("data size=" + data.length + "<br />");
+					        		personService.saveProduction(classification, sdcard, sdcardPrice,prepaid,prepaidPrice);
+					        } 
+					        
+					        System.out.println("=======匯入Excel結束=========");
 						}
 					}
 				}
+			} catch (FileUploadBase.SizeLimitExceededException ex1) {
+				System.out.println("上傳檔案超過最大檔案允許大小" + yourMaxRequestSize / (1024 * 1024) + "MB !");
 			}
-		} catch (FileUploadBase.SizeLimitExceededException ex1) {
-			System.out.println("上傳檔案超過最大檔案允許大小" + yourMaxRequestSize / (1024 * 1024) + "MB !");
+			
+			return "redirect:addProductData.do";
 		}
-		return new ModelAndView("addProductData");
-	}
 	
 	//商品管理-商品類別管理
 	@RequestMapping("/manageProductCategory")

@@ -7,12 +7,12 @@
 </head>
 <body>
 ${fname}:我們不在是朋友了嗎?<br>
-<input type="button" value="不是朋友" onclick="saveDelFriend('${memberID}','${fid}')">
+<input type="button" value="不是朋友" onclick="saveDelFriend('${userID}','${fid}')">
 <input type="button" value="還是朋友" onclick="window.close()">
 </body>
 <script type="text/javascript">
 function saveDelFriend(memberId,friendId){	
-	location.href="${pageContext.request.contextPath}/saveDelFriend.do?memberID="+memberId+"friendID="+friendId;
+	location.href="${pageContext.request.contextPath}/saveDelFriend.do?userID="+memberId+"&friendID="+friendId;
 }
 </script>
 </html>

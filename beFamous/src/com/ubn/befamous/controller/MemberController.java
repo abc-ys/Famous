@@ -26,6 +26,8 @@ import javax.servlet.http.HttpServletRequest;
 import com.ubn.befamous.entity.Admin;
 import com.ubn.befamous.entity.Album;
 import com.ubn.befamous.entity.Creator;
+import com.ubn.befamous.entity.Fan;
+import com.ubn.befamous.entity.Friend;
 import com.ubn.befamous.entity.GeneralMember;
 import com.ubn.befamous.entity.GsiBonus;
 import com.ubn.befamous.entity.GsiMoney;
@@ -47,358 +49,232 @@ public class MemberController {
 	private PersonService personService;
 	
 	//創作人頁面
-	@RequestMapping("/creatorProfile")
-	public ModelAndView creatorProfile(String creatorID,Model model) {
-		System.out.println("creatorProfile---"+creatorID);
-		ArrayList list = personService.queryCreatorData(Long.parseLong(creatorID));
-		/*Creator creator = new Creator();
-		creator.setId(111);
-		creator.setPicture("images/lucy.jpg");
-		creator.setUserName("劉為駿");
-		creator.setLocation("台灣");
-		creator.setCity("台中");
-		creator.setIdentityName("樂團");
-		creator.setLikeMusicType("搖滾樂,電子音樂");
-		creator.setLikeSinger("安心亞");
-		creator.setIntroduction("我是kevin，我長得像小夫!");
-		
-		Album newAlbum = new Album();
-		newAlbum.setId(111);
-		newAlbum.setCover("image/image001.png");	
-		newAlbum.setName("aaa");
-		newAlbum.setCreator(creator);
-		newAlbum.setCreateDate("2011.10.25");
-		
-		Album[] albums={newAlbum};		
-		model.addAttribute("creator", creator);
-		model.addAttribute("newAlbum", albums);
-		*/
-		model.addAttribute("creator", list.get(0));
-		model.addAttribute("newAlbum", list.get(2));
-		
-		return new ModelAndView("creatorProfile");		
-	}		
-	
-	//創作人頁面的所有專輯tab(iframe)
-	@RequestMapping("/creatorAllAlbums")
-	public ModelAndView queryAllAlbums(long creatorID,Model model) {		
+		@RequestMapping("/creatorProfile")
+		public ModelAndView creatorProfile(long creatorID,Model model) {
+			System.out.println("creatorProfile---"+creatorID);
+			long userID =2;
+			//long userID = (Long)request.getSession().getAttribute("userID");  從session取得userID
 			
-		System.out.println("AllAlbums---"+creatorID);
-		ArrayList list = personService.queryAllCreatorAlbum(creatorID);
-		/*Creator creator = new Creator();		
-		creator.setId(creatorID);
-		creator.setUserName("lendy");	
-		
-		Album album = new Album();
-		album.setId(111);
-		album.setCover("image/image001.png");	
-		album.setName("aaa");
-		album.setCreator(creator);
-		album.setCreateDate("2011.10.25");
-	
-		Album album1 = new Album();
-		album1.setId(112);
-		album1.setCover("image/image002.png");	
-		album1.setName("bbb");
-		album1.setCreator(creator);
-		album1.setCreateDate("2011.10.24");
-		
-		Album album2 = new Album();
-		album2.setId(113);
-		album2.setCover("image/image003.png");	
-		album2.setName("bbb");
-		album2.setCreator(creator);
-		album2.setCreateDate("2011.10.24");
-		
-		Album[] albums = {album, album1, album2};	
-		
-		Song hotSong = new Song();
-		hotSong.setName("兩隻老虎");
-		hotSong.setAlbum(album);
-		
-		Song hotSong1 = new Song();
-		hotSong1.setName("一隻沒有眼睛");
-		hotSong1.setAlbum(album1);
-		
-		Song hotSong2 = new Song();
-		hotSong2.setName("一隻沒有尾巴");
-		hotSong2.setAlbum(album1);
-		
-		Song[] hotSongs = { hotSong, hotSong1, hotSong2};
-		*/
-		model.addAttribute("albumList", list.get(0));
-		model.addAttribute("songList", list.get(1));
-		return new ModelAndView("queryAllAlbums");
-	}
-	
-	//創作人頁面的最新動態tab(iframe)
-	@RequestMapping("/creatorNewActivity")
-	public ModelAndView queryCreatorRecentAction(long creatorID, Model model) {		
-		System.out.println("CreatorRecentAction---"+creatorID);
-		/*
-		Creator creator = new Creator();		
-		creator.setId(9999);
-		creator.setUserName("lendy");
-		Creator creator2 = new Creator();
-		creator2.setId(8888);
-		creator2.setUserName("KevinLiu");
-		Creator creator3 = new Creator();		
-		creator3.setId(7777);
-		creator3.setUserName("lendyLin");
-		
-		Album album = new Album();
-		album.setCover("image/image001.png");	
-		album.setName("ccc");
-		album.setCreator(creator);
-		//album.setDate("2011.10.25");
-		
-		Album album1 = new Album();
-		album1.setCover("image/image002.png");	
-		album1.setName("dddd");
-		album1.setCreator(creator2);
-		//album1.setDate("2011.10.25");
-		
-		Album album2 = new Album();
-		album2.setCover("image/image003.png");	
-		album2.setName("eeeee");
-		album2.setCreator(creator3);
-		//album2.setDate("2011.10.25");
-		
-		Album[] albums = { album, album1, album2};
-		
-		Song likeSong = new Song();
-		likeSong.setName("兩隻老虎");
-		likeSong.setAlbum(album);
-		
-		Song likeSong1 = new Song();
-		likeSong1.setName("一隻沒有眼睛");
-		likeSong1.setAlbum(album1);
-		
-		Song likeSong2 = new Song();
-		likeSong2.setName("一隻沒有尾巴");
-		likeSong2.setAlbum(album2);
-		
-		Song[] likeSongs = { likeSong, likeSong1, likeSong2};
-		
-		Song listenSong = new Song();
-		listenSong.setName("小星星");
-		listenSong.setAlbum(album);
-		
-		Song listenSong1 = new Song();
-		listenSong1.setName("一閃一閃");
-		listenSong1.setAlbum(album1);
-		
-		Song listenSong2 = new Song();
-		listenSong2.setName("亮晶晶");
-		listenSong2.setAlbum(album2);
-		
-		Song[] listenSongs = { likeSong, likeSong1, likeSong2};
-		*/
-		ArrayList list = personService.queryRecentActivity(creatorID);
-		
-		model.addAttribute("albumList", list.get(0));
-		model.addAttribute("likeSongList", list.get(1));
-		model.addAttribute("listenSongList", list.get(2));
-		return new ModelAndView("queryCreatorRecentAction");
-	}
-	
-	//創作人頁面的好友與粉絲tab(iframe)
-	@RequestMapping("/creatorAllFriendsFans")
-	public ModelAndView queryFriendsFans(long creatorID,Model model) {		
-		
-		System.out.println("FriendsFans---"+creatorID);
-		/*
-		Member friend = new Member();
-		friend.setUserName("aaa");
-		friend.setIdentityName("一般會員");
-		friend.setId(001);
-		friend.setPicture("images/title_01.gif");
-		
-		Member friend1 = new Member();
-		friend1.setUserName("bbb");
-		friend1.setIdentityName("創作人");
-		friend1.setId(002);
-		friend1.setPicture("images/title_01.gif");
-		
-		Member friend2 = new Member();
-		friend2.setUserName("ccc");
-		friend2.setIdentityName("一般會員");
-		friend2.setId(003);
-		friend2.setPicture("images/title_01.gif");
-		
-		Member friend3 = new Member();
-		friend3.setUserName("ddd");
-		friend3.setIdentityName("創作人");
-		friend3.setId(004);
-		friend3.setPicture("images/title_01.gif");
-		
-		Member[] friends = {friend, friend1, friend2, friend3};
-		
-		Member fan = new Member();
-		fan.setUserName("aaaa");
-		fan.setId(104);
-		fan.setPicture("images/title_01.gif");
-		
-		Member fan1 = new Member();
-		fan1.setUserName("bbbb");
-		fan1.setId(105);
-		fan1.setPicture("images/title_01.gif");
-		
-		Member fan2 = new Member();
-		fan2.setUserName("cccc");
-		fan2.setId(106);
-		fan2.setPicture("images/title_01.gif");
-		
-		Member fan3 = new Member();
-		fan3.setUserName("dddd");
-		fan3.setId(107);
-		fan3.setPicture("images/title_01.gif");
-		
-		Member[] fans = {fan, fan1, fan2, fan3};
-		*/
-		ArrayList list = personService.queryFriendFans(creatorID);
-		model.addAttribute("friendList", list.get(0));
-		model.addAttribute("fanList", list.get(1));
+			ArrayList list = personService.queryCreatorData(creatorID);
+			Creator creator = (Creator)list.get(0);
 			
-		return new ModelAndView("queryFriendsFans");
-	}
-
-	//一般會員頁面
-	@RequestMapping("/memberProfile")
-	public ModelAndView memberProfile(String memberID,Model model) {
-		System.out.println("memberProfile==>"+memberID);
-		Member member = new Member();
-		member.setId(111);
-		member.setPicture("images/lucy.jpg");
-		member.setUserName("劉為駿");
-		member.setLocation("台灣");
-		member.setCity("台中");
-		member.setIntroduction("我是kevin，我長得像小夫!");	
-		model.addAttribute("member", member);			
-		return new ModelAndView("memberProfile");			
-	}
-	
-	//一般會員頁面的最新動態tab(iframe)
-	@RequestMapping("/memberNewActivity")
-	public ModelAndView queryMemberRecentAction(String memberID,Model model) {		
-		System.out.println("MemberRecentAction---"+memberID);
+			//GeneralMember user = personService.queryMemberData(userID);  //user
+			Friend[] arFriend = personService.queryFriend(userID);//user
+			Fan[] arFan = personService.queryFans(userID,creatorID);//user
+			//Fan[] arFan =  (Fan[])FansList.get(1);
+			boolean isFan = false;
+			//判斷是否已加入粉絲
+			for(Fan f : arFan){
+				if(f.getMember().getId() == userID){
+					isFan = true;
+					break;
+				}
+			}
 		
-		Creator creator = new Creator();		
-		creator.setId(1111);
-		creator.setUserName("lendy");
-		Creator creator2 = new Creator();
-		creator2.setId(1111);
-		creator2.setUserName("KevinLiu");
-		Creator creator3 = new Creator();		
-		creator3.setId(1111);
-		creator3.setUserName("lendyLin");
+			boolean isFriend = false;
+			//判斷是否已加入好友
+			for(Friend f : arFriend){
+				System.out.println("1111111111111===>"+f.getInviter().getId());
+				System.out.println("2222222222222===>"+creator.getId());
+				if(f.getFriend().getId() == creator.getId()){
+					isFriend = true;
+					break;
+				}
+			}
+			model.addAttribute("isFan", isFan);
+			model.addAttribute("isFriend", isFriend);	
+			model.addAttribute("creator", creator);
+			model.addAttribute("newAlbum", list.get(2));
+			
+			return new ModelAndView("creatorProfile");		
+		}		
 		
-		Album album = new Album();
-		album.setCover("image/image001.png");	
-		album.setName("ccc");
-		album.setCreator(creator);
-		//album.setDate("2011.10.25");
-		
-		Album album1 = new Album();
-		album1.setCover("image/image002.png");	
-		album1.setName("dddd");
-		album1.setCreator(creator2);
-		//album1.setDate("2011.10.25");
-		
-		Album album2 = new Album();
-		album2.setCover("image/image003.png");	
-		album2.setName("eeeee");
-		album2.setCreator(creator3);
-		//album2.setDate("2011.10.25");
-		
-		Album[] albums = { album, album1, album2};
-		
-		Song likeSong = new Song();
-		likeSong.setName("兩隻老虎");
-		likeSong.setAlbum(album);
-		
-		Song likeSong1 = new Song();
-		likeSong1.setName("一隻沒有眼睛");
-		likeSong1.setAlbum(album1);
-		
-		Song likeSong2 = new Song();
-		likeSong2.setName("一隻沒有尾巴");
-		likeSong2.setAlbum(album2);
-		
-		Song[] likeSongs = { likeSong, likeSong1, likeSong2};
-		
-		Song listenSong = new Song();
-		listenSong.setName("小星星");
-		listenSong.setAlbum(album);
-		
-		Song listenSong1 = new Song();
-		listenSong1.setName("一閃一閃");
-		listenSong1.setAlbum(album1);
-		
-		Song listenSong2 = new Song();
-		listenSong2.setName("亮晶晶");
-		listenSong2.setAlbum(album2);
-		
-		Song[] listenSongs = { likeSong, likeSong1, likeSong2};
+		//創作人頁面的所有專輯tab(iframe)
+		@RequestMapping("/creatorAllAlbums")
+		public ModelAndView queryAllAlbums(long creatorID,Model model) {		
 				
-		model.addAttribute("albumList", albums);
-		model.addAttribute("likeSongList", likeSongs);
-		model.addAttribute("listenSongList", listenSongs);
-		return new ModelAndView("queryMemberRecentAction");
-	}
-
-	//一般會員頁面的好友與喜愛創作人tab(iframe)
-	@RequestMapping("/memberAllFriendsCreators")
-	public ModelAndView queryFriendsCreators(String memberID,Model model) {		
-		System.out.println("AllFriendsCreators---"+memberID);
+			System.out.println("AllAlbums---"+creatorID);
+			ArrayList list = personService.queryAllCreatorAlbum(creatorID);
+			model.addAttribute("albumList", list.get(0));
+			model.addAttribute("songList", list.get(1));
+			return new ModelAndView("queryAllAlbums");
+		}
 		
-		Member friend = new Member();
-		friend.setUserName("aaa");
-		friend.setId(001);
-		friend.setPicture("images/title_01.gif");
-		
-		Member friend1 = new Member();
-		friend1.setUserName("bbb");
-		friend1.setId(002);
-		friend1.setPicture("images/title_01.gif");
-		
-		Member friend2 = new Member();
-		friend2.setUserName("ccc");
-		friend2.setId(003);
-		friend2.setPicture("images/title_01.gif");
-		Member friend3 = new Member();
-		friend3.setUserName("ddd");
-		friend3.setId(004);
-		friend3.setPicture("images/title_01.gif");
-		
-		Member[] friends = {friend, friend1, friend2, friend3};
-		
-		Member creator = new Member();
-		creator.setUserName("aaaa");
-		creator.setId(105);
-		creator.setPicture("images/title_01.gif");
-		
-		Member creator1 = new Member();
-		creator1.setUserName("bbbb");
-		creator1.setId(106);
-		creator1.setPicture("images/title_01.gif");
-		
-		Member creator2 = new Member();
-		creator2.setUserName("cccc");
-		creator2.setId(107);
-		creator2.setPicture("images/title_01.gif");
-		
-		Member creator3 = new Member();
-		creator3.setUserName("dddd");
-		creator3.setId(108);
-		creator3.setPicture("images/title_01.gif");
-		
-		Member[] creators = {creator, creator1, creator2, creator3};
+		//創作人頁面的最新動態tab(iframe)
+		@RequestMapping("/creatorNewActivity")
+		public ModelAndView queryCreatorRecentAction(long creatorID, Model model) {		
+			System.out.println("CreatorRecentAction---"+creatorID);
 			
-		model.addAttribute("friendList", friends);
-		model.addAttribute("creatorList", creators);
-		return new ModelAndView("queryFriendsCreators");
-	}
+			ArrayList list = personService.queryRecentActivity(creatorID);
+			
+			model.addAttribute("albumList", list.get(0));
+			model.addAttribute("likeSongList", list.get(1));
+			model.addAttribute("listenSongList", list.get(2));
+			return new ModelAndView("queryCreatorRecentAction");
+		}
+		
+		//創作人頁面的好友與粉絲tab(iframe)
+		@RequestMapping("/creatorAllFriendsFans")
+		public ModelAndView queryFriendsFans(long creatorID,Model model) {		
+			
+			System.out.println("FriendsFans---"+creatorID);
+			
+			ArrayList list = personService.queryFriendFans(creatorID);
+			model.addAttribute("friendList", list.get(0));
+			model.addAttribute("fanList", list.get(1));
+				
+			return new ModelAndView("queryFriendsFans");
+		}
+
+		//一般會員頁面
+		@RequestMapping("/memberProfile")
+		public ModelAndView memberProfile(long memberID,Model model) {
+			System.out.println("memberProfile==>"+memberID);
+			long userID =3;
+			//long userID = (Long)request.getSession().getAttribute("userID");  從session取得userID
+			
+			GeneralMember member = personService.queryMemberData(memberID); //會員
+			GeneralMember member2 = personService.queryMemberData(userID);  //user
+			Set<Friend> FriendSet = member.getFriend();
+			Friend[] arFriend = personService.queryFriend(userID);
+			boolean isFriend = false;
+			//判斷是否已加入好友
+			for(Friend f : arFriend){
+				if(f.getFriend().getId() == member.getId()){
+					isFriend = true;
+					break;
+				}
+			}
+			model.addAttribute("isFriend", isFriend);	
+			model.addAttribute("GeneralMember", member);	
+			model.addAttribute("FriendSet", FriendSet);	
+			return new ModelAndView("memberProfile");			
+		}
+		
+		//一般會員頁面的最新動態tab(iframe)
+		@RequestMapping("/memberNewActivity")
+		public ModelAndView queryMemberRecentAction(long memberID,Model model) {		
+			System.out.println("MemberRecentAction---"+memberID);
+			/*
+			Creator creator = new Creator();		
+			creator.setId(1111);
+			creator.setUserName("lendy");
+			Creator creator2 = new Creator();
+			creator2.setId(1111);
+			creator2.setUserName("KevinLiu");
+			Creator creator3 = new Creator();		
+			creator3.setId(1111);
+			creator3.setUserName("lendyLin");
+			
+			Album album = new Album();
+			album.setCover("image/image001.png");	
+			album.setName("ccc");
+			album.setCreator(creator);
+			//album.setDate("2011.10.25");
+			
+			Album album1 = new Album();
+			album1.setCover("image/image002.png");	
+			album1.setName("dddd");
+			album1.setCreator(creator2);
+			//album1.setDate("2011.10.25");
+			
+			Album album2 = new Album();
+			album2.setCover("image/image003.png");	
+			album2.setName("eeeee");
+			album2.setCreator(creator3);
+			//album2.setDate("2011.10.25");
+			
+			Album[] albums = { album, album1, album2};
+			
+			Song likeSong = new Song();
+			likeSong.setName("兩隻老虎");
+			likeSong.setAlbum(album);
+			
+			Song likeSong1 = new Song();
+			likeSong1.setName("一隻沒有眼睛");
+			likeSong1.setAlbum(album1);
+			
+			Song likeSong2 = new Song();
+			likeSong2.setName("一隻沒有尾巴");
+			likeSong2.setAlbum(album2);
+			
+			Song[] likeSongs = { likeSong, likeSong1, likeSong2};
+			
+			Song listenSong = new Song();
+			listenSong.setName("小星星");
+			listenSong.setAlbum(album);
+			
+			Song listenSong1 = new Song();
+			listenSong1.setName("一閃一閃");
+			listenSong1.setAlbum(album1);
+			
+			Song listenSong2 = new Song();
+			listenSong2.setName("亮晶晶");
+			listenSong2.setAlbum(album2);
+			
+			Song[] listenSongs = { likeSong, likeSong1, likeSong2};
+					*/
+			ArrayList list = personService.queryMemberRecentAction(memberID);
+			model.addAttribute("albumList", list.get(0));
+			model.addAttribute("likeSongList", list.get(1));
+			model.addAttribute("listenSongList", list.get(2));
+			return new ModelAndView("queryMemberRecentAction");
+		}
+
+		//一般會員頁面的好友與喜愛創作人tab(iframe)
+		@RequestMapping("/memberAllFriendsCreators")
+		public ModelAndView queryFriendsCreators(String memberID,Model model) {		
+			System.out.println("AllFriendsCreators---"+memberID);
+			
+		/*	Member friend = new Member();
+			friend.setUserName("aaa");
+			friend.setId(001);
+			friend.setPicture("images/title_01.gif");
+			
+			Member friend1 = new Member();
+			friend1.setUserName("bbb");
+			friend1.setId(002);
+			friend1.setPicture("images/title_01.gif");
+			
+			Member friend2 = new Member();
+			friend2.setUserName("ccc");
+			friend2.setId(003);
+			friend2.setPicture("images/title_01.gif");
+			Member friend3 = new Member();
+			friend3.setUserName("ddd");
+			friend3.setId(004);
+			friend3.setPicture("images/title_01.gif");
+			
+			Member[] friends = {friend, friend1, friend2, friend3};
+			
+			Member creator = new Member();
+			creator.setUserName("aaaa");
+			creator.setId(105);
+			creator.setPicture("images/title_01.gif");
+			
+			Member creator1 = new Member();
+			creator1.setUserName("bbbb");
+			creator1.setId(106);
+			creator1.setPicture("images/title_01.gif");
+			
+			Member creator2 = new Member();
+			creator2.setUserName("cccc");
+			creator2.setId(107);
+			creator2.setPicture("images/title_01.gif");
+			
+			Member creator3 = new Member();
+			creator3.setUserName("dddd");
+			creator3.setId(108);
+			creator3.setPicture("images/title_01.gif");
+			
+			Member[] creators = {creator, creator1, creator2, creator3};
+				*/
+			ArrayList list= personService.queryFriendsCreators(4);  //member
+			
+			model.addAttribute("friendList", list.get(0));
+			model.addAttribute("creatorList", list.get(1));
+			return new ModelAndView("queryFriendsCreators");
+		}
 
 	//個人資料編輯頁(傳入參數"userID"待新增!!!)
 		@RequestMapping("/editMemberData")

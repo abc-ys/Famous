@@ -40,7 +40,7 @@ import com.ubn.befamous.service.PersonService;
 public class BannerController {
 	
 	@Autowired
-	 PersonService personService;
+	private PersonService personService;
 	
 	//Kevin
 	String account = "kevin@ubn.net";
@@ -49,10 +49,12 @@ public class BannerController {
 	public ModelAndView forwardAddBanner() {
 		ModelAndView mav = new ModelAndView("forwardAddBanner");
 		//取得創做人ID from session 
-		
+		/*
 		AdType adType = new AdType();
 		adType.setAdTypeName("我");
 		AdType[] arAdType = {adType};
+		*/
+		AdType[] arAdType = personService.getAdType();
 		mav.addObject("memberID", account);
 		mav.addObject("arAdType", arAdType);
 		return mav;
@@ -62,10 +64,14 @@ public class BannerController {
 	
 	//處理上傳
 	@RequestMapping(value = "/saveBanner")
-	public ModelAndView uploadBanner(HttpServletRequest request, Ad ad) {
+	public ModelAndView uploadBanner(HttpServletRequest request) {
 		
+		Ad ad = new Ad();
 		System.out.println("活動內容0===>"+ad.getWebsite());
 		System.out.println("活動內容===>"+ad.getActivityContent());
+		long bannerTypeId = 0;
+		
+		
 		int buffersize = 4096;
 		int SizeMax = 20 * 1024 * 1024;// 1Mbyte最大檔案大小
 		String allowedFileTypes = "gif|jpg|png";
@@ -117,6 +123,15 @@ public class BannerController {
 				String name = item.getFieldName();
 				String value = item.getString("UTF-8");
 				System.out.println(name + "=" + value + "<br />");
+				if(name.equals("dep")){
+					bannerTypeId = Long.parseLong(value);
+				}
+				if(name.equals("activityName")) ad.setActivityName(value);
+				if(name.equals("activityStartDate")) ad.setActivityStartDate(value);
+				if(name.equals("activityEndDate")) ad.setActivityEndDate(value);
+				if(name.equals("website")) ad.setWebsite(value);
+				if(name.equals("activityContent")) ad.setActivityContent(value);
+				
 			} else {
 				String fileName = item.getName();
 			}
@@ -144,6 +159,10 @@ public class BannerController {
      }catch(Exception e){
     	 
      }
+     
+     personService.saveAd(4, bannerTypeId, ad);
+     
+     
 		return new ModelAndView("saveBanner");
 		
 	}

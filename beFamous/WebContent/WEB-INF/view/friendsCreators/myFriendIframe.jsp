@@ -10,9 +10,9 @@
 
 <table name=friends>
 		<c:forEach var="hm2" items="${friends}">
-	 	<td><img alt="" src=${hm2.picture}  width="50"　height="20"></img></td>
-	 	<td width="100"><a href="javascript:void(0)" onclick="identity('${hm2.identityName}','${hm2.memberId}')">${hm2.userName}</a></td>
-	 	<td><input type="button" value="刪除" onclick="confirmDelFriend('${memberID}','${hm2.memberId}')"></td><tr>
+	 	<td><img alt="" src="${hm2.friend.picture}"  width="50"　height="20"></img></td>
+	 	<td width="100"><a href="javascript:void(0)" onclick="identity('${hm2.friend.identityName}','${hm2.friend.id}')">${hm2.friend.userName}</a></td>
+	 	<td><input type="button" value="刪除" onclick="confirmDelFriend('${userID}','${hm2.friend.id}')"></td><tr>
 	 	</c:forEach> 
 	</table>
 </body>
@@ -26,7 +26,7 @@ function identity(identityName,memberId)
 	}
 }
 function confirmDelFriend(memberId,friendId){
-	window.open("${pageContext.request.contextPath}/confirmDelFriend.do?memberID="+memberId+"friendID="+friendId,'son','height=300,width=300,location=no,scrollbars=no,toolbar=no,directories=no,menubar=no,directories=no,status=no,titlebar=no');
+	window.open("${pageContext.request.contextPath}/confirmDelFriend.do?userID="+memberId+"&friendID="+friendId,'son','height=300,width=300,location=no,scrollbars=no,toolbar=no,directories=no,menubar=no,directories=no,status=no,titlebar=no');
 }
 </script>
 </html>

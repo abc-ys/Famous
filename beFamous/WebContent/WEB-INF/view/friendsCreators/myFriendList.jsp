@@ -11,14 +11,14 @@
 	<table name=unfriends>
 		<h4>待確認清單</h4>
 		<c:forEach var="hm" items="${unfriends}">
-	 	<td><img alt="" src=${hm.picture}  width="50"　height="20"></img></td>
-	 	<td width="100"><a href="javascript:void(0)" onclick="identity('${hm.identityName}','${hm.memberId}')">${hm.userName}</a></td>
-	 	<td><input type="button" value="接受邀請" onclick="acceptInvite('${memberID}','${hm.memberId}')"> &nbsp&nbsp <input type="button" value="忽略" onclick="refuseInvite('${memberID}','${hm.memberId}')"></td>
+	 	<td><img alt="" src="/${initParam.ImageWeb}/${hm.friend.picture}"  width="50"　height="20"></img></td>
+	 	<td width="100"><a href="javascript:void(0)" onclick="identity('${hm.friend.identityName}','${hm.friend.id}')">${hm.friend.userName}</a></td>
+	 	<td><input type="button" value="接受邀請" onclick="acceptInvite('${userID}','${hm.friend.id}')"> &nbsp;&nbsp; <input type="button" value="忽略" onclick="refuseInvite('${userID}','${hm.friend.id}')"></td>
 		</c:forEach> 
 	</table>
 	<hr />
 	<div id="myFriendIframe" style="display:block">
-	 		<iframe name="myFriendIframe" src="${pageContext.request.contextPath}/myFriendIframe.do?memberID=${memberID}" height="1000" width="740" frameborder="0"></iframe> 
+	 		<iframe name="myFriendIframe" src="${pageContext.request.contextPath}/myFriendIframe.do?userID=${userID}" height="1000" width="740" frameborder="0"></iframe> 
 	</div>	
 	
 </body>
@@ -32,10 +32,10 @@ function identity(identityName,memberId)
 	}
 }
 function acceptInvite(memberId,friendId){
-	location.href="${pageContext.request.contextPath}/acceptFriend.do?memberID="+memberId+"friendID="+friendId;
+	location.href="${pageContext.request.contextPath}/acceptFriend.do?userID="+memberId+"&friendID="+friendId;
 }
 function refuseInvite(memberId,friendId){
-	location.href="${pageContext.request.contextPath}/refuseFriend.do?memberID="+memberId+"friendID="+friendId;
+	location.href="${pageContext.request.contextPath}/refuseFriend.do?userID="+memberId+"&friendID="+friendId;
 }
 </script>
 </html>

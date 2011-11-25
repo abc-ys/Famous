@@ -11,14 +11,14 @@
 <table width="730" border="0">
 	<h4>好友圈(${fn:length(friendList)})</h4>
 	<c:forEach var="hm" items="${friendList}">
- 	<td><img alt="" src=${hm.picture}  width="50"　height="20"></img><br><a href="javascript:void(0)" onclick="identity('${hm.identityName}','${hm.memberId}')">${hm.userName}</a></td>
+ 	<td><img alt="" src="/${initParam.ImageWeb}/${hm.friend.picture}"  width="50"　height="20"></img><br><a href="javascript:void(0)" onclick="identity('${hm.friend.identityName}','${hm.friend.id}')">${hm.friend.userName}</a></td>
  	</c:forEach> 
 </table>
 <br>
 <table width="730" border="0">
 	<h4>追蹤中創作人(${fn:length(creatorList)})</h4>
 	<c:forEach var="hm2" items="${creatorList}">
-	<td><img alt="" src=${hm2.picture}  width="50"　height="20"></img><br><a href="javascript:void(0)" onclick="identity('${hm2.identityName}','${hm2.memberId}')">${hm2.userName}</a></td>
+	<td><img alt="" src="/${initParam.ImageWeb}/${hm2.friend.picture}"  width="50"　height="20"></img><br><a href="javascript:void(0)" onclick="identity('${hm2.creatorLiked.identityName}','${hm2.creatorLiked.id}')">${hm2.creatorLiked.userName}</a></td>
 	</c:forEach>
 </table>
 </body>

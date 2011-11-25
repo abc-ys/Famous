@@ -14,11 +14,12 @@
  
  <form name="pdfForm" action="${pageContext.request.contextPath}/saveBanner.do" enctype="multipart/form-data" method="post">
  <p>會員帳號:<input type="text" name="memberID" value="${memberID}">
+   <input type="button" value="變更帳號" onclick="modifyMemberId('${memberID}')">
  </p>
  <p>banner類別:
  <select name="dep">
  <c:forEach items="${arAdType}" var="adType">
-<option value="${adType.adTypeName}">${adType.adTypeName}</option>
+<option value="${adType.id}">${adType.adTypeName}</option>
 </c:forEach>
 </select>
 </p>

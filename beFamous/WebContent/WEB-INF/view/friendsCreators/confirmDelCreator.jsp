@@ -7,12 +7,12 @@
 </head>
 <body>
 ${cname}你不再支持我了嗎?<br>
-<input type="button" value="對，不想" onclick="saveDelCreator('${memberID}','${cid}')">
+<input type="button" value="對，不想" onclick="saveDelCreator('${userID}','${cid}')">
 <input type="button" value="繼續支持" onclick="window.close()">
 </body>
 <script type="text/javascript">
 function saveDelCreator(memberId,creatorId){	
-	location.href="${pageContext.request.contextPath}/saveDelCreator.do?memberID="+memberId+"creatorID="+creatorId;
+	location.href="${pageContext.request.contextPath}/saveDelCreator/"+memberId+"/"+creatorId+".do";
 }
 </script>
 </html>

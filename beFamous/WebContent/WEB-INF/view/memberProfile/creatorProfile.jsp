@@ -13,11 +13,11 @@ pageEncoding="UTF-8"%>
 <body>
 <table width="1000" border="1" cellspacing="2" align=center rules="none"> 
 	<td height="270" width="200">
-		<img alt="" src="${creator.picture}" width="200"　height="100" >
+		<img alt="" src="/${initParam.ImageWeb}/${creator.picture}" width="200"　height="100" >
 	</td>
 	<td width="300">
 		<form name="form">	
-			<h2>${creator.userName}<input type="submit" value="讚"></h2>
+			<h2>${creator.userName}<input type="button" value="讚"></h2>
 			<h4>創作人基本資料</h4>
 			${creator.location}, ${creator.city}<br>
 			身份:${creator.identityName}<br>
@@ -31,10 +31,14 @@ pageEncoding="UTF-8"%>
 		<h4>推薦你如果你喜歡</h4>
 			${creator.likeSinger}<br>
 			<br><br>
-		<form name="form">    
-	
-		<input type="submit" value="加入粉絲團">
-		<input type="submit" value="加為好友">
+		<form name="form" method="post">    
+	    <c:if test="${isFan==false}">
+		   <div id="fanSize"> <input type="button" name="111" value="加入粉絲團"  onclick="addFan('${creator.id}');"></div>
+		</c:if>
+		<c:if test="${isFriend==false}">
+		    <div id="friendSize"><input type="button" name="222" value="加為好友" onclick="addFriend('${creator.id}');"></div>
+		</c:if>
+		
 		</form>
 	</td>
 	<td width="250">
@@ -81,6 +85,39 @@ pageEncoding="UTF-8"%>
  	</table>
 </body>
 <script type="text/javascript">
+
+
+function addFan(addMemberid){
+	$.ajax({
+		url: '${pageContext.request.contextPath}/addFan.do' ,
+        data:{"memberID":addMemberid},
+		type: 'post',
+		error: function(xhr) {},
+		success: function(response) {
+			$("#fanSize").hide();
+			alert('加入粉絲團成功!');
+			//location.reload();
+			
+		}
+	});
+	
+}
+
+function addFriend(addMemberid){
+	$.ajax({
+		url: '${pageContext.request.contextPath}/addCreatorFriend.do' ,
+        data:{"memberID":addMemberid},
+		type: 'post',
+		error: function(xhr) {},
+		success: function(response) {
+			$("#friendSize").hide();
+			alert('加入好友成功!');
+			//location.reload();
+		}
+	});
+	
+}
+
 function display(divname){
 	if(divname=='creatorAllAlbums'){
 		$("#creatorAllAlbums").toggle();
