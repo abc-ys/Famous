@@ -6,11 +6,12 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
-<form name="form">
+<form name="form" method="post">
 	<h4>停權理由</h4><tr>
 	請填入停權理由:
 	<textarea rows="6" cols="40" name="reason" id="reason"></textarea><tr><tr>	
 	<input type="button" value="送出" onclick="saveModification()"><tr>
+	<input type="hidden" name="statusName" id="statusName" value=停權><tr>
 	<input type="hidden" name="adminId" id="adminId" value=${admin}><tr>		
 	<input type="hidden" name="memberId" id="memberId" value=${memberId}><tr>		
 </form>
