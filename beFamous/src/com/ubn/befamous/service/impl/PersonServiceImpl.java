@@ -171,6 +171,7 @@ public class PersonServiceImpl implements PersonService{
 	public void addFriend(long addMemberID ,long userID,String message){
 		String pattern = "yyyy-MM-dd";
 		String inviteDate = DateFormatUtils.format(new Date(), pattern);
+		String createDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
 		Member memberUser = (Member) memberDAO.find(userID);
 		Member memberAddMember = (Member) memberDAO.find(addMemberID);
 		
@@ -178,7 +179,9 @@ public class PersonServiceImpl implements PersonService{
 		Set<Friend> setFriend = new HashSet<Friend>();
 		friend.setInviter(memberUser);
 		friend.setFriend(memberAddMember);
-		friend.setInviteDate(inviteDate);
+		friend.setInviteDate(createDate);
+		friend.setCreateDate(createDate);
+		friend.setCreateUser(String.valueOf(userID));
 		setFriend.add(friend);
 		memberUser.setFriend(setFriend);
 		memberAddMember.setFriend(setFriend);
@@ -545,32 +548,43 @@ public class PersonServiceImpl implements PersonService{
 	 * @param prepaid
 	 * @param prePaidPrice
 	 */
-	public void saveProduction(String classification , SDCard sdcard, SDCardPrice sdcardPrice,
+	@Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
+	public void saveProduction(String userID,String classification , SDCard sdcard, SDCardPrice sdcardPrice,
 			PrePaid prepaid,PrePaidPrice prePaidPrice){
 		
 		//ProductionClassification pp = new ProductionClassification();
 		//pp.setName("PrePaid");
 		//productionClassificationDAO.save(pp);
+		String createDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
 		ProductionClassification pp = productionClassificationDAO.find(Long.parseLong(classification));
+		Set<ProductionCategory> productionCategorySet = new HashSet<ProductionCategory>();
 		if("1".equals(classification)){
 			
-			Set<SDCard> SDCardSet = new HashSet<SDCard>();
-			SDCardSet.add(sdcard);
-			
-			pp.setSdCard(SDCardSet);
+			productionCategorySet.add(sdcard);
+			//Set<SDCard> SDCardSet = new HashSet<SDCard>();
+			//SDCardSet.add(sdcard);
+			pp.setProductionCategory(productionCategorySet);
+			//pp.setSdCard(SDCardSet);
 			sdcard.setProductionClassification(pp);
-			
+			sdcard.setCreateDate(createDate);
+			sdcard.setCreateUser(userID);
 			sdcard.setSdCardPrice(sdcardPrice);
+			sdcardPrice.setCreateDate(createDate);
+			sdcardPrice.setCreateUser(userID);
 			sdCardPriceDAO.save(sdcardPrice);
 			sdCardDAO.save(sdcard);		
 		}else if("2".equals(classification)){
 			
-			Set<PrePaid> PrePaidSet = new HashSet<PrePaid>();
-			PrePaidSet.add(prepaid);
-			
-			pp.setPrePaid(PrePaidSet);
+			//Set<PrePaid> PrePaidSet = new HashSet<PrePaid>();
+			//PrePaidSet.add(prepaid);
+			productionCategorySet.add(prepaid);
+			pp.setProductionCategory(productionCategorySet);
 			prepaid.setProductionClassification(pp);
 			prepaid.setPrePaidPrice(prePaidPrice);
+			prepaid.setCreateUser(userID);
+			prepaid.setCreateDate(createDate);
+			prePaidPrice.setCreateDate(createDate);
+			prePaidPrice.setCreateUser(userID);
 			prePaidPriceDAO.save(prePaidPrice);
 			prePaidDAO.save(prepaid);
 		}
