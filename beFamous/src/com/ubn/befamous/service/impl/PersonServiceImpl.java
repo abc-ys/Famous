@@ -183,8 +183,8 @@ public class PersonServiceImpl implements PersonService{
 		friend.setCreateDate(createDate);
 		friend.setCreateUser(String.valueOf(userID));
 		setFriend.add(friend);
-		memberUser.setFriend(setFriend);
-		memberAddMember.setFriend(setFriend);
+		//memberUser.setFriend(setFriend);
+		//memberAddMember.setFriend(setFriend);
 		friendDAO.save(friend);
 		
 		//System.out.println("member birthday1=>"+memberUser.getBirthday());
@@ -202,8 +202,10 @@ public class PersonServiceImpl implements PersonService{
 		
 		//1. 好友清單
 		GeneralMember member = (GeneralMember) generalMemberDAO.find(userID);
-		Set<Friend> FriendSet = member.getFriend();
-		Friend[] arFriend = FriendSet.toArray(new Friend[FriendSet.size()]);
+		//Set<Friend> FriendSet = member.getFriend();
+		//Friend[] arFriend = FriendSet.toArray(new Friend[FriendSet.size()]);
+		Friend[] arFriend = this.queryFriend(userID);
+		
 		
 		//2.追蹤中的創作人清單
 		Set<LikeCreator> LikeCreatorSet = member.getLikeCreator();
