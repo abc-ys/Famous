@@ -7,6 +7,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -206,64 +207,11 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 			return shoppingCartDetail;
 		}
 
-		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-		public ShoppingCartDetail[] deleteShoppingCart(long userId, long transactionId) {
-			this.shoppingCartDetailDAO.delete(transactionId);
-			ShoppingCartDetail[] shoppingCartDetail = this.queryShoppingCart(userId); 		 
-			return shoppingCartDetail;
-		}
 
 		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 		public ShoppingCartDetail[] forwardPurchase(long userId) {
 			ShoppingCartDetail[] shoppingCartDetail = this.queryShoppingCart(userId); 		 
 			return shoppingCartDetail;
-		}
-
-		//確認購買，轉成訂單!
-		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-		public void purchaseConfirm(long shoppingCartId, String gsiMoney, String gsiBonus) {
-			
-			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
-			
-			ShoppingCart s = this.shoppingCartDAO.find(shoppingCartId);
-			Set<ShoppingCartDetail> detailSet = s.getShoppingCartDetail();
-			Member member = s.getMember();
-			
-			Order order = new Order();
-			order.setMember(member);
-			order.setCreateDate(date);
-			order.setPayDate(date);
-			order.setPurchaseDate(date);
-			order.setBillDate(date);
-			order.setHandleStatus("1");
-			order.setPayStatus("1");
-			order.setPayMethod("1");
-			this.orderDAO.save(order);
-			
-			for (ShoppingCartDetail od:detailSet) {
-				
-				OrderDetail orderDetail = new OrderDetail();			
-				orderDetail.setOrder(order);
-				orderDetail.setAmount("1");
-				orderDetail.setProductionCategory(od.getProductionCategory());
-				orderDetail.setGsiMoney(gsiMoney);
-				orderDetail.setGsiBonus(gsiBonus);
-			
-			this.orderDetailDAO.save(orderDetail);
-			}
-			
-			GsiMoney gm = new GsiMoney();
-			gm.setCreateDate(date);
-			gm.setMember(member);
-			gm.setOutgo(gsiMoney);
-			this.gsiMoneyDAO.save(gm);
-			
-			GsiBonus gb = new GsiBonus();
-			gb.setCreateDate(date);
-			gb.setMember(member);
-			gb.setPurchase(gsiBonus);
-			this.gsiBonusDAO.save(gb);
-			
 		}
 
 
@@ -1508,7 +1456,22 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 		}
 		
 		//儲值轉訂單
-		public Order purchasePrepaid(PrePaid prePaid,Order order){
+		public Order purchasePrepaid(long userID,PrePaid prePaid,Order order){
+			String createDate = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
+			Query query = this.sessionFactory.getCurrentSession().createQuery("from GsiMoney g where g.member.id =:v1 order by g.id desc");
+			query.setParameter("v1", userID);
+			List<GsiMoney> gsiMoneyList = (List<GsiMoney>)query.list();	
+			GsiMoney gsiMoney = new GsiMoney();
+			if(gsiMoneyList.size()>0){
+				gsiMoney = gsiMoneyList.get(0);
+			}
+			gsiMoney.setCreateDate(createDate);
+			gsiMoney.setOutgo(prePaid.getPrePaidPrice().getPrice());
+			int totalPrice = Integer.valueOf(prePaid.getPrePaidPrice().getPrice());
+			String balance = String.valueOf(Integer.valueOf(gsiMoney.getBalance()) - totalPrice) ;
+			gsiMoney.setBalance(balance);
+			gsiMoneyDAO.save(gsiMoney);
+			
 			
 			OrderDetail detail = new OrderDetail();
 			detail.setProductionCategory(prePaid);
@@ -1524,7 +1487,9 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 
 		//SD卡轉訂單
 		public Order purchaseSDCard(SDCard adCard,Order order,String amount){
-				
+			String createDate = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
+			//GsiMoney[] arGsiMoney = gsiMoneyList.toArray(new GsiMoney[gsiMoneyList.size()]);
+			
 			OrderDetail detail = new OrderDetail();
 			detail.setAmount(amount);
 			detail.setProductionCategory(adCard);
@@ -1533,7 +1498,7 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 			detailSet.add(detail);
 				
 			order.setOrderDetail(detailSet);
-				
+		    order.setCreateDate(createDate);
 			orderDAO.save(order);
 			return order;
 		}
@@ -1542,26 +1507,34 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 		/**
 		 * 第二步:加入購物車*/
 		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-		public ArrayList addMusicShoppingCart(long userId, long productId) {
+		public ArrayList addMusicShoppingCart(long userId, long productId,String useBonus) {
 			
-			
+			Query query = this.sessionFactory.getCurrentSession().createQuery("from ShoppingCart s where s.member.id = :userID and s.dropDate is null");
+			query.setLong("userID", userId);
+			ShoppingCart cart = (ShoppingCart)query.uniqueResult();
 			
 			Member member = this.memberDAO.find(userId);	
 			ProductionCategory productionCategory = this.productionCategoryDAO.find(productId);
-			Set<ShoppingCartDetail> shoppingCartList = new HashSet();
+			Set<ShoppingCartDetail> shoppingCartList = new HashSet<ShoppingCartDetail>();
 			ShoppingCartDetail cartDetail = new ShoppingCartDetail();		
 			
-			ShoppingCart cart = new ShoppingCart();
-			cart.setMember(member);
-			cart.setCreateDate(DateFormatUtils.format(new Date(), "yyyyMMddhhmmss"));
-			cart.setShoppingCartDetail(shoppingCartList);
-			
+			if(cart == null){
+				cart = new ShoppingCart();
+				cart.setMember(member);
+				cart.setCreateDate(DateFormatUtils.format(new Date(), "yyyyMMddhhmmss"));
+				cart.setShoppingCartDetail(shoppingCartList);
+				this.shoppingCartDAO.save(cart);
+			}else{
+				cart.setShoppingCartDetail(shoppingCartList);		
+			}
+		
 			cartDetail.setShoppingCart(cart);
 			cartDetail.setProductionCategory(productionCategory);
+			cartDetail.setUseBonus(useBonus);
 			
 			shoppingCartList.add(cartDetail);
 			this.shoppingCartDetailDAO.save(cartDetail);
-			this.shoppingCartDAO.save(cart);
+			
 			
 			ArrayList list = new ArrayList();
 			list.add(member);
@@ -1575,29 +1548,331 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 		
 		//購買專輯或歌曲
 		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-		public ShoppingCartDetail[] queryMusicShoppingCart(long userId) {
-				
-			Query query = this.sessionFactory.getCurrentSession().createQuery("select d from ShoppingCart s join s.shoppingCartDetail d where s.member.id =:v1 order by s.id desc");
+		public ArrayList queryMusicShoppingCart(long userId) {
+			
+			
+			Query query = this.sessionFactory.getCurrentSession().createQuery("select d from ShoppingCart s join s.shoppingCartDetail d where s.member.id =:v1 and s.dropDate is null and d.dropDate is null order by s.id desc");
 			query.setParameter("v1", userId);
 				
 			List<ShoppingCartDetail> detailList = (List<ShoppingCartDetail>)query.list();		
-				
+			//ShoppingCartDetail[] songDetail = new ShoppingCartDetail[detailList.size()] ;
+			//ShoppingCartDetail[] anbumDetail = new ShoppingCartDetail[detailList.size()] ;
+			ArrayList<ShoppingCartDetail> songlist = new ArrayList<ShoppingCartDetail>();
+			ArrayList<ShoppingCartDetail> albumlist = new ArrayList<ShoppingCartDetail>();
+			
+			int i=0;
+			int j=0;
 			for(ShoppingCartDetail d : detailList){
 				System.out.println("id===>"+d.getId());
 				Object productionCategory = d.getProductionCategory();
 				if(productionCategory instanceof Song){
-					System.out.println("true------");
+					System.out.println("Song------");
 					Song song = (Song)productionCategory;
+					songlist.add(d);
+					//songDetail[i] = d;
+					//i++;
+				}else if(productionCategory instanceof Album){
+					System.out.println("Album------");
+					Album album = (Album)productionCategory;
+					albumlist.add(d);
+					//anbumDetail[j] = d;
+					//j++;
 				}
 				
 			}
 				
+			//ShoppingCartDetail[] songDetail = new ShoppingCartDetail[detailList.size()] ;
+		    //ShoppingCartDetail[] albumDetail = new ShoppingCartDetail[detailList.size()] ;
+			ShoppingCartDetail[] songDetail = songlist.toArray(new ShoppingCartDetail[songlist.size()]);
+			ShoppingCartDetail[] albumDetail = albumlist.toArray(new ShoppingCartDetail[albumlist.size()]);
+			
+			ArrayList<ShoppingCartDetail[]> list = new ArrayList<ShoppingCartDetail[]>();
+			list.add(songDetail);
+			list.add(albumDetail);
 				//ShoppingCart newShoppingCart = shoppingCart.get(0);
 				
 				//Set<ShoppingCartDetail> detailSet = newShoppingCart.getShoppingCartDetail();
 				
-				ShoppingCartDetail[] shoppingCartDetail = detailList.toArray(new ShoppingCartDetail[detailList.size()]);
+				//ShoppingCartDetail[] shoppingCartDetail = detailList.toArray(new ShoppingCartDetail[detailList.size()]);
 				
-				return shoppingCartDetail;
+				return list;
 		}
+			
+			
+		//確認購買，轉成訂單!
+			@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+			public int purchaseConfirm(long shoppingCartId, String gsiMoney, String gsiBonus) {
+				
+				String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
+				System.out.println("shoppingCartId==>"+shoppingCartId);
+				ShoppingCart s = this.shoppingCartDAO.find(shoppingCartId);
+				//Set<ShoppingCartDetail> detailSet = s.getShoppingCartDetail();
+				Query query = this.sessionFactory.getCurrentSession().createQuery(" from ShoppingCartDetail d where d.shoppingCart.id = :shoppingCartId and d.dropDate is null");
+				query.setParameter("shoppingCartId", shoppingCartId);
+				List<ShoppingCartDetail> detailSet = (List<ShoppingCartDetail>)query.list();	
+				s.setDropDate(date);
+				
+				Member member = s.getMember();
+				System.out.println("購買者人id==>"+member.getId());
+				System.out.println("總金額==>"+gsiMoney);
+				System.out.println("總Bonus==>"+gsiBonus);
+				
+				/**=================新增購買者的GsiMoney=================**/
+				 query = this.sessionFactory.getCurrentSession().createQuery("from GsiMoney g where g.member.id =:v1 order by g.id desc");
+				query.setParameter("v1", member.getId());
+				String createDate = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
+				List<GsiMoney> userGsiMoneyList = (List<GsiMoney>)query.list();	
+				GsiMoney userMoney = new GsiMoney();
+				if(userGsiMoneyList.size()>0){
+					userMoney = userGsiMoneyList.get(0);
+				}
+				
+				GsiMoney gm = new GsiMoney();
+				gm.setCreateDate(date);
+				gm.setMember(member);
+				gm.setOutgo(gsiMoney);
+				int totalCost = Integer.valueOf(gsiMoney);
+				String balance = String.valueOf(Integer.valueOf(userMoney.getBalance()) - totalCost) ;
+				gm.setBalance(balance);
+				//gm.setPurchase(gsiMoney);
+				this.gsiMoneyDAO.save(gm);
+				
+				
+				/**=================新增購買者的GsiBonus=================**/
+				query = this.sessionFactory.getCurrentSession().createQuery("from GsiBonus g where g.member.id =:v1 order by g.id desc");
+				query.setParameter("v1", member.getId());
+				List<GsiBonus> userGsiBonusList = (List<GsiBonus>)query.list();	
+				GsiBonus userBonus = new GsiBonus();
+				if(userGsiBonusList.size()>0){
+					userBonus = userGsiBonusList.get(0);
+				}
+				int totalUseBonus = Integer.valueOf(gsiBonus);
+				String balanceBonus = String.valueOf(Integer.valueOf(userBonus.getBalance()) - totalUseBonus) ;
+				GsiBonus gb = new GsiBonus();
+				gb.setCreateDate(date);
+				gb.setMember(member);
+				gb.setPurchase(gsiBonus);
+				gb.setBalance(balanceBonus);
+				this.gsiBonusDAO.save(gb);
+				
+				
+				//新增訂單
+				Order order = new Order();
+				order.setMember(member);
+				order.setCreateDate(date);
+				order.setPayDate(date);
+				order.setPurchaseDate(date);
+				order.setBillDate(date);
+				order.setHandleStatus("1");
+				order.setPayStatus("1");
+				order.setPayMethod("1");
+				order.setGsiMoney(gm);
+				//order.setGsiBonus(gb);
+				this.orderDAO.save(order);
+				
+				
+				//找出不重複的creator
+				Set<Long> setCreator = new HashSet<Long>();
+				for (ShoppingCartDetail od:detailSet) {
+					if(od.getProductionCategory() instanceof Song){
+						Song song = (Song)od.getProductionCategory();
+						long creatorId = song.getAlbum().getCreator().getId();
+					    setCreator.add(creatorId);
+					}else{
+						Album album = (Album)od.getProductionCategory();
+						setCreator.add(album.getCreator().getId());
+					}
+				}
+				
+				/**============ 找出創作人GsiMoney ============**/
+				List<GsiMoney> tempList = new ArrayList<GsiMoney>(); 
+				for(long creatorId : setCreator){
+					query = this.sessionFactory.getCurrentSession().createQuery("from GsiMoney g where g.member.id =:v1 order by g.id desc");
+					query.setParameter("v1", creatorId);
+		
+					List<GsiMoney> gsiMoneyList = (List<GsiMoney>)query.list();	
+					GsiMoney creatorMoney = new GsiMoney();
+					if(gsiMoneyList.size()>0){
+						GsiMoney g = gsiMoneyList.get(0);
+						creatorMoney.setBalance(g.getBalance());
+						creatorMoney.setCreateUser(g.getMember().getIdentityName());
+						creatorMoney.setExchangeDate(g.getExchangeDate());
+						creatorMoney.setExchangeStatus(g.getExchangeStatus());
+						creatorMoney.setExchangeTax(g.getExchangeTax());
+						creatorMoney.setMember(g.getMember());
+						creatorMoney.setMemo(g.getMemo());
+						creatorMoney.setPaid(g.getPaid());
+						creatorMoney.setPaid(g.getPaidDate());
+						creatorMoney.setTransactionType(g.getTransactionType());
+					}
+					tempList.add(creatorMoney);
+				}
+				/**============ 找出創作人GsiMoney End============**/
+				System.out.println("創作人GsiMoney===>"+tempList);
+				
+				
+				
+				/**============ 找出創作人GsiBonus ============**/
+				List<GsiBonus> tempBonusList = new ArrayList<GsiBonus>(); 
+				for(long creatorId : setCreator){
+					query = this.sessionFactory.getCurrentSession().createQuery("from GsiBonus g where g.member.id =:v1 order by g.id desc");
+					query.setParameter("v1", creatorId);
+		
+					List<GsiBonus> gsiBonusList = (List<GsiBonus>)query.list();	
+					GsiBonus creatorBonus = new GsiBonus();
+					if(gsiBonusList.size()>0){
+						GsiBonus g = gsiBonusList.get(0);
+						creatorBonus.setBalance(g.getBalance());
+						creatorBonus.setMember(g.getMember());
+
+					}
+					tempBonusList.add(creatorBonus);
+				}
+				/**============ 找出創作人GsiBonus End============**/
+				System.out.println("創作人GsiBonus===>"+tempBonusList);
+				
+				
+				
+				/**================新增訂單明細==================**/
+				int tReward = 0; //回饋給購買者的Bonus
+				for (ShoppingCartDetail od:detailSet) {
+					
+					OrderDetail orderDetail = new OrderDetail();			
+					orderDetail.setOrder(order);
+					orderDetail.setAmount("1");
+					orderDetail.setProductionCategory(od.getProductionCategory());
+					if(od.getProductionCategory() instanceof Song){
+						Song song = (Song)od.getProductionCategory();
+						long creatorId = song.getAlbum().getCreator().getId();
+						//int price = Integer.valueOf(song.getSongPrice().getPrice());			
+						
+						//設定創作人的GsiMoney
+						for(GsiMoney creatorMoney : tempList){
+							long tempCreatorId = creatorMoney.getMember().getId();
+							if(creatorId == tempCreatorId){
+								int productIncome = Integer.valueOf(song.getSongPrice().getPrice());
+								creatorMoney.setCreateDate(createDate);
+								creatorMoney.setIncome(song.getSongPrice().getPrice());
+								String b2 = String.valueOf(Integer.valueOf(creatorMoney.getBalance()) + productIncome) ;
+								creatorMoney.setBalance(b2);
+								order.setGsiMoney(creatorMoney);
+							}
+						}	
+						
+						//設定創作人的GsiBonus
+						for(GsiBonus creatorBonus : tempBonusList){
+							long tempCreatorId = creatorBonus.getMember().getId();
+							if(creatorId == tempCreatorId){
+								int reward = Integer.valueOf(song.getSongPrice().getCreatorReward());
+								creatorBonus.setCreateDate(createDate);
+								creatorBonus.setReward(song.getSongPrice().getCreatorReward());
+								String b2 = String.valueOf(Integer.valueOf(creatorBonus.getBalance()) + reward) ;
+								creatorBonus.setBalance(b2);
+								order.setGsiBonus(creatorBonus);
+							}
+						}
+						
+						//是否使用Bonus購買
+						if("N".equals(od.getUseBonus())){
+							orderDetail.setGsiMoney(song.getSongPrice().getPrice());
+						}else{
+							orderDetail.setGsiMoney(song.getSongPrice().getDiscountPrice());
+							orderDetail.setGsiBonus(song.getSongPrice().getDiscountBonus());
+						}			
+						tReward += Integer.valueOf(song.getSongPrice().getReward());
+						System.out.println("tReward111===>"+tReward);
+					}else if(od.getProductionCategory() instanceof Album){
+						//Album album = (Album)od.getProductionCategory();
+						//orderDetail.setGsiMoney(album.g)
+						int tAlbumPrice = 0;
+						int tAlbumBonus = 0;
+						int tAlbumReward = 0;
+						Album album = (Album)od.getProductionCategory();
+						
+						Set<Song> songSet = album.getSongSet();
+						if("N".equals(od.getUseBonus())){
+						     for(Song song : songSet){
+						    	 tAlbumPrice += Integer.parseInt(song.getSongPrice().getPrice());
+						    	 tAlbumReward += Integer.valueOf(song.getSongPrice().getReward()); 
+						     }	
+						     orderDetail.setGsiMoney(String.valueOf(tAlbumPrice));
+						}else{
+							 for(Song song : songSet){
+								 tAlbumPrice += Integer.parseInt(song.getSongPrice().getDiscountPrice());
+								 tAlbumBonus += Integer.parseInt(song.getSongPrice().getDiscountBonus());
+								 tAlbumReward += Integer.valueOf(song.getSongPrice().getReward());
+						     }	
+							 orderDetail.setGsiMoney(String.valueOf(tAlbumPrice));
+							 orderDetail.setGsiBonus(String.valueOf(tAlbumBonus));
+						}
+						
+						long creatorId = album.getCreator().getId();
+						//設定創作人的GsiMoney
+						for(GsiMoney creatorMoney : tempList){
+							long tempCreatorId = creatorMoney.getMember().getId();
+							if(creatorId == tempCreatorId){
+								creatorMoney.setCreateDate(createDate);
+								creatorMoney.setIncome(String.valueOf(tAlbumPrice));
+								String b2 = String.valueOf(Integer.valueOf(creatorMoney.getBalance()) + tAlbumPrice) ;
+								System.out.println("最後創作人的GsiMoney==>"+b2);
+								creatorMoney.setBalance(b2);
+								order.setGsiMoney(creatorMoney);
+							}
+						}	
+						
+						//設定創作人的GsiBonus
+						for(GsiBonus creatorBonus : tempBonusList){
+							long tempCreatorId = creatorBonus.getMember().getId();
+							if(creatorId == tempCreatorId){
+								//int reward = Integer.valueOf(song.getSongPrice().getCreatorReward());
+								creatorBonus.setCreateDate(createDate);
+								creatorBonus.setReward(String.valueOf(tAlbumReward));
+								String b2 = String.valueOf(Integer.valueOf(creatorBonus.getBalance()) + tAlbumReward) ;
+								System.out.println("最後創作人的GsiBonus==>"+b2);
+								creatorBonus.setBalance(b2);
+								order.setGsiBonus(creatorBonus);
+							}
+						}		
+						tReward += tAlbumReward;
+						System.out.println("tReward222===>"+tReward);
+					}
+				
+				    this.orderDetailDAO.save(orderDetail);
+				}
+				System.out.println("回饋給購買者的Bonus==>"+tReward);
+				/**================新增訂單明細 End==================**/
+				gb.setReward(""+tReward);
+				
+				//新增創作人GsiMoney
+				Iterator<GsiMoney> it = tempList.iterator();
+				while(it.hasNext()){
+					gsiMoneyDAO.save(it.next());
+				}
+				Iterator<GsiBonus> it2 = tempBonusList.iterator();
+				while(it2.hasNext()){
+					gsiBonusDAO.save(it2.next());
+				}
+				return tReward;
+
+			}
+		
+	    //變更價格
+	    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public ArrayList updateUseBonus(long userID,long id,String useBonus){
+			ShoppingCartDetail detail =this.shoppingCartDetailDAO.find(id);
+			detail.setUseBonus(useBonus);
+			
+			return queryMusicShoppingCart(userID);
+			
+		}
+	    
+	    //刪除購物車
+	    @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public ArrayList deleteShoppingCart(long userId, long transactionId) {
+			this.shoppingCartDetailDAO.delete(transactionId);
+			//ShoppingCartDetail[] shoppingCartDetail = this.queryMusicShoppingCart(userId); 
+			ArrayList list =  this.queryMusicShoppingCart(userId);
+			return list;
+		}
+		
 }

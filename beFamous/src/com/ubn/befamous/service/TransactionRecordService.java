@@ -32,9 +32,8 @@ public interface TransactionRecordService{
 		
 		//購物車service
 		public ShoppingCartDetail[] queryShoppingCart(long userId);
-		public ShoppingCartDetail[] deleteShoppingCart(long userId,long transactionId);
 		public ShoppingCartDetail[] forwardPurchase(long userId);
-		public void purchaseConfirm(long shoppingCartId, String gsiMoney, String gsiBonus);
+		
 		
 		
 		//訂單管理-實體幣訂單-搜尋實體幣訂單
@@ -200,10 +199,13 @@ public interface TransactionRecordService{
 		//kevin
 		public Member addMemberData(long userID,Member member);
 		//儲值轉訂單
-		public Order purchasePrepaid(PrePaid prePaid,Order order);
+		public Order purchasePrepaid(long userID,PrePaid prePaid,Order order);
 		//SD卡轉訂單
 		public Order purchaseSDCard(SDCard adCard,Order order,String amount);
 		public Member queryMember(long userID);
-		public ShoppingCartDetail[] queryMusicShoppingCart(long userId);
-		public ArrayList addMusicShoppingCart(long userId, long productId);
+		public ArrayList queryMusicShoppingCart(long userId);
+		public ArrayList addMusicShoppingCart(long userId, long productId,String useBonus);
+		public int purchaseConfirm(long shoppingCartId, String gsiMoney, String gsiBonus);
+		public ArrayList updateUseBonus(long userID,long id,String useBonus);
+		public ArrayList deleteShoppingCart(long userId,long transactionId);
 }
