@@ -6,11 +6,13 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
-<img src=/${initParam.ImageWeb}/${news.picture}><br>
-${news.createDate}${news.newsSouce}<br><br>
-
-展覽名稱:${news.newsName}<br><br>
-展覽介紹:${news.content}<br><br>
-
+<input type="button" value="確定修改" onclick="show(2.5)">
 </body>
+<script type="text/javascript">
+function show(a){
+	alert(2 < a < 3);
+}
+
+show(1);
+</script>
 </html>

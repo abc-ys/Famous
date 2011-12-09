@@ -21,21 +21,21 @@
 	<tr><td Height="35"><font size="2">${status.index+1}</font></td>
 		<td><font size="2">${hm[1]}</font></td>
 		<td><font size="2"><a href="javascript:void(0)">${hm[0].name}</a></font></td>
-		<td><font size="2"><a href="javascript:void(0)" onclick="album('${hm[0].album.pid}')">${hm[0].album.name}</a></font></td>
-		<td><font size="2"><a href="javascript:void(0)" onclick="creator('${hm[0].album.creator.id}')">${hm[0].album.creator.userName}</a></font></td>
+		<td><font size="2"><a href="javascript:void(0)" onclick="album('${hm[0].album.pid}','${adminId}')">${hm[0].album.name}</a></font></td>
+		<td><font size="2"><a href="javascript:void(0)" onclick="creator('${hm[0].album.creator.id}','${adminId}')">${hm[0].album.creator.userName}</a></font></td>
 		<td><font size="2"><a href="javascript:void(0)" onclick="offenseReason('${hm[0].pid}')">檢舉原因</a></font></td>
 		<td><input type="button" value="隱藏歌曲" onclick="hide(${hm[0].pid})"></td></tr>
 	</c:forEach>
 </table>
-<input type="hidden" name="adminId" value="2">
+<input type="hidden" name="adminId" value=${adminId}>
 </form>
 </body>
 <script>
-function album(albumId){
-	window.open("${pageContext.request.contextPath}/queryAlbumData.do?albumid="+albumId);
+function album(albumId, userId){
+	window.open("${pageContext.request.contextPath}/queryAlbumData.do?albumid="+albumId+"&userId="+userId);
 }
-function creator(userId){
-	window.open("${pageContext.request.contextPath}/manageCreatorDetail/get/123456/"+userId+".do");
+function creator(memberId,adminId){
+	window.open("${pageContext.request.contextPath}/manageCreatorDetail/get/"+adminId+"/"+memberId+".do");
 }
 function offenseReason(productionCategoryId){
 	window.open("${pageContext.request.contextPath}/offenseReason.do?productionCategoryId="+productionCategoryId,"parent","height=300,width=600,location=no,scrollbars=yes,toolbar=no,directories=no,menubar=no,directories=no");

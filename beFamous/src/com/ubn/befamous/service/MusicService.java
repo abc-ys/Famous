@@ -2,6 +2,7 @@ package com.ubn.befamous.service;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Map;
 
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,8 +13,13 @@ import com.ubn.befamous.entity.Creator;
 import com.ubn.befamous.entity.Hidden;
 import com.ubn.befamous.entity.InelegantKeyword;
 import com.ubn.befamous.entity.Keyword;
+import com.ubn.befamous.entity.Member;
 import com.ubn.befamous.entity.MusicCategory;
 import com.ubn.befamous.entity.News;
+import com.ubn.befamous.entity.Order;
+import com.ubn.befamous.entity.OrderDetail;
+import com.ubn.befamous.entity.PromotionActivity;
+import com.ubn.befamous.entity.RecommendActivity;
 import com.ubn.befamous.entity.Song;
 
 public interface MusicService {
@@ -26,37 +32,37 @@ public interface MusicService {
      * 查詢專輯周榜
      * @param datetime 現在日期時間
      */
-    public Album[] queryAlbumsWeekRanking(String datetime);
+    public Album[] queryAlbumsWeekRanking();
     
     /**
      * 查詢專輯月榜
      * @param datetime 現在日期時間
      */
-    public Album[] queryAlbumsMonthRanking(String datetime);
+    public Album[] queryAlbumsMonthRanking();
     
     /**
      * 查詢歌曲周榜
      * @param datetime 現在日期時間
      */
-    public Song[] querySongsWeekRanking(String datetime);
+    public Song[] querySongsWeekRanking();
     
     /**
      * 查詢歌曲月榜
      * @param datetime 現在日期時間
      */
-    public Song[] querySongsMonthRanking(String datetime);
+    public Song[] querySongsMonthRanking();
     
     /**
      * 查詢創作人週榜
      * @param datetime 現在日期時間
      */
-    public Creator[] queryCreatorWeekRanking(String datetime);
+    public ArrayList queryCreatorWeekRanking();
     
     /**
      * 查詢創作人月榜
      * @param datetime 現在日期時間
      */
-    public Creator[] queryCreatorMonthRanking(String datetime);
+    public ArrayList queryCreatorMonthRanking();
     
     /**
      * 查詢專輯資料
@@ -232,6 +238,11 @@ public interface MusicService {
     public MusicCategory[] queryMusicCategory ();
     
     /**
+     * 查詢音樂類別
+     */
+    public MusicCategory musicCategory (String mcID);
+    
+    /**
      * 刪除音樂類別
      * @param musicCategoryID 音樂分類編號
      * @param managerID 管理者編號
@@ -266,6 +277,11 @@ public interface MusicService {
     
     //管理排行榜
     /**
+     * 查詢音樂類別清單
+     */
+    public MusicCategory[] musicCategoryList();
+    
+    /**
      * 管理者查詢專輯週榜
      * @param albumName 專輯名稱
      * @param creatorName 創作人姓名
@@ -273,7 +289,7 @@ public interface MusicService {
      * @param startDate 專輯上架起始日期
      * @param endDate 專輯上架結束日期
      */
-    public Album[] queryAlbumWeekRankingForAdmin (String albumName, String creatorName, long musicCategoryID, String startDate, String endDate);
+    public ArrayList queryAlbumWeekRankingForAdmin (String albumName, String creatorName, String musicCategoryID, String startDate, String endDate);
     
     /**
      * 管理者查詢專輯月榜
@@ -283,7 +299,7 @@ public interface MusicService {
      * @param startDate 專輯上架起始日期
      * @param endDate 專輯上架結束日期
      */
-    public Album[] queryAlbumMonthRankingForAdmin (String albumName, String creatorName, long musicCategoryID, String startDate, String endDate);
+    public ArrayList queryAlbumMonthRankingForAdmin (String albumName, String creatorName, String musicCategoryID, String startDate, String endDate);
     
     /**
      * 管理者查詢歌曲週榜
@@ -294,7 +310,7 @@ public interface MusicService {
      * @param startDate 專輯上架起始日期
      * @param endDate 專輯上架結束日期
      */
-    public Song[] querySongWeekRankingForAdmin (String songName, String albumName, String creatorName, long musicCategoryID, String startDate, String endDate);
+    public ArrayList querySongWeekRankingForAdmin (String songName, String albumName, String creatorName, String musicCategoryID, String startDate, String endDate);
     
     /**
      * 管理者查詢歌曲月榜
@@ -305,19 +321,19 @@ public interface MusicService {
      * @param startDate 專輯上架起始日期
      * @param endDate 專輯上架結束日期
      */
-    public Song[] querySongMonthRankingForAdmin (String songName, String albumName, String creatorName, long musicCategoryID, String startDate, String endDate);
+    public ArrayList querySongMonthRankingForAdmin (String songName, String albumName, String creatorName, String musicCategoryID, String startDate, String endDate);
     
     /**
      * 管理者查詢創作人週榜
      * @param creatorName 創作人姓名
      */
-    public Creator[] queryCreatorWeekRankingForAdmin (String creatorName);
+    public ArrayList queryCreatorWeekRankingForAdmin (String creatorName);
     
     /**
      * 管理者查詢創作人月榜
      * @param creatorName 創作人姓名
      */
-    public Creator[] queryCreatorMonthRankingForAdmin (String creatorName);
+    public ArrayList queryCreatorMonthRankingForAdmin (String creatorName);
     
     /**
      * 更新專輯週榜的CP值
@@ -326,7 +342,7 @@ public interface MusicService {
      * @param startDate 專輯周榜起始日期
      * @param endDate 專輯周架結束日期
      */
-    public Album[] updateAlbumWeekCP (String startDate, String endDate, String modifyDate, int CP);
+    public void updateAlbumWeekCP (String adminID,String albumID, int CP);
     
     /**
      * 更新專輯月榜的CP值
@@ -335,7 +351,7 @@ public interface MusicService {
      * @param startDate 專輯月榜起始日期
      * @param endDate 專輯月榜結束日期
      */
-    public Album[] updateAlbumMonthCP (String startDate, String endDate, String modifyDate, int CP);
+    public void updateAlbumMonthCP (String adminID,String albumID, int CP);
     
     /**
      * 更新歌曲週榜的CP值
@@ -344,7 +360,7 @@ public interface MusicService {
      * @param startDate 專輯周榜起始日期
      * @param endDate 專輯周架結束日期
      */
-    public Song[] updateSongWeekCP (String startDate, String endDate, String modifyDate, int CP);
+    public void updateSongWeekCP (String adminID,String songID, int CP);
     
     /**
      * 更新歌曲月榜的CP值
@@ -353,7 +369,7 @@ public interface MusicService {
      * @param startDate 專輯月榜起始日期
      * @param endDate 專輯月榜結束日期
      */
-    public Song[] updateSongMonthCP (String startDate, String endDate, String modifyDate, int CP);
+    public void updateSongMonthCP (String adminID,String songID, int CP);
     
     /**
      * 更新創作人週榜的CP值
@@ -362,7 +378,7 @@ public interface MusicService {
      * @param startDate 專輯周榜起始日期
      * @param endDate 專輯周架結束日期
      */
-    public Creator[] updateCreatorWeekCP (String startDate, String endDate, String modifyDate, int CP);
+    public void updateCreatorWeekCP (String adminID,String creatorID, int CP);
     
     /**
      * 更新創作人月榜的CP值
@@ -371,7 +387,7 @@ public interface MusicService {
      * @param startDate 專輯月榜起始日期
      * @param endDate 專輯月榜結束日期
      */
-    public Creator[] updateCreatorMonthCP (String startDate, String endDate, String modifyDate, int CP);
+    public void updateCreatorMonthCP (String adminID,String creatorID, int CP);
     
     /**
      * 試聽
@@ -494,4 +510,109 @@ public interface MusicService {
      */
     public Song querySongLyrics(long songID);
     
+    
+    //大力推活動
+    /**
+     * 儲存推薦活動
+     * @param songID 歌曲編號
+     */
+    public void saveRecommendActivityForAlbum(String adminID,String recommendActName,String startDate,String endDate,String[] recommendActContent,String recommendActState);
+   
+    /**
+     * 查詢推薦活動清單
+     * @param songID 歌曲編號
+     */
+    public RecommendActivity[] queryRecommendActivities(String year,String month);
+    
+    /**
+     * 查詢推薦活動
+     * @param songID 歌曲編號
+     */
+    public RecommendActivity queryRecommendActivity(String recommendActID);
+    
+    /**
+     * 更新推薦活動
+     * @param songID 歌曲編號
+     */
+    public void updateRecommendActivity(String adminID,String recommendActID,String recommendActName,String startDate,String endDate,String[] recommendActContent,String recommendActState);
+
+    /**
+     * 查詢專輯，然後將專輯加至推薦活動中
+     * @param songID 歌曲編號
+     */
+    public Map queryJoinAlbumsForRec(String recommendActID);
+    
+    /**
+     * 查詢歌曲，然後將歌曲加至推薦活動中
+     * @param songID 歌曲編號
+     */
+    public Map queryJoinSongsForRec(String recommendActID);
+    
+    /**
+     * 查詢推薦活動裡專輯被購買數
+     * @param songID 歌曲編號
+     */
+    public ArrayList  queryJoinAlbumForRec(String recommendActID);
+    
+    /**
+     * 查詢有購買推薦活動裡專輯的會員
+     * @param songID 歌曲編號
+     */
+    public Member[] queryJoinMembersForRec(String recommendActID);
+
+    
+    //行銷活動
+    /**
+     * 查詢推薦的專輯
+     * @param songID 歌曲編號
+     */
+    public void savePromotionActivity(String adminID,String promotionActName,String startDate,String endDate,String prepaidMoney,String prepaidCount,String promotionActContentType,String[] promotionActContent,String promotionActCondition,String presentType,int presentBonus,String presentDeadline,String promotionActState);
+    
+    /**
+     * 查詢推薦的專輯
+     * @param songID 歌曲編號
+     */
+    public PromotionActivity[] queryPromotionActivities(String year,String month);
+     
+    /**
+     * 查詢推薦的專輯
+     * @param songID 歌曲編號
+     */
+    public PromotionActivity queryPromotionActivity(String promotionActID);
+    
+    /**
+     * 查詢推薦的專輯
+     * @param songID 歌曲編號
+     */
+    public void updatePromotionActivity(String adminID,String promotionActID,String promotionActName,String prepaidMoney,String prepaidCount,String startDate,String endDate,String promotionActContentType,String[] promotionActContent,String promotionActCondition,String presentType,int presentBonus,String presentDeadline,String promotionActState);
+    
+    /**
+     * 查詢行銷活動的專輯
+     * @param songID 歌曲編號
+     */
+    public Member[ ] queryJoinMembersForPro(String promotionActID);
+    
+    /**
+     * 查詢推薦的專輯
+     * @param songID 歌曲編號
+     */
+    public Order[] queryJoinGSiMoneyForPro(String promotionActID);
+    
+    /**
+     * 查詢行銷活動的專輯
+     * @param songID 歌曲編號
+     */
+    public ArrayList queryJoinTimesForPro(String promotionActID);
+    
+    /**
+     * 查詢推薦的專輯
+     * @param songID 歌曲編號
+     */
+    public ArrayList queryJoinAlbumsForPro(String promotionActID);
+    
+    /**
+     * 查詢推薦的專輯
+     * @param songID 歌曲編號
+     */
+    public ArrayList queryJoinSongsForPro(String promotionActID);
 }

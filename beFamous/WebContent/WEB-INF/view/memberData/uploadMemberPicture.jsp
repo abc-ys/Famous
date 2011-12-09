@@ -8,7 +8,7 @@
 <body>
 <p class="topic">上傳圖片</p>
 <form name="upload" enctype="multipart/form-data" method="post">
-	 <input type="hidden" name="userID" value=${member.id}><br><br>
+	 <input type="hidden" name="userId" value=${member.id}><br><br>
 	上傳一張代表您的圖片作為在GSibefamous的顯示圖片。
 	<p><input type="file" name="file" size="20" /> 
 	<p> <input type="submit" value="上傳" onclick="add()"> 

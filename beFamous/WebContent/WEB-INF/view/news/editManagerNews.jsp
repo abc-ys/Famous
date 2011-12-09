@@ -21,12 +21,15 @@
 	消息標題:&nbsp;<input type="text" name="newsName" value="${news.newsName}"><p>
 	圖片:&nbsp;<input type="file" name="picture" size="20"><br>
 	長700x高不限，檔案格式:JPG、JPEG。<br>
-	<img alt="" src="/${initParam.ImageWeb}/${news.picture}" width="200" height="100"><p>
+	<c:if test="${news.picture==' '}"><img alt="" src="/${initParam.ImageWeb}/${news.picture}" width="200" height="100"></c:if><p>
 	消息來源:&nbsp;<input type="text" name="newsSouce" value="${news.newsSouce}"><p>
-	上架日期:&nbsp;<input type="text" name="onDate" value="${news.onDate}" class="fillbox" readonly>&nbsp;<A HREF="javascript:show_calendar('form.onDate');"><img src="${pageContext.request.contextPath}/images/cal.gif" border="0"></img></a><p>
-	建立日期:&nbsp;<fmt:parseDate var="dateObj" value="${news.createDate}" type="DATE" pattern="yyyyMMddhhmmss"/> 
+	<fmt:parseDate var="onDate" value="${news.onDate}" type="DATE" pattern="yyyyMMddHHmmss"/>
+	上架日期:&nbsp;<input type="text" name="onDate" value="<fmt:formatDate value='${onDate}' pattern='yyyy-MM-dd' />" class="fillbox" readonly>&nbsp;<A HREF="javascript:show_calendar('form.onDate');"><img src="${pageContext.request.contextPath}/images/cal.gif" border="0"></img></a><p>
+	建立日期:&nbsp;<fmt:parseDate var="dateObj" value="${news.createDate}" type="DATE" pattern="yyyyMMddHHmmss"/> 
 	<fmt:formatDate value='${dateObj}' pattern='yyyy-MM-dd' /><p>
-	內文:&nbsp;<textarea rows="6" cols="40" name="content">${news.content}</textarea><p>
+	內文:&nbsp;<textarea rows="6" cols="40" name="content">${news.content}</textarea><p>	
+	<input type="hidden" name="newsId" value="${news.id}" >
+	<input type="hidden" name="adminId" value="${adminId}" >
 	<input type="button" value="儲存" onclick="saveEditedNews()">
 </form>
 </body>

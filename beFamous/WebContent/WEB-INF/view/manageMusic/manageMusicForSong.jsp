@@ -24,7 +24,7 @@
 		</select><br><br>
 	<center><input type="button" value="查詢" onclick="querySong('${adminID}')">&nbsp&nbsp<input type="reset" value="全部清除"></center>
 <p>
-<c:if test="${Song != ''}">
+<c:if test="${Song != null}">
 查詢結果
 <table border="1" BorderColor="#000000" cellpadding="0" cellspacing="0">
 <tr><td Width="30" Height="35" valign="top"><font size="2">編號</font></td>
@@ -45,7 +45,7 @@
 	<td Height="35"><font size="2">${status.index+1}</font></td>
 	<td><font size="2">${hm.pid}</font></td>
 	<td><font size="2"><a href="javascript:void(0)')">${hm.name}</a></font></td>	
-	<td><font size="2"><a href="javascript:album('${hm.album.pid}')">${hm.album.name}</a></font></td>	
+	<td><font size="2"><a href="javascript:album('${hm.album.pid}','${adminID}')">${hm.album.name}</a></font></td>	
 	<td><font size="2"><a href="javascript:creator('${hm.album.creator.id}','${adminID}')">${hm.album.creator.userName}</a></font></td>
 	<td><font size="2"><a href="javascript:lyrics('${hm.pid}')">歌詞</a></font></td>
 	<td><font size="2">${hm.musicCategory.name}</font></td>
@@ -76,8 +76,8 @@ function querySong(adminID){
 	document.fm.action="${pageContext.request.contextPath}/querySong.do?adminID="+adminID;
   	document.fm.submit();
 }
-function album(albumId){
-	window.open("${pageContext.request.contextPath}/queryAlbumData.do?albumid="+albumId);
+function album(albumId,adminID){
+	window.open("${pageContext.request.contextPath}/queryAlbumData.do?albumid="+albumId+"&userId="+adminID);
 }
 function creator(memberId,adminId){
 	window.open("${pageContext.request.contextPath}/manageCreatorDetail/get/"+adminId+"/"+memberId+".do");

@@ -22,9 +22,9 @@
 	長700x高不限，檔案格式:JPG、JPEG。<br><br>
 	消息來源:&nbsp;<input type="text" name="newsSouce" ><p>
 	上架日期:&nbsp;<input type="text" name="onDate" class="fillbox" readonly>&nbsp;<A HREF="javascript:show_calendar('form.onDate');"><img src="${pageContext.request.contextPath}/images/cal.gif" border="0"></img></a><p>
-	建立日期:&nbsp;<input type="text" name="createDate"value=<fmt:formatDate value="<%=new java.util.Date() %>" pattern ="yyyy-MM-dd"/>><br><br>
+	建立日期:&nbsp;<input type="text" name="createDate"value=<fmt:formatDate value="<%=new java.util.Date() %>" pattern ="yyyy-MM-dd"/> disabled="true"><br><br>
 	內文:&nbsp;<textarea rows="6" cols="40" name="content"></textarea><p>
-	<input type="hidden" name="adminID" value="${adminID}" >
+	<input type="hidden" name="adminId" value="${adminId}" >
 	<input type="button" value="儲存" onclick="saveCNews()">
 </form>
 </body>

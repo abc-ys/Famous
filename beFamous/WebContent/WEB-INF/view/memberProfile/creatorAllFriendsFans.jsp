@@ -28,7 +28,7 @@ function identity(identityName,memberId)
 	if(identityName == '一般會員'){
 		top.location.href ="${pageContext.request.contextPath}/memberProfile.do?memberID="+memberId;		
 	}else{
-		top.location.href ="${pageContext.request.contextPath}/creatorProfile.do?memberID="+memberId;
+		top.location.href ="${pageContext.request.contextPath}/creatorProfile.do?creatorID="+memberId;
 	}
 }
 </script>

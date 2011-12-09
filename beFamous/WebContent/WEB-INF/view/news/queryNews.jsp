@@ -27,7 +27,7 @@
 	</c:if>
 <br><br>
 <input type="button" value="查詢" onclick="queryNews()">
-<input type="hidden" name="userID" value=${userID}>
+<input type="hidden" name="userId" value=${userId}>
 </form>
 <p>
 <h4>查詢結果</h4>
@@ -47,14 +47,14 @@
 			<td valign="top" Width="50"><center><font size="2"><input type="checkbox" name="del" id="del" value=${hm.id}></font></center></td>	
 			<fmt:parseDate var="dateObj" value="${hm.createDate}" type="DATE" pattern="yyyyMMddHHmmss"/> 
 			<td valign="top" Width="100"><center><font size="2"><fmt:formatDate value='${dateObj}' pattern='yyyy-MM-dd' /></font></center></td>
-			<td valign="top" Width="100"><center><font size="2">${hm.newsName}</font></center></td>	
+			<td valign="top" Width="100"><center><font size="2"><a href="javascript:void(0)" onclick="showNews(${hm.id})">${hm.newsName}</a></font></center></td>	
 			<td valign="top" Width="100"><center><font size="2">${hm.newsSouce}</font></center></td>
 			<c:if test="${hm.onStatus == 1}"><td valign="top" Width="100"><center><font size="2">開放</font></center></td></c:if>
 			<c:if test="${hm.onStatus == 2}"><td valign="top" Width="100"><center><font size="2">草稿</font></center></td></c:if>
 			<td valign="top" Width="100"><center><font size="2">${hm.hit}</font></center></td>
-			<td valign="top" Width="100"><center><font size="2"><center><input type="button" value="編輯" onclick="modifyNews('${userID}','${hm.id}')"></font></center></td></tr>
+			<td valign="top" Width="100"><center><font size="2"><center><input type="button" value="編輯" onclick="modifyNews('${userId}','${hm.id}')"></font></center></td></tr>
 		</c:forEach>
-		<input type="hidden" name="userID" value=${userID}>
+		<input type="hidden" name="userId" value=${userId}>
 		<input type="hidden" name="onStatus" value=${onStatus}>
 		<input type="hidden" name="delList">	 
 	</table>
@@ -76,12 +76,13 @@ function delNews(){
 	$('input:checkbox:checked[name="del"]').each(function(i) { delList[i] = this.value; });
 	document.form2.delList.value = delList;
 	document.form2.action="${pageContext.request.contextPath}/delNews.do";
-	document.form2.submit(); 
-	
-	 
+	document.form2.submit();	 
 }
-function modifyNews(userID, newsID){
-	window.open("${pageContext.request.contextPath}/modifyNews.do?userID="+userID+"&newsID="+newsID,'son','location=no,scrollbars=no,toolbar=no,directories=no,menubar=no,directories=no,status=no,titlebar=no');		
+function modifyNews(userId, newsId){
+	window.open("${pageContext.request.contextPath}/modifyNews.do?newsId="+newsId,'son','location=no,scrollbars=no,toolbar=no,directories=no,menubar=no,directories=no,status=no,titlebar=no');		
+}
+function showNews(newsId){
+	window.open("${pageContext.request.contextPath}/showNews.do?newsId="+newsId);		
 }
 </script>
 </html>

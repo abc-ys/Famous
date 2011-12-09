@@ -1,5 +1,6 @@
 package com.ubn.befamous.controller;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -99,8 +100,9 @@ public class ManageMusicController {
 	
 	//音樂管理-查詢歌曲
 	@RequestMapping("/querySong")
-	public ModelAndView querysong(String albumName, String name, String musicType,String adminID) {
-			
+	public ModelAndView querysong(String albumName, String name, String musicType,String adminID) throws UnsupportedEncodingException {
+		albumName = new String(albumName.getBytes("ISO-8859-1"),"utf8");    //將中文參數轉成utf8編碼
+
 		System.out.println("albumName==>"+albumName);
 		System.out.println("name==>"+name);
 		System.out.println("musicType==>"+musicType);

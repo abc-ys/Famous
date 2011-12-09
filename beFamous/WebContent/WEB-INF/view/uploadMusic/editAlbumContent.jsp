@@ -5,6 +5,7 @@
 <head>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.6.1.min.js"></script>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
@@ -13,17 +14,20 @@
 <h3>${album.name}</h3>
 <p>
 <table>
-<td Width="140" Height="35" align="center" rowspan="4"><img alt="" src="${album.cover}"></td>
+<td Width="140" Height="35" align="center" rowspan="4"><img alt="" src="/${initParam.ImageWeb}/${album.cover}"></td>
 <td>音樂類型:&nbsp${album.musicCategory.name}</td><tr>
-<td>${album.createDate}</td><tr>
+<td>
+<fmt:parseDate var="dateObj" value="${album.createDate}" type="DATE" pattern="yyyyMMddHHmmss"/> 
+<fmt:formatDate value='${dateObj}' pattern='yyyy-MM-dd' />
+</td><tr>
 <c:if test="${album.status == '1'}">
-<td>狀態:&nbsp公開&nbsp<a href="javascript:changeState('2','${album.id}','${creatorId}')">隱藏</a></td><tr>
+<td>狀態:&nbsp公開&nbsp<a href="javascript:changeState('2','${album.pid}','${creatorId}')">隱藏</a></td><tr>
 </c:if>
 <c:if test="${album.status == '2'}">
-<td>狀態:&nbsp<a href="javascript:changeState('1','${album.id}','${creatorId}')">公開</a>&nbsp隱藏</td><tr>
+<td>狀態:&nbsp<a href="javascript:changeState('1','${album.pid}','${creatorId}')">公開</a>&nbsp隱藏</td><tr>
 </c:if>
-<td><input type="button" value="編輯專輯資訊" onclick="editAlbumInfo('${album.id}','${creatorId}')"/>&nbsp
-<input type="button" value="新增歌曲" onclick="addSong('${album.id}','${creatorId}')"/></td>
+<td><input type="button" value="編輯專輯資訊" onclick="editAlbumInfo('${album.pid}','${creatorId}')"/>&nbsp
+<input type="button" value="新增歌曲" onclick="addSong('${album.pid}','${creatorId}')"/></td>
 </table><p>
 <table border="1" BorderColor="#000000" cellpadding="0" cellspacing="0">
 <td Width="30" Height="35" valign="top"><font size="2">序號</font></td>
@@ -33,18 +37,18 @@
 <td valign="top" Width="100"><font size="2">編輯歌曲資訊</font></td><tr>
 	
 <c:forEach var="hm" items="${album.songSet}"  varStatus="status">
-<c:if test="${hm.dropDate == ''}">
+<c:if test="${hm.dropDate == null}">
 <td Height="35"><font size="2">${status.index+1}</font></td>
 <td><font size="2"><INPUT type=checkbox name=interst value="${hm.pid}"></font></td>
 <td><font size="2">${hm.name}</font></td>
 <td><font size="2"><a href="javascript:void(0)"><img alt="" src="${pageContext.request.contextPath}/images/title_01.gif"><br></a></font></td>	
-<td><font size="2"><a href="javascript:editSongData('${hm.id}','${creatorId}')">編輯</a></font></td><tr>
+<td><font size="2"><a href="javascript:editSongData('${hm.pid}','${creatorId}')">編輯</a></font></td><tr>
 </c:if>
 </c:forEach>
-<td Width="140" Height="35" colspan="5"><input type="button" value="刪除" onclick="deleteData('${creatorId}','${album.id}')"/></td>
+<td Width="140" Height="35" colspan="5"><input type="button" value="刪除" onclick="deleteData('${creatorId}','${album.pid}')"/></td>
 </table>
 提示:上下拖曳歌曲，即可調整曲序，調整完後請按儲存。<p>
-<input type="button" value="儲存" onclick="saveData('${album.id}','${creatorId}')"/>
+<input type="button" value="儲存" onclick="saveData('${album.pid}','${creatorId}')"/>
 </form>
 </body>
 <script>

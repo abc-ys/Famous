@@ -25,16 +25,9 @@
 			<tr>
 				<td width=400>音樂類型&nbsp;
 					<select name="musicCategory" id="musicCategory">
-						<option value="1" selected>Rock & roll 搖滾樂</option>
-						<option value="2" >Electronic 電子音樂</option>
-						<option value="3" >Hip-Hop 嘻哈音樂</option>
-						<option value="4" >R&B 節奏藍調</option>
-						<option value="5" >Jazz 爵士樂</option>
-						<option value="6" >World music世界音樂</option>
-						<option value="7" >Folk 民歌</option>
-						<option value="8" >Classical 古典音樂</option>
-						<option value="9" >New Age music 新世紀音樂</option>
-						<option value="10" >Kids songs兒歌</option>
+						<c:forEach var="hm" items="${mType}">
+						<option value="${hm.id}">${hm.name}</option>
+						</c:forEach>
 					</select>
 				</td>
 				<td width=400>試聽狀態:&nbsp; 
@@ -68,9 +61,7 @@
 				<td width=400><input type='button' value='完成' onclick="saveSongData()"></td>
 			</tr>
 			<p>
-			<tr>
-				<td width=400><input type='button' value='結束上傳' onclick="stopUpload('${albumId}','${creatorId}')"></td>
-			</tr>
+			
 		</table></form>
 </body>
 <script type="text/javascript">
@@ -84,9 +75,6 @@ function saveSongData(){
 		document.form.submit();	
 	}
 }
-function stopUpload(albumId,creatorId){
-	document.form.action="${pageContext.request.contextPath}/editAlbumData.do?albumID="+albumId+"&creatorId="+creatorId;	
-	document.form.submit();	
-}
+
 </script>
 </html>

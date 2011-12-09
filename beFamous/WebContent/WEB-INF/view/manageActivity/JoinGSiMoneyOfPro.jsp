@@ -24,9 +24,10 @@
 
 <tr>
 <td>${status.count}</td>
-<td>${hm.billNo}</td>
+<td>${hm.id}</td>
 <td>${hm.member.email}</td>
-<td>${orderDetail.productionCategory.prePaid.prePaidPrice.pPrice}</td>
+<td>${orderDetail.gsiMoney}</td>
+<c:set var="number" value="${orderDetail.gsiMoney}"/>
 </tr>
 
 </c:forEach>
@@ -34,7 +35,8 @@
 
 </table>
 <br>
-活動儲值總金額:${totalPrice}
+<input type="hidden" value="<c:set var="total" value="${total+number}"/>"/>
+活動儲值總金額:${total+number}
 
 </body>
 </html>

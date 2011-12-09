@@ -17,7 +17,7 @@
 
 <table border="0">
 <tr>
-<td><img alt="" src="${album[0].cover}">
+<td><img alt="" src="/${initParam.ImageWeb}/${album[0].cover}" width="190" height="80">
 
 </td>
 <td>
@@ -40,7 +40,7 @@
    </tr>
    <tr>
       <td><input type="button" name="cart" value="加到購物車"></td>
-      <td><input type="button" name="offense" value="檢舉"></td>
+      <td><input type="button" name="offense" value="檢舉" onclick="addOffense('${userId}','${album[0].pid}')"></td>
    </tr>
 </table>
 
@@ -71,7 +71,7 @@ ${album[0].introduction}
 <table>
     <tr>
     <c:forEach var="album" items="${album[1]}">
- 		<td><img alt="" src="http://localhost:8080/ImageWeb/${album.cover}"  width="190"　height="80"></img><br><a href="${pageContext.request.contextPath}/queryAlbumData.do?albumid=${album.pid}">album ${album.name}</a><br><a href="">artist ${album.creator.userName}</a><br>date${album.createDate}</td>
+ 		<td><img alt="" src="/${initParam.ImageWeb}/${album.cover}" width="190"　height="80"></img><br><a href="${pageContext.request.contextPath}/queryAlbumData.do?albumid=${album.pid}">album ${album.name}</a><br><a href="">artist ${album.creator.userName}</a><br>date${album.createDate}</td>
  	</c:forEach>
  	</tr>
 </table>
@@ -97,6 +97,9 @@ function test(){
 	alert(s);
 	//$("#total").val(eval(f)+eval(f1));
 	//alert(f);
+}
+function addOffense(userId,productionCategoryId){
+	window.open("${pageContext.request.contextPath}/offense.do?userId="+userId+"&productionCategoryId="+productionCategoryId,'son','height=300,width=600,location=no,scrollbars=no,toolbar=no,directories=no,menubar=no,directories=no,status=no,titlebar=no');	
 }
 
 

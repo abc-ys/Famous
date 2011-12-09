@@ -20,24 +20,17 @@
 	廠牌:&nbsp<input type="text" name="brand" ><br><br>
 	*專輯類型&nbsp
 	<select name="musicCategory" id="musicCategory">
-		<option value="1" >Rock & roll 搖滾樂</option>
-		<option value="2" >Electronic 電子音樂</option>
-		<option value="3" >Hip-Hop 嘻哈音樂</option>
-		<option value="4" >R&B 節奏藍調</option>
-		<option value="5" >Jazz 爵士樂</option>
-		<option value="6" >World music世界音樂</option>
-		<option value="7" >Folk 民歌</option>
-		<option value="8" >Classical 古典音樂</option>
-		<option value="9" >New Age music 新世紀音樂</option>
-		<option value="10" >Kids songs兒歌</option>
+		<c:forEach var="hm" items="${mType}">
+		<option value="${hm.id}">${hm.name}</option>
+		</c:forEach>
 	</select><br><br>
 	*標籤:&nbsp <input type="text" name="tag" ><br>
 	<font size=2>請輸入與此唱片相關的標籤，並用半形逗點(,)隔開。例如:流行,愛情,自由,創作等</font><br><br>
 	*專輯封面:&nbsp<input type="file" name="cover" size="20"><br>
 	大小:300pixel*300pixel的JPGC檔<br><br>
-	<img alt="" src="${pageContext.request.contextPath}/${defaultCover[0]}" width="90" height="70"><input type="radio" name="defaultCover" id="defaultCover" value="${defaultCover[0]}" checked/>
-	<img alt="" src="${pageContext.request.contextPath}/${defaultCover[1]}" width="90" height="70"><input type="radio" name="defaultCover" id="defaultCover" value="${defaultCover[1]}"/>
-	<img alt="" src="${pageContext.request.contextPath}/${defaultCover[2]}" width="90" height="70"><input type="radio" name="defaultCover" id="defaultCover" value="${defaultCover[2]}"/>
+	<img alt="" src="/${initParam.ImageWeb}/${defaultCover[0]}" width="90" height="70"><input type="radio" name="defaultCover" id="defaultCover" value="${defaultCover[0]}" checked/>
+	<img alt="" src="/${initParam.ImageWeb}/${defaultCover[1]}" width="90" height="70"><input type="radio" name="defaultCover" id="defaultCover" value="${defaultCover[1]}"/>
+	<img alt="" src="/${initParam.ImageWeb}/${defaultCover[2]}" width="90" height="70"><input type="radio" name="defaultCover" id="defaultCover" value="${defaultCover[2]}"/>
 	<br><br>
 	專輯介紹/創作理念:&nbsp<textarea rows="6" cols="40" name="introduction"></textarea><br><br>
 	*專輯狀態:&nbsp

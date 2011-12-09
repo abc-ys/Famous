@@ -1,5 +1,6 @@
 package com.ubn.befamous.controller;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,26 +30,25 @@ public class ManageRankingCategoryController {
 	
 	//音樂類別管理
 	@RequestMapping("/manageMusicCategory")
-	public ModelAndView managemusiccategory() {
+	public ModelAndView managemusiccategory(String adminId) {
 		ModelAndView mav = new ModelAndView("manageMusicCategory");
 		
 		MusicCategory[] mc = musicService.queryMusicCategory();
 		
 		mav.addObject("musicCategory",mc);
+		mav.addObject("adminID",adminId);
 		return mav;
 	}
 	
 	//音樂類別管理-新增音樂類別
 	@RequestMapping("/addMusicCategory")
-	public String addmusiccategory(String categoryName) {
-
-		long managerID = 1;
+	public String addmusiccategory(String categoryName,String adminID) {
 		
 		System.out.println("categoryName==>"+categoryName);
 		
-		musicService.addMusicCategory(managerID,categoryName);
+		musicService.addMusicCategory(Long.parseLong(adminID),categoryName);
 		
-		return "redirect:manageMusicCategory.do";
+		return "redirect:manageMusicCategory.do?adminId="+adminID;
 	}
 	
 	//音樂類別管理-新增音樂子類別
@@ -67,6 +67,8 @@ public class ManageRankingCategoryController {
 	@RequestMapping("/editMusicCategory")
 	public ModelAndView editmusiccategory(long ID,long adminID) {
 		ModelAndView mav = new ModelAndView("editMusicCategory");
+		MusicCategory mc = musicService.musicCategory(String.valueOf(ID));
+		mav.addObject("mc",mc);
 		mav.addObject("adminID",adminID);
 		mav.addObject("fatherID",ID);
 		return mav;
@@ -82,7 +84,7 @@ public class ManageRankingCategoryController {
 			return mav;
 		}
 	
-	//音樂類別管理-刪除音樂類別或子類別
+	//音樂類別管理-刪除音樂類別
 	@RequestMapping("/deleteMusicCategory")
 	public String deletemusiccategory(long ID) {
 		
@@ -93,12 +95,24 @@ public class ManageRankingCategoryController {
 		return "redirect:manageMusicCategory.do";
 	}
 	
+	//音樂類別管理-刪除音樂子類別
+	@RequestMapping("/deleteSubMusicCategory")
+	public String deletesubmusiccategory(long ID) {
+			
+		musicService.deleteMusicCategory(ID);
+			
+		System.out.println("刪除類別");
+			
+		return "redirect:subMusicCategory.do";
+	}
+	
 	//音樂子類別管理
 	@RequestMapping("/subMusicCategory")
 	public ModelAndView submusiccategory(long ID,long adminID) {
 		ModelAndView mav = new ModelAndView("subMusicCategory");
-		
+		System.out.println("ID==>"+ID+", adminID==>"+adminID);
 		MusicCategory[] mc = musicService.querySubMusicCatrgory(ID);
+		
 		
 		mav.addObject("musicCategory",mc);
 		mav.addObject("adminID",adminID);
@@ -109,398 +123,171 @@ public class ManageRankingCategoryController {
 	//Kevin的
 	//查詢專輯周榜
 	@RequestMapping(value = "/queryAlbumWeekRankingForAdmin")
-	public ModelAndView queryAlbumWeekRankingForAdmin(String albumName,String creatorName,
+	public ModelAndView queryAlbumWeekRankingForAdmin(String adminId,String albumName,String creatorName,
 			String musicCategory,String startDate,String endDate) {
 		System.out.println("musicCategory===>"+musicCategory);
 		
 		ModelAndView mav = new ModelAndView("queryAlbumWeekRankingForAdmin");
 		
-		Creator creator = new Creator();
-		MusicCategory musicCategory1 = new MusicCategory();
-		musicCategory1.setName("rock");
-		creator.setAccountName("kevin");
-		creator.setAccountNO("12345678");
-		creator.setId(123456);
-		
-		Album album = new Album();
-		album.setName("bird");
-		album.setId(1234567);
-		album.setCreator(creator);
-		album.setBrand("UBN");
-		album.setCover("image/image001.png");
-		album.setType("MP3");
-		album.setCreateDate("2011/10/25");
-		album.setMusicCategory(musicCategory1);
-		album.setIntroduction("This is very good album!");
-		
-		WeekRanking weekRanking = new WeekRanking();
-		weekRanking.setId(123456);
-		weekRanking.setModifyValue("20");
-		WeekRanking weekRanking2 = new WeekRanking();
-		weekRanking2.setId(1234567);
-		weekRanking2.setModifyValue("30");
-		
-		Album album2 = new Album();
-		album2.setName("兩隻老虎");
-		album2.setId(1234567);
-		album2.setCreator(creator);
-		album2.setBrand("UBN");
-		album2.setCover("image/image001.png");
-		album2.setType("MP3");
-		album2.setCreateDate("2011/10/25");
-		album2.setMusicCategory(musicCategory1);
-		album2.setIntroduction("This is very good album!");
-		
-		Set<WeekRanking> wr = new HashSet();
-		wr.add(weekRanking);
-		
-		Set<WeekRanking> wr2 = new HashSet();
-		wr2.add(weekRanking2);
-		
-		album.setWeekRanking(wr);		
-		album2.setWeekRanking(wr2);
-		
-        Album[] arAlbum = {album,album2}; 
-		
-		mav.addObject("arAlbum", arAlbum);
-	
+		ArrayList list = musicService.queryAlbumWeekRankingForAdmin(albumName, creatorName, musicCategory, startDate, endDate);
+		MusicCategory[] mc = musicService.musicCategoryList();
+		mav.addObject("arAlbum", list);
+		mav.addObject("mc", mc);
+		mav.addObject("adminID", adminId);
 		return mav;
 	}
 	
 	//修改專輯週CP值
-	@RequestMapping(value = "/updateAlbumWeekCP", method = RequestMethod.POST)
-	public String updateAlbumWeekCP(String cpPoint,String cpId) {
+	@RequestMapping(value = "/updateAlbumWeekCP")
+	public String updateAlbumWeekCP(String cpPoint,String adminID,String albumID) {
 		
 		//update CP值
 		System.out.println("cpPoint===>"+cpPoint);
-		System.out.println("cpId===>"+cpId);
+		System.out.println("albumID===>"+albumID);
+		musicService.updateAlbumWeekCP(adminID, albumID, Integer.parseInt(cpPoint));
 		return "queryAlbumWeekRankingForAdmin";
 	}
 	
 	
 	//查詢專輯月榜
 	@RequestMapping(value = "/queryAlbumMonthRankingForAdmin")
-	public ModelAndView queryAlbumMonthRankingForAdmin(String albumName,String creatorName,
+	public ModelAndView queryAlbumMonthRankingForAdmin(String adminId,String albumName,String creatorName,
 			String musicCategory,String startDate,String endDate) {
 		System.out.println("musicCategory===>"+musicCategory);
 		
 		ModelAndView mav = new ModelAndView("queryAlbumMonthRankingForAdmin");
 		
-		Creator creator = new Creator();
-		MusicCategory musicCategory1 = new MusicCategory();
-		musicCategory1.setName("rock");
-		creator.setAccountName("kevin");
-		creator.setAccountNO("12345678");
-		creator.setId(123456);
-		
-		Album album = new Album();
-		album.setName("bird");
-		album.setId(1234567);
-		album.setCreator(creator);
-		album.setBrand("UBN");
-		album.setCover("image/image001.png");
-		album.setType("MP3");
-		album.setCreateDate("2011/10/25");
-		album.setMusicCategory(musicCategory1);
-		album.setIntroduction("This is very good album!");
-		
-		MonthRanking monthRanking = new MonthRanking();
-		monthRanking.setId(123456);
-		monthRanking.setModifyValue("20");
-		MonthRanking monthRanking2 = new MonthRanking();
-		monthRanking2.setId(1234567);
-		monthRanking2.setModifyValue("30");
-		
-		Album album2 = new Album();
-		album2.setName("兩隻老虎");
-		album2.setId(1234567);
-		album2.setCreator(creator);
-		album2.setBrand("UBN");
-		album2.setCover("image/image001.png");
-		album2.setType("MP3");
-		album2.setCreateDate("2011/10/25");
-		album2.setMusicCategory(musicCategory1);
-		album2.setIntroduction("This is very good album!");
-		
-		Set<MonthRanking> mr = new HashSet();
-		mr.add(monthRanking);
-		
-		Set<MonthRanking> mr2 = new HashSet();
-		mr2.add(monthRanking2);
-		
-		album.setMonthRanking(mr);
-		album2.setMonthRanking(mr2);
-		
-        Album[] arAlbum = {album,album2}; 
-		
-		mav.addObject("arAlbum", arAlbum);
-	
+		ArrayList list = musicService.queryAlbumMonthRankingForAdmin(albumName, creatorName, musicCategory, startDate, endDate);
+		MusicCategory[] mc = musicService.musicCategoryList();
+		mav.addObject("mc", mc);
+		mav.addObject("arAlbum", list);
+		mav.addObject("adminID", adminId);
 		return mav;
 	}
 	
 	
 	//修改專輯月CP值
-	@RequestMapping(value = "/updateAlbumMonthCP", method = RequestMethod.POST)
-	public String updateAlbumMonthCP(String cpPoint,String cpId) {
+	@RequestMapping(value = "/updateAlbumMonthCP")
+	public String updateAlbumMonthCP(String cpPoint,String adminID,String albumID) {
 		
 		//update CP值
 		System.out.println("cpPoint===>"+cpPoint);
+		System.out.println("albumID===>"+albumID);
+		musicService.updateAlbumMonthCP(adminID, albumID, Integer.parseInt(cpPoint));
 		return "queryAlbumMonthRankingForAdmin";
 	}
 	
 	
 	//查詢歌曲周榜
 	@RequestMapping(value = "/querySongWeekRankingForAdmin")
-	public ModelAndView querySongWeekRankingForAdmin(String songName,String albumName,String creatorName,
+	public ModelAndView querySongWeekRankingForAdmin(String adminId,String songName,String albumName,String creatorName,
 			String musicCategory,String startDate,String endDate) {
 		System.out.println("musicCategory===>"+musicCategory);
 		
 		ModelAndView mav = new ModelAndView("querySongWeekRankingForAdmin");	
-		Creator creator = new Creator();
-		creator.setAccountName("kevin");
-		creator.setAccountNO("12345678");
-		creator.setUserName("kevin");
-		Album album = new Album();
-		album.setName("鳥");
-		album.setId(1234567);
-		album.setCreator(creator);
-		album.setBrand("UBN");
-		album.setCover("image/image001.png");
-		album.setType("MP3");
-		album.setCreateDate("2011/10/25");
-		album.setIntroduction("This is very good album!");
 		
-		WeekRanking weekRanking = new WeekRanking();
-		weekRanking.setId(123456);
-		weekRanking.setModifyValue("20");
-		WeekRanking weekRanking2 = new WeekRanking();
-		weekRanking2.setId(1234567);
-		weekRanking2.setModifyValue("30");
-		
-		MusicCategory musicCategory1 = new MusicCategory();
-		musicCategory1.setName("rock");
-		Song song = new Song();
-		SongPrice songPrice = new SongPrice();
-		songPrice.setPrice("30");
-		songPrice.setDiscountBonus("15");
-		songPrice.setDiscountPrice("15");
-		song.setId(1234);
-		song.setName("我愛一條柴");
-		song.setSongPrice(songPrice);
-	    song.setAlbum(album);
-	    song.setCreateDate("2011/11/01");
-	    song.setMusicCategory(musicCategory1);
-		Song song2 = new Song();
-		song2.setId(5678);
-		song2.setName("忘情水");
-		song2.setSongPrice(songPrice);
-		song2.setAlbum(album);
-		song2.setCreateDate("2011/11/01");
-		song2.setMusicCategory(musicCategory1);
-		
-		
-		Set<WeekRanking> wr = new HashSet();
-		wr.add(weekRanking);
-		
-		Set<WeekRanking> wr2 = new HashSet();
-		wr2.add(weekRanking2);
-		
-		song.setWeekRanking(wr);
-		song2.setWeekRanking(wr2);
-		
-		Song[] arSong = {song,song2}; 
-		mav.addObject("arSong", arSong);
-		
+		ArrayList list = musicService.querySongWeekRankingForAdmin(songName, albumName, creatorName, musicCategory, startDate, endDate);
+		MusicCategory[] mc = musicService.musicCategoryList();
+		mav.addObject("mc", mc);
+		mav.addObject("arSong", list);
+		mav.addObject("adminID", adminId);
 		return mav;
 		
 	}
 	
 	//修改歌曲週CP值
-	@RequestMapping(value = "/updateSongWeekCP", method = RequestMethod.POST)
-	public String updateSongWeekCP(String cpPoint,String cpId) {
+	@RequestMapping(value = "/updateSongWeekCP")
+	public String updateSongWeekCP(String cpPoint,String adminID,String songID) {
 		
 		//update CP值
 		System.out.println("songWeekcpPoint===>"+cpPoint);
+		System.out.println("songID===>"+songID);
+		musicService.updateSongWeekCP(adminID, songID, Integer.parseInt(cpPoint));
 		return "querySongWeekRankingForAdmin";
 	}
 	
 	
 	//查詢歌曲月榜
 	@RequestMapping(value = "/querySongMonthRankingForAdmin")
-	public ModelAndView querySongMonthRankingForAdmin(String songName,String albumName,String creatorName,
+	public ModelAndView querySongMonthRankingForAdmin(String adminId,String songName,String albumName,String creatorName,
 			String musicCategory,String startDate,String endDate) {
 		System.out.println("musicCategory===>"+musicCategory);
 		
 		ModelAndView mav = new ModelAndView("querySongMonthRankingForAdmin");	
-		Creator creator = new Creator();
-		creator.setAccountName("kevin");
-		creator.setAccountNO("12345678");
-		creator.setUserName("kevin");
-		Album album = new Album();
-		album.setName("鳥");
-		album.setId(1234567);
-		album.setCreator(creator);
-		album.setBrand("UBN");
-		album.setCover("image/image001.png");
-		album.setType("MP3");
-		album.setCreateDate("2011/10/25");
-		album.setIntroduction("This is very good album!");
 		
-		
-		MonthRanking monthRanking = new MonthRanking();
-		monthRanking.setId(123456);
-		monthRanking.setModifyValue("20");
-		MonthRanking monthRanking2 = new MonthRanking();
-		monthRanking2.setId(1234567);
-		monthRanking2.setModifyValue("30");
-		
-		MusicCategory musicCategory1 = new MusicCategory();
-		musicCategory1.setName("rock");
-		Song song = new Song();
-		SongPrice songPrice = new SongPrice();
-		songPrice.setPrice("30");
-		songPrice.setDiscountBonus("15");
-		songPrice.setDiscountPrice("15");
-		song.setId(1234);
-		song.setName("我愛一條柴");
-		song.setSongPrice(songPrice);
-	    song.setAlbum(album);
-	    song.setCreateDate("2011/11/01");
-	    song.setMusicCategory(musicCategory1);
-		Song song2 = new Song();
-		song2.setId(5678);
-		song2.setName("忘情水");
-		song2.setSongPrice(songPrice);
-		song2.setAlbum(album);
-		song2.setCreateDate("2011/11/01");
-		song2.setMusicCategory(musicCategory1);
-		
-
-		Set<MonthRanking> mr = new HashSet();
-		mr.add(monthRanking);
-		
-		Set<MonthRanking> mr2 = new HashSet();
-		mr2.add(monthRanking2);
-		
-		song.setMonthRanking(mr);
-		song2.setMonthRanking(mr2);
-		
-		Song[] arSong = {song,song2}; 
-		mav.addObject("arSong", arSong);
-		
+		ArrayList list = musicService.querySongMonthRankingForAdmin(songName, albumName, creatorName, musicCategory, startDate, endDate);
+		MusicCategory[] mc = musicService.musicCategoryList();
+		mav.addObject("mc", mc);
+		mav.addObject("arSong", list);
+		mav.addObject("adminID", adminId);
 		return mav;
 		
 	}
 	
 	//修改歌曲月CP值
-	@RequestMapping(value = "/updateSongMonthCP", method = RequestMethod.POST)
-	public String updateSongMonthCP(String cpPoint,String cpId) {
+	@RequestMapping(value = "/updateSongMonthCP")
+	public String updateSongMonthCP(String cpPoint,String adminID,String songID) {
 		
 		//update CP值
 		System.out.println("songWeekcpPoint===>"+cpPoint);
+		System.out.println("songID===>"+songID);
+		musicService.updateSongMonthCP(adminID, songID, Integer.parseInt(cpPoint));
 		return "querySongMonthRankingForAdmin";
 	}
 	
 	
 	//查詢創作人周榜
 	@RequestMapping(value = "/queryCreatorWeekRankingForAdmin")
-	public ModelAndView queryCreatorWeekRankingForAdmin(String albumName,String creatorName,
+	public ModelAndView queryCreatorWeekRankingForAdmin(String adminId,String albumName,String creatorName,
 			String musicCategory,String startDate,String endDate) {
 		System.out.println("musicCategory===>"+musicCategory);
 		
 		ModelAndView mav = new ModelAndView("queryCreatorWeekRankingForAdmin");
 		
-		
-		Creator creator = new Creator();
-		creator.setAccountName("kevin");
-		creator.setAccountNO("12345678");
-		creator.setUserName("怡秀姐");
-		creator.setId(123456);
-		Creator creator2 = new Creator();
-		creator2.setAccountName("kevin");
-		creator2.setAccountNO("12345678");
-		creator2.setUserName("劉小駿");
-		creator2.setId(555555);
-		
-		WeekRanking weekRanking = new WeekRanking();
-		weekRanking.setId(123456);
-		weekRanking.setModifyValue("20");
-		WeekRanking weekRanking2 = new WeekRanking();
-		weekRanking2.setId(1234567);
-		weekRanking2.setModifyValue("30");
-		
-		
-		Set<WeekRanking> wr = new HashSet();
-		wr.add(weekRanking);
-		
-		Set<WeekRanking> wr2 = new HashSet();
-		wr2.add(weekRanking2);
-		
-		creator.setWeekRanking(wr);
-		creator2.setWeekRanking(wr2);
-		
-		Creator[] arCreator = {creator,creator2}; 
-		mav.addObject("arCreator", arCreator);
+		ArrayList list = musicService.queryCreatorWeekRankingForAdmin(creatorName);
+		MusicCategory[] mc = musicService.musicCategoryList();
+		mav.addObject("mc", mc);
+		mav.addObject("arCreator", list);
+		mav.addObject("adminID", adminId);
 		return mav;
 	}
 	
 	//修改創作人週CP值
-	@RequestMapping(value = "/updateCreatorWeekCP", method = RequestMethod.POST)
-	public String updateCreatorWeekCP(String cpPoint,String cpId) {
+	@RequestMapping(value = "/updateCreatorWeekCP")
+	public String updateCreatorWeekCP(String cpPoint,String adminID,String creatorID) {
 		
 		//update CP值
 		System.out.println("creatorWeekcpPoint===>"+cpPoint);
+		System.out.println("creatorID===>"+creatorID);
+		musicService.updateCreatorWeekCP(adminID, creatorID, Integer.parseInt(cpPoint));
 		return "queryCreatorWeekRankingForAdmin";
 	}
 	
 	
 	//查詢創作人月榜
 	@RequestMapping(value = "/queryCreatorMonthRankingForAdmin")
-	public ModelAndView queryCreatorMonthRankingForAdmin(String albumName,String creatorName,
+	public ModelAndView queryCreatorMonthRankingForAdmin(String adminId,String albumName,String creatorName,
 			String musicCategory,String startDate,String endDate) {
 		System.out.println("musicCategory===>"+musicCategory);
 		
 		ModelAndView mav = new ModelAndView("queryCreatorMonthRankingForAdmin");
-		
-		
-		Creator creator = new Creator();
-		creator.setAccountName("kevin");
-		creator.setAccountNO("12345678");
-		creator.setUserName("怡秀姐");
-		creator.setId(123456);
-		Creator creator2 = new Creator();
-		creator2.setAccountName("kevin");
-		creator2.setAccountNO("12345678");
-		creator2.setUserName("劉小駿");
-		creator2.setId(555555);
-		
-		MonthRanking monthRanking = new MonthRanking();
-		monthRanking.setId(123456);
-		monthRanking.setModifyValue("20");
-		MonthRanking monthRanking2 = new MonthRanking();
-		monthRanking2.setId(1234567);
-		monthRanking2.setModifyValue("30");	
-
-		Set<MonthRanking> mr = new HashSet();
-		mr.add(monthRanking);
-		
-		Set<MonthRanking> mr2 = new HashSet();
-		mr2.add(monthRanking2);
-		
-		creator.setMonthRanking(mr);
-		creator2.setMonthRanking(mr2);
 	
-		Creator[] arCreator = {creator,creator2}; 
-		mav.addObject("arCreator", arCreator);
+		ArrayList list = musicService.queryCreatorMonthRankingForAdmin(creatorName);
+		MusicCategory[] mc = musicService.musicCategoryList();
+		mav.addObject("mc", mc);
+		mav.addObject("arCreator", list);
+		mav.addObject("adminID", adminId);
 		return mav;
 	}
 	
 	//修改創作人月CP值
-	@RequestMapping(value = "/updateCreatorMonthCP", method = RequestMethod.POST)
-	public String updateCreatorMonthCP(String cpPoint,String cpId) {
+	@RequestMapping(value = "/updateCreatorMonthCP")
+	public String updateCreatorMonthCP(String cpPoint,String adminID,String creatorID) {
 		
 		//update CP值
 		System.out.println("CreatorMonthcpPoint===>"+cpPoint);
+		System.out.println("creatorID===>"+creatorID);
+		musicService.updateCreatorMonthCP(adminID, creatorID, Integer.parseInt(cpPoint));
 		return "queryCreatorMonthRankingForAdmin";
 	}
 }

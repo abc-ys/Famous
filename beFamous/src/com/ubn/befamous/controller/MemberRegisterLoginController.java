@@ -13,6 +13,7 @@ import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,6 +43,7 @@ public class MemberRegisterLoginController {
 	@RequestMapping("/saveRegisterOne")
 	public String saveRegisterOne(String email,String userName,String password,String sex,String birthday,String location, Model model)
 	{
+		birthday=birthday+"000000";
 		System.out.println("saveRegisterOne==>");
 		System.out.println("	email="+email+", userName="+userName+", password="+password+", sex="+sex+", birthday="+birthday+", location="+location);
 		
@@ -153,9 +155,10 @@ public class MemberRegisterLoginController {
 				System.out.println("上傳檔案超過最大檔案允許大小" + yourMaxRequestSize / (1024 * 1024) + "MB !");
 		}
 		System.out.println("picture2=="+picture2);
-		if(!picture2.isEmpty()){
+		if(StringUtils.isNotBlank(picture2)){
 			personService.updateMemberPicture(memberId, picture2);
 		}else{
+			fileName="image/memberPicture/"+fileName;
 			personService.updateMemberPicture(memberId, fileName);
 		}
 		

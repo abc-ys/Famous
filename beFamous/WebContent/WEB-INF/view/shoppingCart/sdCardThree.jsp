@@ -22,21 +22,25 @@
 <tr><td Width="140" Height="35" valign="top">
 <font size="2">產品名稱</font></td>
 <td valign="top" Width="100"><font size="2">價格</font></td>
+<td valign="top" Width="100"><font size="2">數量</font></td>
 <td valign="top" Width="100"><font size="2">贈送GSiBonus</font></td></tr>
 <tr>
 <td Width="140" Height="50" valign="top">
-<font size="2">${PrePaid.name}點</font>
+<font size="2">${SDCard.name}點</font>
 </td>
 <td valign="top" Width="100">
-<font size="2">${PrePaid.prePaidPrice.price}</font>
+<font size="2">${SDCard.sdCardPrice.price}</font>
 </td>
 <td valign="top" Width="100">
-<font size="2">${PrePaid.reward}</font>
+<font size="2">${amount}</font>
+</td>
+<td valign="top" Width="100">
+<font size="2">${SDCard.reward}</font>
 </td>
 </tr>
 <%--  <tr><td Width="140" Height="50" valign="top"><font size="2">${sdName}</font></td><td valign="top" Width="100"><font size="2">${price}</font></td><td valign="top" Width="100"><font size="2">${discountBonus}</font></td></tr> --%>
-<tr><td colspan="3" align="right" valign="top" Height="35"><font size="2">處理費/郵資  NT$ ${price}元</font></td></tr>
-<tr><td colspan="3" align="right" valign="top" Height="35"><font size="2">本筆訂單需付款金額  NT$ ${PrePaid.prePaidPrice.price}元</font></td></tr>
+<tr><td colspan="4" align="right" valign="top" Height="35"><font size="2">處理費/郵資  NT$ 元</font></td></tr>
+<tr><td colspan="4" align="right" valign="top" Height="35"><font size="2">本筆訂單需付款金額  NT$ ${SDCard.sdCardPrice.price*amount}元</font></td></tr>
 </table>
 <p>
 <table border="1" BorderColor="#000000" cellpadding="0" cellspacing="0" Width="200" Height="35"><td><font size="2" color="#880000"><b>付款方式與寄送資訊</b></font></font></td></table>
@@ -55,6 +59,8 @@
 <input type="hidden" name="receiverEmail" value="${memberUser.email}">
 <input type="hidden" name="receiverTel" value="${memberUser.tel}">
 <input type="hidden" name="shipAddress" value="${memberUser.address}">
+<input type="hidden" name="productType" value="sdCard">
+<input type="hidden" name="amount" value="${amount}">
 <br>
 <p>
 <center><input type="submit" value="確認無誤結帳" onclick="add()"/></center>

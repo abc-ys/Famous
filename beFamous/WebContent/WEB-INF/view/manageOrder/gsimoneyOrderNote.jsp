@@ -8,13 +8,14 @@
 <body>
 <form name="fm" method="post">
 <p>
-訂單備註1&nbsp&nbsp備註訂購者可見<br>
-<textarea cols="60" rows="6" name="memo1"></textarea> 
+訂單備註1&nbsp;&nbsp;備註訂購者可見<br>
+<textarea cols="60" rows="6" name="memo1">${noteList[0]}</textarea> 
 <p>
-訂單備註2&nbsp&nbsp備註只有管理者可見<br>
-<textarea cols="60" rows="6" name="memo2"></textarea> 
-
+訂單備註2&nbsp;&nbsp;備註只有管理者可見<br>
+<textarea cols="60" rows="6" name="memo2">${noteList[1]}</textarea> 
 <center><input type="submit" value="儲存" onclick="saveData()"/></center>
+<input type="hidden" name="adminId" value="${adminId}">
+<input type="hidden" name="orderId" value="${orderId}">
 </form>
 </body>
 <script>

@@ -33,7 +33,7 @@
 		</td><tr><tr>
 		<td>活動名稱:&nbsp <input type="text" name="activityName" value='<c:out value="${adDetail.activityName}"></c:out>'></td><tr><tr>
 		<input type="hidden" name="picture" value="${adDetail.picture}">
-		<td>檔案:&nbsp <img alt="" src="${adDetail.picture}"></td><tr><tr>
+		<td>檔案:&nbsp <img alt="" src="/${initParam.ImageWeb}/${adDetail.picture}"></td><tr><tr>
 		<td><input type="file" name="file" size="20"></td><tr><tr>
 		<td>活動期間:&nbsp <input name="activityStartDate" type="text" value="<fmt:parseDate var="dateObj" value="${adDetail.activityStartDate}" type="DATE" pattern="yyyyMMddHHmmss"/><fmt:formatDate value='${dateObj}' pattern='yyyy-MM-dd' />" class="fillbox" readonly>&nbsp;<A HREF="javascript:show_calendar('modifyAd.activityStartDate');"><img src="${pageContext.request.contextPath}/images/cal.gif" border="0"></img></a>
 		  &nbsp~&nbsp <input name="activityEndDate" type="text" value="<fmt:parseDate var="dateObj" value="${adDetail.activityEndDate}" type="DATE" pattern="yyyyMMddHHmmss"/><fmt:formatDate value='${dateObj}' pattern='yyyy-MM-dd' />" class="fillbox" readonly >&nbsp;<A HREF="javascript:show_calendar('modifyAd.activityEndDate');"><img src="${pageContext.request.contextPath}/images/cal.gif" border="0"></img></a>

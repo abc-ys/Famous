@@ -230,7 +230,8 @@
 		<property name="sessionFactory">
 			<ref bean="sessionFactory" />
 		</property>
-	</bean><bean id="hiddenDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
+	</bean>
+	<bean id="hiddenDAO" class="com.ubn.befamous.dao.impl.BaseDaoImpl">
 		<constructor-arg>
 			<value>com.ubn.befamous.entity.Hidden</value>
 		</constructor-arg>

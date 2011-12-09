@@ -5,6 +5,7 @@
 <head>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.6.1.min.js"></script>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
@@ -18,9 +19,10 @@
 <c:forEach var="hm" items="${album}" varStatus="status">
 <c:if test="${status.count%3==1}"><tr></c:if>
 <td>
-<img alt="" src="${hm.cover}"  width="150" height="150"><br>
-<a href="javascript:editAlbumContent('${hm.id}','${creatorId}')">${hm.name}</a><br>
-${hm.createDate}<br>
+<img alt="" src="/${initParam.ImageWeb}/${hm.cover}"  width="150" height="150"><br>
+<a href="javascript:editAlbumContent('${hm.pid}','${creatorId}')">${hm.name}</a><br>
+<fmt:parseDate var="dateObj" value="${hm.createDate}" type="DATE" pattern="yyyyMMddHHmmss"/> 
+<fmt:formatDate value='${dateObj}' pattern='yyyy-MM-dd' /><br>
 <c:if test="${hm.hidden.id != null}">
 <font color="ff0000">被管理員隱藏<br>${hm.hidden.hiddenReason}</font>
 </c:if>

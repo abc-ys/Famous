@@ -17,31 +17,32 @@
 消息類別:&nbsp;
 <select name="newsCategory">
 	<option value=""></option> 
-	<option value="表演">表演</option>
-	<option value="公告">公告</option>
-	<option value="新聞">新聞</option>
-	<option value="好康">好康</option>
-	<option value="其他">其他</option>
+	<option value="表演" <c:if test="${newsCategory=='表演'}">selected = "true"</c:if> >表演</option>
+	<option value="公告" <c:if test="${newsCategory=='公告'}">selected = "true"</c:if> >公告</option>
+	<option value="新聞" <c:if test="${newsCategory=='新聞'}">selected = "true"</c:if> >新聞</option>
+	<option value="好康" <c:if test="${newsCategory=='好康'}">selected = "true"</c:if> >好康</option>
+	<option value="其他" <c:if test="${newsCategory=='其他'}">selected = "true"</c:if> >其他</option>
 	</select><p>
-消息標題:&nbsp;<input type="text" name="newsName">&nbsp;<p>
+消息標題:&nbsp;<input type="text" name="newsName" value=${newsName}>&nbsp;<p>
 上架時間:&nbsp;
-<input name="MOPEND" type="text" class="fillbox" readonly>&nbsp;
+<input name="MOPEND" type="text" class="fillbox" value=${MOPEND} >&nbsp;
 <A HREF="javascript:show_calendar('fm.MOPEND');"><img src="${pageContext.request.contextPath}/images/cal.gif" border="0"></img></a>&nbsp-&nbsp
-<input name="MCLOSED" type="text" class="fillbox" readonly >&nbsp;
+<input name="MCLOSED" type="text" class="fillbox" value=${MCLOSED} >&nbsp;
 <A HREF="javascript:show_calendar('fm.MCLOSED');"><img src="${pageContext.request.contextPath}/images/cal.gif" border="0"></img></a><p>
 狀態:&nbsp;
 <select name="onStatus">
-<option value=""></option> 
-<option value="1">刊登中</option> 
-<option value="2">未上架</option>
+<option value="" <c:if test="${onStatus==''}">selected = "true"</c:if> ></option> 
+<option value="1" <c:if test="${onStatus=='1'}">selected = "true"</c:if> >刊登中</option> 
+<option value="2" <c:if test="${onStatus=='2'}">selected = "true"</c:if> >未上架</option>
 </select><p>
-消息來源:&nbsp;<input type="text" name="newsSource">&nbsp;<p>
+消息來源:&nbsp;<input type="text" name="newsSource" value=${newsSource} >&nbsp;<p>
+<input type="hidden" name="adminId" value=${adminId}>
 <center><input type="submit" value="查詢" onclick="query()"/></center>
 </form>
 <p>
 查詢結果
 <form name="form2" id='form2' method="post">
-<input type="submit" value="刪除" onclick="deleteData()"/>
+<input type="submit" value="刪除" onclick="deleteData(${adminId})"/>
 <table border="1" BorderColor="#000000" cellpadding="0" cellspacing="0">
 <tr><td Width="50" Height="35" valign="top"><font size="2">序號</font></td>
 	<td valign="top" Width="50"><font size="2"></font></td>
@@ -58,13 +59,14 @@
 	<td><INPUT type=checkbox name="del" id="del" value="${n.id}"></td>
 	<td><font size="2">${n.newsCategory}</font></td>
 	<c:if test="${n.onStatus == 1}">
-	<td><font size="2"><a href="javascript:void(0)" onclick="showcontent('${n.id}')">${n.newsName}</a></font></td></c:if>
+	<td><font size="2"><a href="javascript:void(0)" onclick="showcontent('${n.id}','${adminId}')">${n.newsName}</a></font></td></c:if>
 	<c:if test="${n.onStatus == 2}">
-	<td><font size="2"><a href="javascript:void(0)" onclick="editcontent('${n.id}')">${n.newsName}</a></font></td></c:if>	
+	<td><font size="2"><a href="javascript:void(0)" onclick="editcontent('${n.id}','${adminId}')">${n.newsName}</a></font></td></c:if>	
 	<td><font size="2">${n.newsSouce}</font></td>	
 	<fmt:parseDate var="dateObj" value="${n.createDate}" type="DATE" pattern="yyyyMMddHHmmss"/> 
 	<td><font size="2"><fmt:formatDate value='${dateObj}' pattern='yyyy-MM-dd' /></font></td>
-	<td><font size="2">${n.onDate}</font></td>
+	<fmt:parseDate var="onDate" value="${n.onDate}" type="DATE" pattern="yyyyMMddHHmmss"/> 
+	<td><font size="2"><fmt:formatDate value='${onDate}' pattern='yyyy-MM-dd' /></font></td>
 	<c:if test="${n.onStatus == 1}"><td><font size="2">刊登中</font></td></c:if>
 	<c:if test="${n.onStatus == 2}"><td><font size="2">未上架</font></td></c:if>
 	<td><font size="2">${n.hit}</font></td><tr>
@@ -78,20 +80,19 @@ function query(){
      document.fm.action="${pageContext.request.contextPath}/queryManagerNewsData.do";
      document.fm.submit();
 }
-function editcontent(newsID){
-    document.form2.action="${pageContext.request.contextPath}/editNewsData/edit.do?newsID="+newsID;
+function editcontent(newsID,adminId){
+    document.form2.action="${pageContext.request.contextPath}/editNewsData/edit.do?newsID="+newsID+"&adminId="+adminId;
     document.form2.submit();
 }
-function showcontent(newsID){
-    document.fm.action="${pageContext.request.contextPath}/editNewsData/show.do?newsID="+newsID;
-    document.fm.submit();
+function showcontent(newsID,adminId){
+    document.form2.action="${pageContext.request.contextPath}/editNewsData/show.do?newsID="+newsID+"&adminId="+adminId;
+    document.form2.submit();
 }
-function deleteData(){
-	alert($('input:checkbox:checked[name="del"]').val());
+function deleteData(adminId){
 	var delList = new Array();
 	$('input:checkbox:checked[name="del"]').each(function(i) { delList[i] = this.value; });
 	document.form2.delList.value = delList;
-	document.form2.action="${pageContext.request.contextPath}/deleteData.do";
+	document.form2.action="${pageContext.request.contextPath}/deleteData.do?adminId="+adminId;
 	document.form2.submit(); 
 }
 </script>

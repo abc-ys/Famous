@@ -13,9 +13,9 @@
 <h4>查看上傳廣告內容</h4>
 <p>
 <form name="fm" method="post">	
-	活動時間:&nbsp<input name="activityStartDate" type="text" class="fillbox" readonly>&nbsp;
+	活動時間:&nbsp<input name="activityStartDate" type="text" class="fillbox" >&nbsp;
 	<A HREF="javascript:show_calendar('fm.activityStartDate');"><img src="${pageContext.request.contextPath}/images/cal.gif" border="0"></img></a>&nbsp-&nbsp
-	<input name="activityEndDate" type="text" class="fillbox" readonly >&nbsp;
+	<input name="activityEndDate" type="text" class="fillbox" >&nbsp;
 	<A HREF="javascript:show_calendar('fm.activityEndDate');"><img src="${pageContext.request.contextPath}/images/cal.gif" border="0"></img></a><br><br>
 
 	審核狀態:<select name="identity" id="identity">
@@ -25,7 +25,7 @@
 			<option value="3" >審核失敗</option>
 		</select><br><br>
 	專輯數:<input type="text" name="albumNumber" id="albumNumber"><br><br>
-	<input type="button" value="查詢" onclick="queryAd()">
+	<input type="button" value="查詢" onclick="queryAd('${adminId}')">
 </form>
 <p>
 查詢結果
@@ -57,8 +57,8 @@
 </table>
 </body>
 <script type="text/javascript">
-function queryAd(){
-	document.fm.action="${pageContext.request.contextPath}/queryUploadAdBanner.do";
+function queryAd(adminId){
+	document.fm.action="${pageContext.request.contextPath}/queryUploadAdBanner.do?adminID="+adminId;
   	document.fm.submit();
 }
 function identity(adminId,memberId,identityName){	

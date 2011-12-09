@@ -7,26 +7,32 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=BIG5">
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.6.1.min.js"></script>
+<script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar.js"></script>
 </head>
 <body>
 <h1>新增活動</h1>
 
 <form action="" name="qForm" method="post">
 活動名稱:<input type="text" name="title" ><br></br>
-活動期間:<input type="text" name="startDate" > - <input type="text" name="endDate" ><br>
+活動期間:
+<input type="text" name="startDate" class="fillbox" readonly>&nbsp;<A HREF="javascript:show_calendar('qForm.startDate');"><img src="${pageContext.request.contextPath}/images/cal.gif" border="0"></img></a>
+&nbsp;-&nbsp;<input type="text" name="endDate" class="fillbox" readonly>&nbsp;<A HREF="javascript:show_calendar('qForm.endDate');"><img src="${pageContext.request.contextPath}/images/cal.gif" border="0"></img></a><br><br>
 
 篩選條件: <br>
 <input type="radio"  name="contentCondition" value="1" onclick="closeMusic('1');">儲值金額 <input type="text" id="a_money"  name="prepaidMoney" >元<br>
 <input type="radio"  name="contentCondition" value="2" onclick="closeMusic('2');">儲值次數 <input type="text" id="a_count"  name="prepaidCount" >次<br>
 
 
-<input type="radio" id="album" name="contentCondition" value="3" onclick="changeProduct('album');">專輯   <input type="radio" id="song" name="contentCondition" value="4" onclick="changeProduct('song');">歌曲 
+<input type="radio" id="album" name="contentCondition" value="3" onclick="changeProduct('album');">專輯   
+<input type="radio" id="song" name="contentCondition" value="4" onclick="changeProduct('song');">歌曲 
 
 <div id="a_album">
 專輯ID:<input type="text" name="albumId">  <input type="button" name="111" value="增加" onclick="addAlbum();">
 
-<table id="albumTable" border="1">
+<table id="albumTable1" border="1">
+<tbody id="albumTable">
 <tr><td> 專輯ID </td> <td> 專輯名稱 </td> <td> 創作人 </td><td>刪除</td></tr>
+</tbody>
 </table>
 
 
@@ -36,27 +42,36 @@
 <div id="a_song">
 歌曲ID:<input type="text" name="songId"> <input type="button" name="222" value="增加" onclick="addSong();">
 
-<table id="songTable" border="1">
+<table id="songTable1" border="1">
+<tbody id="songTable">
 <tr><td> 歌曲ID </td> <td> 專輯名稱 </td> <td> 歌曲名稱 </td> <td> 創作人 </td><td>刪除</td></tr>
+</tbody>
 </table>
 
 </div>
 <br>
-
+<p>
 符合內容: <input type="radio"  name="condition"  value="1">符合全部所選ID<br>
           <input type="radio"  name="condition" value="2">只符合一個所選的ID<br>
           <input type="radio"  name="condition" value="3">須符合三個所選的ID<br>
-          
+<p>  
 贈送內容: GSiBonus  <br>
     <input type="radio" name="rewardCondition"  value="1"> <input type="text" id="a_rewardMoney1"  name="rewardMoney1" >元(點)<br>
     <input type="radio" name="rewardCondition"  value="2"> 訂單金額  X <input type="text" id="a_rewardMoney2"  name="rewardMoney2" >元(點)<br>
-
-
-活動狀態:  <input type="radio" name="status" value="0">到期自動開啟
-          <input type="radio"  name="status" value="1">隱藏          
+<p>
+使用期限:
+<select name="rewardDeadline">  
+	<option value="1">一個月</option> 
+	<option value="2">三個月</option> 
+	<option value="3">六個月</option> 
+	<option value="4">九個月</option> 
+	<option value="5">一年</option> 
+</select>
+<p>
+活動狀態:  <input type="radio" name="status" value="1">到期自動開啟
+          <input type="radio"  name="status" value="3">隱藏          
 <br>
-
-
+<input type="hidden"  name="adminID"  value="${adminID}">
 <input type="button" name="222" value="確定儲存" onclick="onSubmit();">
 
 </form>
@@ -67,8 +82,9 @@ $(document).ready(function(){
 	$("#a_album").hide();
 	$("#a_song").hide();
 	$("#albumTable").hide();
+	$("#albumTable1").hide();
 	$("#songTable").hide();	
-	
+	$("#songTable1").hide();	
 });
 
 function openMusic(){
@@ -76,7 +92,9 @@ function openMusic(){
 	$("#a_album").show();
 	$("#a_song").hide();
 	$("#albumTable").hide();
+	$("#albumTable1").hide();
 	$("#songTable").hide();	
+	$("#songTable1").hide();	
 }
 function closeMusic(condition){
 	
@@ -139,17 +157,18 @@ function addAlbum(){
 				  alert('已有重複專輯ID!');
 	              return; 
 			  }
-			 $("#albumTable").show();
-             for(i=0;i<NumOfJData;i++){  
+			 
+             for(var i=0;i<NumOfJData;i++){  
    			 $("#albumTable").append( " <tr id=\""+ response[i].albumID + "\">"  +
    		   			                  " <td> "+response[i].albumID+"</td>"+
    			                          " <td> <a href=\"${pageContext.request.contextPath}/queryAlbumData.do?albumid="+response[i].albumID+"\">"+response[i].name+"</a></td> "+
-   			                          " <td> <a href=\"${pageContext.request.contextPath}/creatorProfile.do?creatorID="+response[i].creator.memberId+"\">"+response[i].creator.userName+"</a></td> "+
+   			                          " <td> <a href=\"${pageContext.request.contextPath}/creatorProfile.do?creatorID="+response[i].creatorID+"\">"+response[i].creatorName+"</a></td> "+
    			                          " <td><input type='button' value='刪除' onclick=\"deleteAlbumRow('"+response[i].albumID+"');\"></td> "+
    			                          "</tr>" );
    			$("#albumTable").append(" <input type=\"hidden\" name=\"albumID\" value=\""+response[i].albumID+"\">");
-               
 		  }
+             $("#albumTable").show();
+             $("#albumTable1").show();
 	    }
 	});
 	
@@ -174,17 +193,19 @@ function addSong(){
 				  alert('已有重複歌曲ID!');
 	              return; 
 			  }
-			 $("#songTable").show();
-             for(i=0;i<NumOfJData;i++){       
+			 
+             for(var i=0;i<NumOfJData;i++){       
    			 $("#songTable").append( " <tr id=\""+ response[i].songID + "\">"  +
    		   			                  " <td> "+response[i].songID+"</td>"+
-   			                          " <td> <a href=\"${pageContext.request.contextPath}/queryAlbumData.do?albumid="+response[i].album.albumID+"\">"+response[i].album.name+"</a></td> "+
+   			                          " <td> <a href=\"${pageContext.request.contextPath}/queryAlbumData.do?albumid="+response[i].albumID+"\">"+response[i].albumName+"</a></td> "+
    			                          " <td> "+response[i].name+"</td> "+
-   			                          " <td> <a href=\"${pageContext.request.contextPath}/creatorProfile.do?creatorID="+response[i].album.creator.memberId+"\">"+response[i].album.creator.userName+"</a></td> "+
+   			                          " <td> <a href=\"${pageContext.request.contextPath}/creatorProfile.do?creatorID="+response[i].creatorID+"\">"+response[i].creatorName+"</a></td> "+
    			                          " <td><input type='button' value='刪除' onclick=\"deleteSongRow('"+response[i].songID+"');\"></td> "+
    			                          "</tr>" );
    			$("#songTable").append(" <input type=\"hidden\" name=\"songID\" value=\""+response[i].songID+"\">");
                }
+             $("#songTable").show();
+             $("#songTable1").show();
 	    }
 	});
 	

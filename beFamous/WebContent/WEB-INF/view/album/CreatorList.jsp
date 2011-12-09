@@ -13,16 +13,16 @@
 <body>
 
 <table border="1">
-<c:forEach var="creator" items="${arCreator}" >
+<c:forEach var="list" items="${arCreator}"  end="29" >
 <tr>
 <td>
-<img alt="" src="${creator.picture}">
+<img alt="" src="/${initParam.ImageWeb}/${list[0].picture}"  width="190" height="80">
    </td>
 </tr>
 <tr>
 <td>
-${creator.userName}
-專輯數:${fn:length(creator.album)}   
+${list[0].userName}
+專輯數:${list[1]}   
 
 </td>
 </tr>

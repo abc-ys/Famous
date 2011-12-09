@@ -16,7 +16,7 @@
 <c:forEach var="creator" items="${arCreator}" >
 <tr>
 <td>
-<img alt="" src="${creator.picture}">
+<img alt="" src="/${initParam.ImageWeb}/${creator.picture}">
    </td>
 </tr>
 <tr>

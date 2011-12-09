@@ -18,8 +18,8 @@
 <form action="" name="qform" method="POST">
 
 
-<a href="javascript: void(0)" onClick="goSubmit('a01');">最新發佈</a>
-<a href="javascript: void(0)" onClick="goSubmit('a02');">最受歡迎</a>
+<a href="javascript: void(0)" onClick="goSubmit('a01','${categoryID}');">最新發佈</a>
+<a href="javascript: void(0)" onClick="goSubmit('a02','${categoryID}');">最受歡迎</a>
 
 
 
@@ -31,13 +31,13 @@
 </body>
 
 <script type="text/javascript">
-function goSubmit(condition){
+function goSubmit(condition,categoryID){
 	if(condition=='a01'){
-      document.qform.action='${pageContext.request.contextPath}/queryNewAlbumsForMusicCategory.do';
+      document.qform.action='${pageContext.request.contextPath}/queryNewAlbumsForMusicCategory/'+categoryID+'.do';
       document.qform.submit();
 	}
 	if(condition=='a02'){
-	      document.qform.action='${pageContext.request.contextPath}/queryHotAlbumsForMusicCategory.do';
+	      document.qform.action='${pageContext.request.contextPath}/queryHotAlbumsForMusicCategory/'+categoryID+'.do';
 	      document.qform.submit();
 	}
 	

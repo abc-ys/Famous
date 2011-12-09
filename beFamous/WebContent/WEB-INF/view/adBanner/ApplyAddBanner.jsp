@@ -14,7 +14,6 @@
  
  <form name="pdfForm" action="${pageContext.request.contextPath}/saveBanner.do" enctype="multipart/form-data" method="post">
  <p>會員帳號:<input type="text" name="memberID" value="${memberID}">
-   <input type="button" value="變更帳號" onclick="modifyMemberId('${memberID}')">
  </p>
  <p>banner類別:
  <select name="dep">

@@ -35,10 +35,13 @@
 								<tr>
 									<td Height="35"><font size="2">${status.index+1}</font></td>
 									<td><font size="2"><a href="javascript:void(0)"
-											onclick="album('${hm[0].albumID}')">${hm[0].name}</a></font></td>
+											onclick="album('${hm[0].pid}')">${hm[0].name}</a></font></td>
 									<td><font size="2">${hm[1]}</font></td>
-									<td><font size="2">${hm[0].status}</font></td>
-									<td><input type="button"  value="詳細清單" onclick="offReason('${hm[0].albumID}')"></td>
+									<td><font size="2">
+									<c:if test="${hm[0].status == 1}">公開</c:if>
+									<c:if test="${hm[0].status == 2}">隱藏</c:if>
+									</font></td>
+									<td><input type="button"  value="詳細清單" onclick="offReason('${hm[0].pid}')"></td>
 								</tr>
 							</c:forEach>
 						</table>							
@@ -60,10 +63,13 @@
 									<td Height="35"><font size="2">${status2.index+1}</font></td>
 									<td><font size="2"><a href="javascript:void(0)">${hm2[0].name}</a></font></td>
 									<td><font size="2"><a href="javascript:void(0)"
-											onclick="album('${hm2[0].album.albumID}')">${hm2[0].album.name}</a></font></td>
+											onclick="album('${hm2[0].album.pid}')">${hm2[0].album.name}</a></font></td>
 									<td><font size="2">${hm2[1]}</font></td>
-									<td><font size="2">${hm2[0].album.status}</font></td>
-									<td><input type="button"  value="詳細清單" onclick="offReason('${hm2[0].songID}')"></td>			
+									<td><font size="2">
+									<c:if test="${hm2[0].album.status == 1}">公開</c:if>
+									<c:if test="${hm2[0].album.status == 2}">隱藏</c:if>
+									</font></td>
+									<td><input type="button"  value="詳細清單" onclick="offReason('${hm2[0].pid}')"></td>			
 								</tr>
 							</c:forEach>
 						</table>
@@ -88,7 +94,7 @@ function album(albumId) {
 	window.open("${pageContext.request.contextPath}/queryAlbumData.do?albumid="+albumId);
 }
 function offReason(id) {
-	window.open("${pageContext.request.contextPath}/offenseReason.do?id="+id);
+	window.open("${pageContext.request.contextPath}/offenseReason.do?productionCategoryId="+id);
 }
 </script>
 </html>

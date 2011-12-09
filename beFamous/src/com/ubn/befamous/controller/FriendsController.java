@@ -68,7 +68,6 @@ public class FriendsController {
 			*/
 			Friend[] arFriend = personService.queryUnCheckFriend(userID);
 			model.addAttribute("userID", userID);	
-			model.addAttribute("unfriends", arFriend);	
 			
 			return new ModelAndView("queryFriend");
 		}

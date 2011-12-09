@@ -2,62 +2,54 @@ package com.ubn.befamous.controller;
 
 import java.util.ArrayList;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.ubn.befamous.entity.Album;
 import com.ubn.befamous.entity.Creator;
+import com.ubn.befamous.entity.Member;
 import com.ubn.befamous.entity.Order;
 import com.ubn.befamous.entity.PrePaidPrice;
 import com.ubn.befamous.entity.SDCard;
 import com.ubn.befamous.entity.SDCardPrice;
+import com.ubn.befamous.entity.ShoppingCart;
+import com.ubn.befamous.entity.ShoppingCartDetail;
 import com.ubn.befamous.entity.Song;
 import com.ubn.befamous.entity.SongPrice;
 import com.ubn.befamous.entity.PrePaid;
+import com.ubn.befamous.service.TransactionRecordService;
 
 @Controller
+@SessionAttributes
 public class ShoppingCartController {
+	
+	@Autowired
+	private TransactionRecordService transactionRecordService;
 	
 	//儲值-購物車-步驟一
 	@RequestMapping("/prepay")
 	public ModelAndView prepay() {
-		PrePaidPrice price = new PrePaidPrice();
-		PrePaid prePaid = new PrePaid();
-		prePaid.setName("儲值100");
-		price.setpPrice("100");
-		PrePaidPrice price2 = new PrePaidPrice();
-		PrePaid prePaid2 = new PrePaid();
-		prePaid2.setName("儲值300");
-		price2.setpPrice("300");
-		PrePaidPrice price3 = new PrePaidPrice();
-		PrePaid prePaid3 = new PrePaid();
-		prePaid3.setName("儲值500");
-		price3.setpPrice("500");
-		PrePaidPrice price4 = new PrePaidPrice();
-		PrePaid prePaid4 = new PrePaid();
-		prePaid4.setName("儲值800");
-		price4.setpPrice("800");
-		PrePaidPrice price5 = new PrePaidPrice();
-		PrePaid prePaid5 = new PrePaid();
-		prePaid5.setName("儲值1000");
-		price5.setpPrice("1000");
-		PrePaid[] pre = {prePaid,prePaid2,prePaid3,prePaid4,prePaid5};
-		PrePaidPrice[] prIce = {price,price2,price3,price4,price5};
-		ArrayList list = new ArrayList();
-		list.add(pre);
-		list.add(prIce);
-		return new ModelAndView("prepay","prePay",list);
+		return new ModelAndView("prepay", "prePay",this.transactionRecordService.queryPrePaid());
 	}
 	
 	//儲值-購物車-步驟二
 	@RequestMapping("/prepayTwo")
-	public ModelAndView prepaytwo(String prePay, String agree1) {
+	public ModelAndView prepaytwo(String prePay, String agree1,HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView("prepayTwo");
-		
-		System.out.println("prePay==>"+prePay);
-		System.out.println("agree==>"+agree1);
+		String[] prePaid = prePay.split(";");
+		System.out.println("prePaid[0]==>"+prePaid[0]);
+		ArrayList list = transactionRecordService.queryProductDetail(Long.parseLong(prePaid[0]));
+		PrePaid paid = (PrePaid)list.get(0);
+		request.getSession().setAttribute("PRE_PAID", paid);
+		System.out.println("paid1111111==>"+paid);
+		//this.transactionRecordService.purchaseConfirmShoppingCart(userId, shoppingCart);
 		
 		mav.addObject("price",prePay);
 		return mav;
@@ -65,29 +57,35 @@ public class ShoppingCartController {
 	
 	//儲值-購物車-步驟三
 	@RequestMapping("/prepayThree")
-	public ModelAndView prepaythree(String pay, String price, String tel, String msg, String email, String city, String region, String number, String address, String time, String billData, String discountBonus, String sdName) {
+	public ModelAndView prepaythree(String pay, String price, Member member,
+			String time, String billData, String discountBonus,
+			String sdName, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView("prepayThree");
-		mav.addObject("pay",pay);
-		mav.addObject("price",price);
-		mav.addObject("tel",tel);
-		mav.addObject("msg",msg);
-		mav.addObject("email",email);
-		mav.addObject("city",city);
-		mav.addObject("region",region);
-		mav.addObject("number",number);
-		mav.addObject("address",address);
-		mav.addObject("time",time);
-		mav.addObject("billData",billData);
-		mav.addObject("discountBonus",discountBonus);
+		System.out.println("pay==>"+pay);
+		long userID=1;
+		//long userID = (Long)request.getSession().getAttribute("userID");  從session取得userID
+		Member memberUser = transactionRecordService.addMemberData(userID,member);
+		
+		PrePaid paid = (PrePaid)request.getSession().getAttribute("PRE_PAID");
+		System.out.println("paid222222==>"+paid);
+		
 		mav.addObject("sdName",sdName);
+		mav.addObject("PrePaid",paid);
+		mav.addObject("pay",pay);
+		mav.addObject("memberUser",memberUser);
 		return mav;
 	}
 	
 	//儲值和SD卡-購物車-信用卡付款頁
 	@RequestMapping("/cardPay")
-	public ModelAndView cardpay(@RequestParam String discountBonus) {
+	public ModelAndView cardpay(@RequestParam String discountBonus,HttpServletRequest request,
+			Order order,String amount,String productType) {
 		ModelAndView mav = new ModelAndView("cardPay");
+		
+		request.getSession().setAttribute("ORDER", order);
 		mav.addObject("discountBonus",discountBonus);
+		mav.addObject("amount",amount);
+		mav.addObject("productType",productType);
 		return mav;
 	}
 	
@@ -100,59 +98,98 @@ public class ShoppingCartController {
 	
 	//儲值和SD卡-購物車-完成結帳頁
 	@RequestMapping("/prepayFinal")
-	public ModelAndView prepayfinal(@RequestParam String discountBonus) {
+	public ModelAndView prepayfinal(@RequestParam String discountBonus,HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView("prepayFinal");
-		Order order = new Order();
-		long orderNo = 1109211303;
-		order.setOrderRid(orderNo);
-		mav.addObject("orDer",order);
+		//Order order = new Order();
+		//long orderNo = 1109211303;
+		//order.setId(orderNo);
+		//mav.addObject("orDer",order);
+		PrePaid paid = (PrePaid)request.getSession().getAttribute("PRE_PAID");
+		Order order = (Order)request.getSession().getAttribute("ORDER");
+		order = transactionRecordService.purchasePrepaid(paid,order);
 		mav.addObject("discountBonus",discountBonus);
+		mav.addObject("order",order);
 		return mav;
 	}
 	
 	//SD卡-購物車-步驟一
 	@RequestMapping("/sdCard") 
 	public ModelAndView sdcard() {
-		SDCard sdCard = new SDCard();
-		SDCardPrice cardPrice = new SDCardPrice();
-		sdCard.setName("1G GSiSD卡");
-		cardPrice.setpPrice("299");
-		cardPrice.setDiscountPrice("249");
-		cardPrice.setDiscountBonus("50");
-		SDCard sdCard2 = new SDCard();
-		SDCardPrice cardPrice2 = new SDCardPrice();
-		sdCard2.setName("2G GSiSD卡");
-		cardPrice2.setpPrice("399");
-		cardPrice2.setDiscountPrice("349");
-		cardPrice2.setDiscountBonus("50");
-		SDCard sdCard3 = new SDCard();
-		SDCardPrice cardPrice3 = new SDCardPrice();
-		sdCard3.setName("4G GSiSD卡");
-		cardPrice3.setpPrice("599");
-		cardPrice3.setDiscountPrice("549");
-		cardPrice3.setDiscountBonus("50");
-		SDCard[] sd = {sdCard,sdCard2,sdCard3};
-		SDCardPrice[] cp = {cardPrice,cardPrice2,cardPrice3};
-		ArrayList list = new ArrayList();
-		list.add(sd);
-		list.add(cp);
-		return new ModelAndView("sdCard","sdCard",list);
+		return new ModelAndView("sdCard", "sdCard",this.transactionRecordService.querySDCard());	
 	}
 	
 	//SD卡-購物車-步驟二
-	@RequestMapping("/sdcardTwo")
-	public ModelAndView sdcardtwo(@RequestParam String sdprice, String sdmsg, String discountBonus, String sdName) {
-		ModelAndView mav = new ModelAndView("prepayTwo");
-		mav.addObject("price",sdprice);
-		mav.addObject("msg",sdmsg);
-		mav.addObject("discountBonus",discountBonus);
-		mav.addObject("sdName",sdName);
-		return mav;
+	@RequestMapping("/sdCardTwo")
+	public ModelAndView sdCardTwo(HttpServletRequest request,@RequestParam long userId, String price, String amount, Model model) {
+		System.out.println("sdCardTwo====>");
+		String []splits = price.split("_");
+		long productId =Long.valueOf(splits[0]);
+		String priceType = splits[1];
+		System.out.println("	productId="+productId+", priceType"+priceType);
+		//加入購物車
+		//ArrayList list = this.transactionRecordService.addShoppingCart(userId, productId, amount);
+		ArrayList list = transactionRecordService.queryProductDetail(productId);
+		SDCard sdCard = (SDCard)list.get(0);
+		request.getSession().setAttribute("SDCARD", sdCard);
+		
+		//Member member = (Member) list.get(0);
+		ArrayList list2 = new ArrayList();
+		Member member = transactionRecordService.queryMember(userId);
+		
+		//ShoppingCart shoppingCart = (ShoppingCart) list.get(1);
+		model.addAttribute("priceType", priceType);
+		model.addAttribute("member", member);
+		model.addAttribute("amount", amount);
+		//model.addAttribute("SDCard", sdCard);
+		//model.addAttribute("shoppingCart", shoppingCart);
+		return new ModelAndView("sdCardTwo");
 	}
 	
+	//SD卡-購物車-步驟三
+		@RequestMapping("/sdCardThree")
+		public ModelAndView sdCardThree(String amount,String pay, String price, Member member,
+				String time, String billData, String discountBonus,
+				String sdName, HttpServletRequest request) {
+			ModelAndView mav = new ModelAndView("sdCardThree");
+			System.out.println("pay==>"+pay);
+			long userID=1;
+			//long userID = (Long)request.getSession().getAttribute("userID");  從session取得userID
+			Member memberUser = transactionRecordService.addMemberData(userID,member);
+			
+			SDCard sdCard = (SDCard)request.getSession().getAttribute("SDCARD");
+			System.out.println("sdCard222222==>"+sdCard);
+			
+			mav.addObject("sdName",sdName);
+			mav.addObject("SDCard",sdCard);
+			mav.addObject("pay",pay);
+			mav.addObject("amount",amount);
+			mav.addObject("memberUser",memberUser);
+			return mav;
+		}
+	
+		//SD卡-購物車-完成結帳頁
+		@RequestMapping("/sdCardFinal")
+		public ModelAndView sdCardFinal(@RequestParam String discountBonus,HttpServletRequest request,String amount) {
+			ModelAndView mav = new ModelAndView("prepayFinal");
+			//Order order = new Order();
+			//long orderNo = 1109211303;
+			//order.setId(orderNo);
+			//mav.addObject("orDer",order);
+			SDCard sdCard = (SDCard)request.getSession().getAttribute("SDCARD");
+			Order order = (Order)request.getSession().getAttribute("ORDER");
+			order = transactionRecordService.purchaseSDCard(sdCard,order,amount);
+			
+			mav.addObject("discountBonus",discountBonus);
+			mav.addObject("order",order);
+			return mav;
+		}
+		
+		
+		
 	//音樂-購物車-步驟一
 	@RequestMapping("/shoppingCartOne")
 	public ModelAndView shoppingcartone() {
+		/*
 		String albumPrice = "300";
 		String albumDiscountPrice = "250";
 		String albumDiscountBonus = "50";
@@ -183,7 +220,11 @@ public class ShoppingCartController {
 		list.add(albumPrice);
 		list.add(albumDiscountPrice);
 		list.add(albumDiscountBonus);
-		return new ModelAndView("shoppingCartOne","albumSong",list);
+		*/
+		long userID = 2;
+		ShoppingCartDetail[] arDetail = transactionRecordService.queryMusicShoppingCart(userID);
+		
+		return new ModelAndView("shoppingCartOne","albumSong",arDetail);
 	}
 	
 	//音樂-購物車-步驟二

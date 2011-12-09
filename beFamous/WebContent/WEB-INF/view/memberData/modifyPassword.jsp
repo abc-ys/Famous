@@ -8,7 +8,7 @@
 <body>
 <h4>變更密碼</h4>
 <form name="form">
-	<input type="hidden" name="userID" value=${member.id}>
+	<input type="hidden" name="userId" value=${member.id}>
  	<input type="hidden" name="oldPassword" value=${member.password}>
 	目前密碼: <input type="password" name="password"><br><br>
 	新密碼: <input type="password" name="newPassword"><br><br>

@@ -21,7 +21,7 @@
 	<c:forEach var="hm" items="${offenseReason}" varStatus="status"><c:if test="${empty hm.modifyDate}">	
 	<tr><td Height="35"><center><font size="2">${status.index+1}</font></center></td>
 		<td><center><font size="2"><a href="javascript:identity('2','${hm.member.id}','${hm.member.identityName}')">${hm.member.email}</a></font></center></td>
-		<fmt:parseDate var="dateObj" value="${hm.createDate}" type="DATE" pattern="yyyyMMddhhmmss"/> 
+		<fmt:parseDate var="dateObj" value="${hm.createDate}" type="DATE" pattern="yyyyMMddHHmmss"/> 
 		<td><center><font size="2"><fmt:formatDate value='${dateObj}' pattern='yyyy-MM-dd' /></font></center></td>
 		<td><font size="2">${hm.reason}</font></td>
 		<td><center><INPUT type="submit" name="offenseWrong" value="不當檢舉" onclick="check('2','${hm.id}');"/></center></td><tr>

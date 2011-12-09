@@ -3,6 +3,7 @@ package com.ubn.befamous.controller;
 import java.util.ArrayList;
 import java.util.Set;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +16,7 @@ import com.ubn.befamous.entity.Friend;
 import com.ubn.befamous.entity.Member;
 import com.ubn.befamous.entity.ShoppingCart;
 import com.ubn.befamous.entity.ShoppingCartDetail;
+import com.ubn.befamous.service.PersonService;
 
 @Controller
 @SessionAttributes
@@ -36,10 +38,10 @@ public class AccountController {
 		int sales = 20; //本月銷售量
 		
 		Creator recommendCreator = new Creator();
-		recommendCreator.setMemberId(001);
+		//recommendCreator.setMemberId(001);
 		recommendCreator.setUserName("lucy");
 		Creator recommendCreator2 = new Creator();
-		recommendCreator2.setMemberId(002);
+		//recommendCreator2.setMemberId(002);
 		recommendCreator2.setUserName("kevin");
 		Creator[] recommendCreators = {recommendCreator,recommendCreator2};
 		
@@ -59,7 +61,7 @@ public class AccountController {
 	{
 		ArrayList list = new ArrayList();	
 		DownloadList download = new DownloadList();
-		download.setDownloadList_rid(01);
+		//download.setDownloadList_rid(01);
 		list.add(download);
 		return new ModelAndView("queryDownload","downloadlist",list);
 	}
@@ -88,21 +90,19 @@ public class AccountController {
 	}
 	
 
-	//帳戶資料編輯頁(傳入參數"userID"待新增!!!)
+	//帳戶資料編輯頁
 	@RequestMapping("/editMemberAccount")
-	public ModelAndView queryAccountData() 
+	public ModelAndView queryAccountData(long userId) 
 	{
-		System.out.println("queryAccountData==>");
-		long userID = 1;
-		return new ModelAndView("editMemberAccount", "member",this.personService.queryMember(userID));
-				
+		System.out.println("queryAccountData==>");		
+		return new ModelAndView("editMemberAccount", "member",this.personService.queryMember(userId));				
 	}
 	//修改帳戶資料編輯頁的修改並呈現修改後結果
 	@RequestMapping("/saveAccountData")
-	public String saveAccountData(long userID, String accountName, String accountNO, String bankName, String bankBranch, String identityNO, String address, String tel, String cellPhone) 
+	public String saveAccountData(long userId, String accountName, String accountNO, String bankName, String bankBranch, String identityNO, String address, String tel, String cellPhone) 
 	{
 		System.out.println("saveAccountData==>");
-		this.personService.updateAccountData(userID, accountName, accountNO, bankName, bankBranch, identityNO, address, tel, cellPhone);
-		return "redirect:editMemberAccount.do";	
+		this.personService.updateAccountData(userId, accountName, accountNO, bankName, bankBranch, identityNO, address, tel, cellPhone);
+		return "redirect:editMemberAccount.do?userId="+userId;	
 	}
 }

@@ -24,8 +24,8 @@
 <table border="1" BorderColor="#000000" cellpadding="0" cellspacing="0">
 <td Width="400"  Height="70">
 <font size="2">
-<INPUT type=radio name=pay id=pay value="信用卡刷卡">信用卡刷卡(可接受VISA,Master,JCB,聯合信用卡)<br>
-<INPUT type=radio name=pay id=pay value="ATM轉帳">ATM轉帳(海外客戶限使用ATM轉帳，轉帳幣別為台幣)
+<INPUT type=radio name="pay" id="pay" value="VISA">信用卡刷卡(可接受VISA,Master,JCB,聯合信用卡)<br>
+<INPUT type=radio name="pay" id="pay" value="ATM">ATM轉帳(海外客戶限使用ATM轉帳，轉帳幣別為台幣)
 </font></td>
 </table>
 
@@ -35,18 +35,18 @@
 <table border="2" BorderColor="white" cellpadding="0" cellspacing="0">
 <tr>
 <td Width="65" Height="40"><font size="2">&nbsp收件人:</font></td>
-<td>&nbsp<input type="text" name="msg"></td>
+<td>&nbsp<input type="text" name="receiver"></td>
 </tr>
 <tr>
 <td></td>
-<td><font color="#000000" size="2" >&nbsp收件人姓名與寄送地址請填寫中文以利辨識</font></td>
+<td><font color="#000000" size="2" >&nbsp;收件人姓名與寄送地址請填寫中文以利辨識</font></td>
 </tr>
 <tr>
-<td Width="65" Height="40"><font size="2">&nbsp連絡電話:</font></td>
+<td Width="65" Height="40"><font size="2">&nbsp;連絡電話:</font></td>
 <td>&nbsp<input type="text" name="tel"></td>
 </tr>
 <tr>
-<td Width="65" Height="40"><font size="2">&nbspemail:</font></td>
+<td Width="65" Height="40"><font size="2">&nbsp;email:</font></td>
 <td>&nbsp<input type="text" name="email"></td>
 </tr>
 <tr>
@@ -112,7 +112,7 @@
 </table>
 <br>
 <p>
-<center><input type=submit value="下一步" onclick="add()"/></center>
+<center><input type="button" name="111" value="下一步" onclick="add()"/></center>
 
 <INPUT type=hidden name=billData value="">
 

@@ -17,8 +17,8 @@
 商品名稱:&nbsp;<input type="text" size="10" name="productName" value="${production[0].name}"><p>
 商品類別:&nbsp;
 <select name="newProductionClassificationId">
-	<c:forEach var="hm" items="${production[1]}">
-		<option value="${hm.id}">${hm.name}</option> 
+	<c:forEach var="hm" items="${production[2]}">
+		<option value="${hm.id}"<c:if test="${productionClassificationId==hm.id}">selected</c:if>>${hm.name}</option> 
 	</c:forEach>
 </select><p>
 交易方式:&nbsp;
@@ -36,9 +36,16 @@
 </c:if>
 <p>
 商品價錢:<br>
-售價:&nbsp;<input type="text" size="5" name="realPrice" value="${production[0].sdCardPrice.price}">元&nbsp;&nbsp;&nbsp;
-特惠價:&nbsp;售價x<input type="text" size="5" name="specialPrice" value="">&nbsp;&nbsp;&nbsp;
-Bonus購買額:&nbsp;<input type="text" size="5" name="discountPrice" value="${production[0].sdCardPrice.discountPrice}">元+&nbsp;<input type="text" size="5" name="discountBonus" value="${production[0].sdCardPrice.discountBonus}">點
+<c:if test="${production[1]=='PrePaid'}">
+	售價:&nbsp;<input type="text" size="5" name="realPrice" value="${production[0].prePaidPrice.price}">元&nbsp;&nbsp;&nbsp;
+	特惠價:&nbsp;售價x<input type="text" size="5" name="specialPrice" value="">&nbsp;&nbsp;&nbsp;
+	Bonus購買額:&nbsp;<input type="text" size="5" name="discountPrice" value="${production[0].prePaidPrice.discountPrice}">元+&nbsp;<input type="text" size="5" name="discountBonus" value="${production[0].prePaidPrice.discountBonus}">點
+</c:if>	
+<c:if test="${production[1]=='SDCard'}">
+	售價:&nbsp;<input type="text" size="5" name="realPrice" value="${production[0].sdCardPrice.price}">元&nbsp;&nbsp;&nbsp;
+	特惠價:&nbsp;售價x<input type="text" size="5" name="specialPrice" value="">&nbsp;&nbsp;&nbsp;
+	Bonus購買額:&nbsp;<input type="text" size="5" name="discountPrice" value="${production[0].sdCardPrice.discountPrice}">元+&nbsp;<input type="text" size="5" name="discountBonus" value="${production[0].sdCardPrice.discountBonus}">點
+</c:if>
 <p>
 贈送bonus:&nbsp;付款金額x<input type="text" size="5" name="giveBonus" value="${production[0].reward}"><p>
 商品庫存:&nbsp;<input type="text" size="5" name="stock" value="${production[0].amount}"><p>
@@ -58,7 +65,7 @@ Bonus購買額:&nbsp;<input type="text" size="5" name="discountPrice" value="${p
 商品關鍵字:&nbsp;<input type="text" size="20" name="keyword" value="${production[0].keyWord}"><p>
 商品簡介:&nbsp;<textarea cols=60 rows=6 name=memo>${production[0].introduction}</textarea><p>
 <input type="hidden" name="productionClassificationId" value="${production[0].productionClassification.id}">
-<input type="hidden" name="adminId" value="2">
+<input type="hidden" name="adminId" size="15" value="${adminId}" >
 <center><input type="submit" value="儲存修改" onclick="saveData()"/></center>
 </form>
 </body>

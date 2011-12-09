@@ -12,6 +12,7 @@ import org.apache.commons.fileupload.FileUploadBase;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -111,15 +112,8 @@ public class UploadMusicController {
 		System.out.println("producer==>"+producer);
 		
 		ModelAndView mav = new ModelAndView("editSongData");
-						
-		MusicCategory mc = new MusicCategory();
-		mc.setName("古典樂");
-		MusicCategory mc2 = new MusicCategory();
-		mc2.setName("搖滾樂");
-		MusicCategory mc3 = new MusicCategory();
-		mc3.setName("兒歌");
-		
-		MusicCategory[] mType = {mc,mc2,mc3};
+				
+		MusicCategory[] mType = musicService.queryMusicCategory();
 		
 		Song song = musicService.querySong(songID);
 		
@@ -161,22 +155,15 @@ public class UploadMusicController {
 		System.out.println("albumID==>"+albumID);
 			
 		ModelAndView mav = new ModelAndView("editAlbumData");
-							
-		MusicCategory mc = new MusicCategory();
-		mc.setName("古典樂");
-		MusicCategory mc2 = new MusicCategory();
-		mc2.setName("搖滾樂");
-		MusicCategory mc3 = new MusicCategory();
-		mc3.setName("兒歌");
-		
-		MusicCategory[] mType = {mc,mc2,mc3};
+				
+		MusicCategory[] mType = musicService.queryMusicCategory();
 		
 		Album ac = new Album();
-		ac.setCover("images/album.jpg");
+		ac.setCover("image/album.jpg");
 		Album ac2 = new Album();
-		ac2.setCover("images/title_01.gif");
+		ac2.setCover("image/title_01.gif");
 		Album ac3 = new Album();
-		ac3.setCover("images/play.png");
+		ac3.setCover("image/play.png");
 		Album[] a = {ac,ac2,ac3};
 		
 		Album album = musicService.queryAlbum(albumID);
@@ -211,7 +198,7 @@ public class UploadMusicController {
 		int yourMaxRequestSize = 500 * 500* 1024;
 		boolean writeToFile = true;
 		String allowedFileTypes = ".jpg .png .gif .jpeg";
-
+		
 		String saveDirectory = "D:/gitTest/befamousWeb/WebContent/file";  //存放的路徑
 
 		// Check that we have a file upload request
@@ -308,7 +295,8 @@ public class UploadMusicController {
 		System.out.println("introduction==>"+introduction);
 		System.out.println("status==>"+status);	
 		
-		cover="images/"+fileName;
+		if(StringUtils.isNotBlank(fileName)){
+		cover="file/"+fileName;}
 		
 		musicService.updateAlbum(creatorId,albumID, albumType, name, date, brand, musicCategory, tag, cover, cover2, introduction, status);
 		
@@ -324,11 +312,14 @@ public class UploadMusicController {
 		{
 			System.out.println("addAlbum==>");
 			
-			ArrayList coverList = new ArrayList();
-			coverList.add("images/album.png");
-			coverList.add("images/album.png");
-			coverList.add("images/album.png");
+			MusicCategory[] mType = musicService.queryMusicCategory();
 			
+			ArrayList coverList = new ArrayList();
+			coverList.add("image/album.png");
+			coverList.add("image/album.png");
+			coverList.add("image/album.png");
+			
+			model.addAttribute("mType",mType);
 			model.addAttribute("defaultCover", coverList);
 			model.addAttribute("creatorId", creatorId);
 			return new ModelAndView("addAlbum");
@@ -449,8 +440,11 @@ public class UploadMusicController {
 			} catch (FileUploadBase.SizeLimitExceededException ex1) {
 				System.out.println("上傳檔案超過最大檔案允許大小" + yourMaxRequestSize / (1024 * 1024) + "MB !");
 			}
-			
-			albumCover="images/"+fileName;
+			if(StringUtils.isNotBlank(fileName)){
+			albumCover="image/memberPicture/"+fileName;
+			}else{
+				albumCover=defaultCover;
+			}
 			System.out.println(" creatorId="+creatorId+", albumType="+albumType+", albumName="+albumName+", albumBrand="+albumBrand+", musicCategory="+musicCategory+", albumTag="+albumTag+", albumIntroduction="+albumIntroduction+", albumStatus="+albumStatus+", albumCover="+albumCover+", defaultCover="+defaultCover);
 			
 			long albumID = musicService.saveAlbum(creatorId,albumType,albumName,albumBrand,musicCategory,albumTag,albumIntroduction,albumStatus,albumCover,defaultCover);
@@ -555,13 +549,17 @@ public class UploadMusicController {
 			}
 			}
 			System.out.println("fileName=="+fileName);
-			fileName = "file/"+fileName;
+			if(StringUtils.isNotBlank(fileName)){
+			fileName = "file/"+fileName;}
 			
 			long songID = musicService.saveSong(albumId, creatorId, fileName);
+			
+			MusicCategory[] mType = musicService.queryMusicCategory();
 			
 			System.out.println("songID=="+songID);
 			model.addAttribute("creatorId", creatorId);
 			model.addAttribute("songID", songID);
+			model.addAttribute("mType",mType);
 			model.addAttribute("albumId", albumId);
 		  return new ModelAndView("addSongData");		
 			
@@ -571,6 +569,7 @@ public class UploadMusicController {
 		@RequestMapping("/addSongData")
 		public ModelAndView addSongData(String creatorId,String albumId, Model model)
 		{
+			
 			System.out.println("addSongData==>");
 			model.addAttribute("albumId", albumId);
 			model.addAttribute("creatorId", creatorId);

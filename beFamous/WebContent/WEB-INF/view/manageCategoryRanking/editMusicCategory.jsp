@@ -11,9 +11,12 @@
 <form name="fm" method="post">
 類別名稱編輯
 <p>
-<font size="2">&nbsp名稱:</font>&nbsp
-<input type="text" name="modifyName" size="15" value="" >
-<input type="submit" value="修改" onclick="add()"/>
+
+<font size="2">&nbsp;名稱:</font>&nbsp;
+<input type="text" name="modifyName" size="15" value="${mc.name}" >
+<input type="hidden" name="ID" value="${fatherID}" >
+<input type="hidden" name="adminID" value="${adminID}" >
+<input type="button" value="修改" onclick="add()"/>
 </form>
 </body>
 <script>

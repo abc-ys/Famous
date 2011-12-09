@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+    <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -24,33 +25,32 @@
 <td Width="200" Height="30" border="0"><font size="2">創作人<br></font></td>
 <td Width="200" Height="30" border="0"><font size="2">價格<br></font></td>
 <td Width="200" Height="30" border="0"><font size="2">移除<br></font></td>
+
+<c:forEach var="hm" items="${albumSong}">
 <tr>
-<td Width="200" Height="30" border="0"><font size="2"><img alt="" src=${albumSong[0][0].cover} width="100" height="35"><INPUT type=hidden name=cover value="${albumSong[0][0].cover}"><br></font></td>
-<td Width="200" Height="30" border="0"><font size="2">${albumSong[0][0].name}<INPUT type=hidden name=aName value="${albumSong[0][0].name}"><br></font></td>
-<td Width="200" Height="30" border="0"><font size="2">${albumSong[0][0].creator.userName}<INPUT type=hidden name=aUserName value="${albumSong[0][0].creator.userName}"><br></font></td>
+<td Width="200" Height="30" border="0"><font size="2">${hm.productionCategory.name}<INPUT type=hidden name=sName value="${hm.productionCategory.name}"><br></font></td>
+<td Width="200" Height="30" border="0"><font size="2">${hm.productionCategory.album.name}<INPUT type=hidden name=aName2 value="${hm.productionCategory.album.name}"><br></font></td>
+<td Width="200" Height="30" border="0"><font size="2">${hm.productionCategory.album.creator.userName}<INPUT type=hidden name=sUserName value="${hm.productionCategory.album.creator.userName}"><br></font></td>
 <td Width="200" Height="30" border="0"><font size="2">
-<INPUT type=radio name=aprice id=aprice value="${albumSong[2]}" checked onclick="cal()">$ ${albumSong[2]}<br></font>
-<font size="2"><INPUT type=radio name=aprice id=aprice value="${albumSong[3]}" onclick="cal()">$ ${albumSong[3]} + ${albumSong[4]}點<br></font></td>
+<INPUT type=radio name=sprice id=sprice value="${hm.productionCategory.songPrice.price}" checked onclick="cal()">$ ${hm.productionCategory.songPrice.price}<br></font>
+<font size="2">
+<INPUT type=radio name=sprice id=sprice value="${hm.productionCategory.songPrice.discountPrice}" onclick="cal()">$ ${hm.productionCategory.songPrice.discountPrice} + ${hm.productionCategory.songPrice.discountBonus}點<br></font></td>
 <td Width="200" Height="30" border="0"><font size="2">x<br></font></td>
-<tr>
-<td Width="200" Height="30" border="0"><font size="2">${albumSong[1][0].name}<INPUT type=hidden name=sName value="${albumSong[1][0].name}"><br></font></td>
-<td Width="200" Height="30" border="0"><font size="2">${albumSong[1][0].album.name}<INPUT type=hidden name=aName2 value="${albumSong[1][0].album.name}"><br></font></td>
-<td Width="200" Height="30" border="0"><font size="2">${albumSong[1][0].album.creator.userName}<INPUT type=hidden name=sUserName value="${albumSong[1][0].album.creator.userName}"><br></font></td>
-<td Width="200" Height="30" border="0"><font size="2">
-<INPUT type=radio name=sprice id=sprice value="${albumSong[1][0].songPrice.price}" checked onclick="cal()">$ ${albumSong[1][0].songPrice.price}<br></font>
-<font size="2"><INPUT type=radio name=sprice id=sprice value="${albumSong[1][0].songPrice.discountPrice}" onclick="cal()">$ ${albumSong[1][0].songPrice.discountPrice} + ${albumSong[1][0].songPrice.discountBonus}點<br></font></td>
-<td Width="200" Height="30" border="0"><font size="2">x<br></font></td>
+</tr>
+<c:set var="totalPrice" value="${totalPrice + hm.productionCategory.songPrice.price }"></c:set>
+</c:forEach>
 <tr>
 <% 
 
 String tBonus="100";
 %>
+
 <INPUT type=hidden name=tBonus value="<%=tBonus %>">
-<td Width="200" Height="30" border="0" colspan="5" align="right"><font size="2">總金額；GSiMoney$ <INPUT type=text name=tPrice id=tPrice Width="5" value="400" >元+ <%=tBonus %>點<br></font></td>
+<td Width="200" Height="30" border="0" colspan="5" align="right"><font size="2">總金額；GSiMoney$ <INPUT type="hidden" name="tPrice" id="tPrice" Width="5" value="400" >${totalPrice}元+ <%=tBonus %>點<br></font></td>
 </table>
 <br>
 
-<center><input type="submit" value="繼續購物" onclick="back()"/><input type="submit" value="結帳" onclick="add()"/><input type="submit" value="前往儲值" onclick="go()"/></center>
+<center><input type="button" value="繼續購物" onclick="back()"/><input type="button" value="結帳" onclick="add()"/><input type="button" value="前往儲值" onclick="go()"/></center>
 </form>
 </body>
 <script>

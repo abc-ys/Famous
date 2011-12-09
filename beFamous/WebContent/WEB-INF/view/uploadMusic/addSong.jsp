@@ -16,6 +16,8 @@
 	<p>檔案:<input type="file" name="file" id="fileToUpload" size="20" /><br><br>
 	<p><input type="checkbox" name="agree" id="agree" value="agree">我已詳閱內容提供合約並同意授權此音樂作品予GSiMedia販售<br><br>
 	<p><input type="button" value="確定上傳" onclick="add()">
+	<p><input type='button' value='結束上傳' onclick="stopUpload('${albumId}','${creatorId}')">
+			
 </form>
 </body>
 <script type="text/javascript">
@@ -26,6 +28,10 @@ function add(){
 		document.form.action="${pageContext.request.contextPath}/saveSong.do";
 		document.form.submit();			
 	
+}
+function stopUpload(albumId,creatorId){
+	document.form.action="${pageContext.request.contextPath}/editAlbumContent.do?albumID="+albumId+"&creatorId="+creatorId;	
+	document.form.submit();	
 }
 </script>
 </html>

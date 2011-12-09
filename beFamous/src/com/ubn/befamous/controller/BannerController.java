@@ -40,160 +40,156 @@ import com.ubn.befamous.service.PersonService;
 public class BannerController {
 	
 	@Autowired
-	private PersonService personService;
+	 PersonService personService;
 	
 	//Kevin
-	String account = "kevin@ubn.net";
-	//導新增Banner
-	@RequestMapping(value = "/forwardAddBanner")
-	public ModelAndView forwardAddBanner() {
-		ModelAndView mav = new ModelAndView("forwardAddBanner");
-		//取得創做人ID from session 
-		/*
-		AdType adType = new AdType();
-		adType.setAdTypeName("我");
-		AdType[] arAdType = {adType};
-		*/
-		AdType[] arAdType = personService.getAdType();
-		mav.addObject("memberID", account);
-		mav.addObject("arAdType", arAdType);
-		return mav;
-		
-	}
-	
-	
-	//處理上傳
-	@RequestMapping(value = "/saveBanner")
-	public ModelAndView uploadBanner(HttpServletRequest request) {
-		
-		Ad ad = new Ad();
-		System.out.println("活動內容0===>"+ad.getWebsite());
-		System.out.println("活動內容===>"+ad.getActivityContent());
-		long bannerTypeId = 0;
+		String account = "kevin@ubn.net";
+		//導新增Banner
+		@RequestMapping(value = "/forwardAddBanner")
+		public ModelAndView forwardAddBanner() {
+			ModelAndView mav = new ModelAndView("forwardAddBanner");
+			//取得創做人ID from session 
+			
+			AdType[] arAdType = personService.getAdType();
+			mav.addObject("memberID", account);
+			mav.addObject("arAdType", arAdType);
+			return mav;
+			
+		}
 		
 		
-		int buffersize = 4096;
-		int SizeMax = 20 * 1024 * 1024;// 1Mbyte最大檔案大小
-		String allowedFileTypes = "gif|jpg|png";
-		//設定上傳的目錄
-		
-		String saveDirectory = "D://PDFUpload//";
-		//setUploadDir("/ebook/edit_tool/");
-		 File imageFolder = new File(saveDirectory);
-		    if (!imageFolder.exists()) imageFolder.mkdir();
-        // 建立一個以disk-base的檔案物件
-        DiskFileItemFactory factory = new DiskFileItemFactory();
- 
-        // 初始化內容
-        // 傳送所用的buffer空間
-        factory.setSizeThreshold(buffersize);
-        // The directory in which temporary files will be located.
- 
-        factory.setRepository(new File(saveDirectory));
-        System.out.println("factory==>"+factory);
-        // 建立一個檔案上傳的物件
-        ServletFileUpload upload = new ServletFileUpload(factory);
-        System.out.println("upload==>"+upload);
-        // 最大檔案大小
-        upload.setSizeMax(SizeMax * 20);
-        // 每一個Fileitem代表一個form上傳的物件內容ex input type="text"
-        
-     try{   
-        List items = null; // 會產生 FileUploadException
-        // 把資料從request取出
-        try {
-			items = upload.parseRequest(request);
-			 System.out.println("items==>"+items);
-		} catch (FileUploadException e) {
+		//處理上傳
+		@RequestMapping(value = "/saveBanner")
+		public ModelAndView uploadBanner(HttpServletRequest request) {
+			
+			Ad ad = new Ad();
+			System.out.println("活動內容0===>"+ad.getWebsite());
+			System.out.println("活動內容===>"+ad.getActivityContent());
+			long bannerTypeId = 0;
+			
+			
+			int buffersize = 4096;
+			int SizeMax = 20 * 1024 * 1024;// 1Mbyte最大檔案大小
+			String allowedFileTypes = "gif|jpg|png";
+			//設定上傳的目錄
+			
+			String saveDirectory = "D:/gitTest/ImageWeb/WebContent/file";
+			//setUploadDir("/ebook/edit_tool/");
+			 File imageFolder = new File(saveDirectory);
+			    if (!imageFolder.exists()) imageFolder.mkdir();
+	        // 建立一個以disk-base的檔案物件
+	        DiskFileItemFactory factory = new DiskFileItemFactory();
+	 
+	        // 初始化內容
+	        // 傳送所用的buffer空間
+	        factory.setSizeThreshold(buffersize);
+	        // The directory in which temporary files will be located.
+	 
+	        factory.setRepository(new File(saveDirectory));
+	        System.out.println("factory==>"+factory);
+	        // 建立一個檔案上傳的物件
+	        ServletFileUpload upload = new ServletFileUpload(factory);
+	        System.out.println("upload==>"+upload);
+	        // 最大檔案大小
+	        upload.setSizeMax(SizeMax * 20);
+	        // 每一個Fileitem代表一個form上傳的物件內容ex input type="text"
+	        
+	     try{   
+	        List items = null; // 會產生 FileUploadException
+	        // 把資料從request取出
+	        try {
+				items = upload.parseRequest(request);
+				 System.out.println("items==>"+items);
+			} catch (FileUploadException e) {
 
-			e.printStackTrace();
-		} 
-		
-	   
-		
-		
-        Iterator iter = items.iterator();
-       // while (iter.hasNext()) {// 先把所有參數取得而不先write to file
-       
-        while (iter.hasNext()) {
-        	 FileItem item = (FileItem) iter.next();
-        	if (item.isFormField()) {
-				// Process a regular form field	
-				//processFormField(item);		
-				String name = item.getFieldName();
-				String value = item.getString("UTF-8");
-				System.out.println(name + "=" + value + "<br />");
-				if(name.equals("dep")){
-					bannerTypeId = Long.parseLong(value);
-				}
-				if(name.equals("activityName")) ad.setActivityName(value);
-				if(name.equals("activityStartDate")) ad.setActivityStartDate(value);
-				if(name.equals("activityEndDate")) ad.setActivityEndDate(value);
-				if(name.equals("website")) ad.setWebsite(value);
-				if(name.equals("activityContent")) ad.setActivityContent(value);
-				
-			} else {
-				String fileName = item.getName();
-			}
-        
-         String fileName = item.getName();
-         System.out.println("fileName==>"+fileName);
-         
-         if (fileName != null && !"".equals(fileName)) {
-	        if (item.getSize() > 0) {
-	        	if ((fileName.lastIndexOf("\\")) != -1)
-	            	fileName = fileName.substring(fileName.lastIndexOf("\\")+1,fileName.length());
-	            
-	        	String extension = FilenameUtils.getExtension(fileName);
-				if (allowedFileTypes.indexOf(extension.toLowerCase()) != -1) {
-					File uploadedFile = new File(saveDirectory,	fileName);						
-				    item.write(uploadedFile);
+				e.printStackTrace();
+			} 
+			
+		   
+			
+			
+	        Iterator iter = items.iterator();
+	       // while (iter.hasNext()) {// 先把所有參數取得而不先write to file
+	       
+	        while (iter.hasNext()) {
+	        	 FileItem item = (FileItem) iter.next();
+	        	if (item.isFormField()) {
+					// Process a regular form field	
+					//processFormField(item);		
+					String name = item.getFieldName();
+					String value = item.getString("UTF-8");
+					System.out.println(name + "=" + value + "<br />");
+					if(name.equals("dep")){
+						bannerTypeId = Long.parseLong(value);
+					}
+					if(name.equals("activityName")) ad.setActivityName(value);
+					if(name.equals("activityStartDate")) ad.setActivityStartDate(value);
+					if(name.equals("activityEndDate")) ad.setActivityEndDate(value);
+					if(name.equals("website")) ad.setWebsite(value);
+					if(name.equals("activityContent")) ad.setActivityContent(value);
+					
 				} else {
-					System.out.println("上傳的檔案不能是" + extension + "<br />");
+					String fileName = item.getName();
 				}
-	              File uploadedFile = null;
-				
+	        
+	         String fileName = item.getName();
+	         System.out.println("fileName==>"+fileName);
+	         
+	         if (fileName != null && !"".equals(fileName)) {
+		        if (item.getSize() > 0) {
+		        	if ((fileName.lastIndexOf("\\")) != -1)
+		            	fileName = fileName.substring(fileName.lastIndexOf("\\")+1,fileName.length());
+		            
+		        	String extension = FilenameUtils.getExtension(fileName);
+					if (allowedFileTypes.indexOf(extension.toLowerCase()) != -1) {
+						File uploadedFile = new File(saveDirectory,	fileName);						
+					    item.write(uploadedFile);
+					} else {
+						System.out.println("上傳的檔案不能是" + extension + "<br />");
+					}
+		              File uploadedFile = null;
+					
+		        }
+	         }
 	        }
-         }
-        }
-     }catch(Exception e){
-    	 
-     }
-     
-     personService.saveAd(4, bannerTypeId, ad);
-     
-     
-		return new ModelAndView("saveBanner");
+	     }catch(Exception e){
+	    	 
+	     }
+	     
+	     personService.saveAd(4, bannerTypeId, ad);
+	     
+	     
+			return new ModelAndView("saveBanner");
+			
+		}
 		
-	}
-	
-	//
-	@RequestMapping(value = "/modifyMemberId")
-	public ModelAndView modifyMemberId(String memberId,Model model) {
+		//
+		@RequestMapping(value = "/modifyMemberId")
+		public ModelAndView modifyMemberId(String memberId,Model model) {
+			
+			model.addAttribute("memberId",memberId);
+			return new ModelAndView("modifyMemberId");
+		}
 		
-		model.addAttribute("memberId",memberId);
-		return new ModelAndView("modifyMemberId");
-	}
-	
-	
-	//導新增Banner
-	@RequestMapping(value = "/modifyAddBanner")
-	public ModelAndView modifyAddBanner(String newMemberId,Ad ad) {
 		
-		System.out.println("活動內容===>"+ad.getActivityContent());
-		
-		ModelAndView mav = new ModelAndView("forwardAddBanner");
-		//取得創做人ID from session 
-		System.out.println("newMemberId==>"+newMemberId);
-		AdType adType = new AdType();
-		adType.setAdTypeName("我");
-		AdType[] arAdType = {adType};
-		account = newMemberId;
-		mav.addObject("memberID", newMemberId);
-		mav.addObject("arAdType", arAdType);
-		return mav;
-		
-	}
+		//導新增Banner
+		@RequestMapping(value = "/modifyAddBanner")
+		public ModelAndView modifyAddBanner(String newMemberId,Ad ad) {
+			
+			System.out.println("活動內容===>"+ad.getActivityContent());
+			
+			ModelAndView mav = new ModelAndView("forwardAddBanner");
+			//取得創做人ID from session 
+			System.out.println("newMemberId==>"+newMemberId);
+			AdType adType = new AdType();
+			adType.setAdTypeName("我");
+			AdType[] arAdType = {adType};
+			account = newMemberId;
+			mav.addObject("memberID", newMemberId);
+			mav.addObject("arAdType", arAdType);
+			return mav;
+			
+		}
 	
 	
 	//Lucy
@@ -340,7 +336,7 @@ public class BannerController {
 			
 			Ad[] a =personService.queryAd(bannerType, activityName, onStartDate, onEndDate, offStartDate, offEndDate);
 			
-			model.addAttribute("adminID", adminID);
+			model.addAttribute("adminID", "1");
 			model.addAttribute("Ad", a);
 			return new ModelAndView("queryAdBanner");		
 		}
@@ -483,7 +479,7 @@ public class BannerController {
 			} catch (FileUploadBase.SizeLimitExceededException ex1) {
 				System.out.println("上傳檔案超過最大檔案允許大小" + yourMaxRequestSize / (1024 * 1024) + "MB !");
 			}
-			if(!fileName.equals("")){
+			if(StringUtils.isNotBlank(fileName)){
 			fileName="image/memberPicture/"+fileName;}
 			
 			
@@ -498,17 +494,9 @@ public class BannerController {
 			System.out.println("	adminId="+adminID+", activityStartDate="+activityStartDate+", activityEndDate="+activityEndDate+", identity="+identity+", albumNumber="+albumNumber);
 			
 			Ad[] adList = personService.queryCreatorAd(activityStartDate, activityEndDate, identity, albumNumber);
-			/*
-			ArrayList ad2 = new ArrayList();
-			ad2.add(a2);
-			ad2.add(albums2);
-			
-			ArrayList adList = new ArrayList();
-			adList.add(ad);
-			adList.add(ad2);*/
 			
 			model.addAttribute("adList", adList);	
-			model.addAttribute("adminId", adminID);
+			model.addAttribute("adminId", "1");
 			return new ModelAndView("queryUploadAdBanner");		
 		}
 		
@@ -540,13 +528,13 @@ public class BannerController {
 		}
 		//管理者填寫審核失敗理由 (window close)
 		@RequestMapping("/saveCheckReason")
-		public String saveCheckReason(String adminId,String adId,String reason) {
+		public ModelAndView saveCheckReason(String adminId,String adId,String reason) {
 			String checkStatus = "3";
 			System.out.println("saveCheckReason==>");		
 			System.out.println("    adId="+adId+", adminId="+adminId);
 			
 			personService.saveNote(Long.parseLong(adId), checkStatus, reason, Long.parseLong(adminId));
-			return "redirect:/queryUploadAdDetail/"+adminId+"/"+adId+".do";
+			return new ModelAndView("saveCheckReason");
 		}
 		
 		//管理者發佈上傳廣告      

@@ -46,7 +46,7 @@ public class OnlineQuestionController {
 		{
 			System.out.println("manageQuestion==>");
 			
-			Question[] questionList = personService.queryQuestion("", "", "", "", "");
+			Question[] questionList = personService.queryQuestion("", "", "", "", "","");
 			model.addAttribute("admin", adminId);
 			model.addAttribute("questionList", questionList);
 			return new ModelAndView("manageQuestion");
@@ -54,13 +54,13 @@ public class OnlineQuestionController {
 		
 		//查詢問題清單 (base on 查詢條件)
 		@RequestMapping("/queryQuestionList")
-		public ModelAndView queryQuestionList(String adminId, String startDate,String endDate, String productionType, String questionType, String email, Model model)
+		public ModelAndView queryQuestionList(String adminId, String startDate,String endDate, String productionType, String questionType, String email,String handleStatus, Model model)
 		{
 			System.out.println("queryQuestionList==>");
 			System.out.println("	startDate="+startDate+", endDate="+endDate+", productionType="+productionType+", questionType="+questionType);
 			
 			
-			Question[] questionList = personService.queryQuestion(startDate, endDate, productionType, email, questionType);
+			Question[] questionList = personService.queryQuestion(startDate, endDate, productionType, email, questionType, handleStatus);
 			model.addAttribute("admin", adminId);
 			model.addAttribute("questionList", questionList);
 			return new ModelAndView("queryQuestionList");

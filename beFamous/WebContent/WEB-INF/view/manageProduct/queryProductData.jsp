@@ -16,7 +16,7 @@
 	<font size="2">&nbsp商品類別:</font>&nbsp;
 	<select name="productionClassificationId">
 			<c:forEach var="hm" items="${productionClassification[0]}">
-				<option value="${hm.id}">${hm.name}</option> 
+				<option value="${hm.id}" <c:if test="${productionClassificationId==hm.id}">selected</c:if>>${hm.name}</option> 
 			</c:forEach>
 		</select>
 	&nbsp;&nbsp;
@@ -30,6 +30,7 @@
 	<option value="2">贈送Bonus</option>  
 	</select>&nbsp;&nbsp;&nbsp;售價x&nbsp
 	<input type="text" size="5" name="rate">&nbsp;&nbsp;&nbsp;
+	<input type="hidden" name="adminId" size="15" value="${adminId}" >
 	<input type="submit" value="調整" onclick="change()"/>
 </form>
 <p>
@@ -50,7 +51,7 @@
 	<td Width="50"><center><font size="2">編輯</font></center></td></tr>
 	
 	<c:forEach var="hm2" items="${productionClassification[1]}">
-	<tr><td><center><font size="2">${hm2.id}</font></center></td>
+	<tr><td><center><font size="2">${hm2.pid}</font></center></td>
 		<td><center><font size="2">${hm2.name}</font></center></td>
 		<td><center><font size="2">${hm2.productionClassification.name}</font></center></td>
 		<td><center><font size="2">${hm2.companyName}</font></center></td>
@@ -58,11 +59,18 @@
 		<c:if test="${hm2.status==1}"><td><center><font size="2">已上架</font></center></td></c:if>
 		<c:if test="${hm2.status==2}"><td><center><font size="2">未上架</font></center></td></c:if>
 		<td><center><font size="2">${hm2.amount}</font></center></td>
-		<td><center><input type=text name="realPrice" size="3" value=${hm2.sdCardPrice.price}></center></td>
-		<td><center><input type=text name="specialPrice" size="3" value=${hm2.sdCardPrice.specialPrice}></center></td>
-		<td><center><font size="2">${hm2.sdCardPrice.discountPrice}元+&nbsp;${hm2.sdCardPrice.discountBonus}點</font></center></td>
+		<c:if test="${productionClassification[2]=='PrePaid'}">
+			<td><center>${hm2.prePaidPrice.price}</center></td>
+			<td><center>${hm2.prePaidPrice.specialPrice}</center></td>
+			<td><center><font size="2">${hm2.prePaidPrice.discountPrice}元+&nbsp;${hm2.prePaidPrice.discountBonus}點</font></center></td>
+		</c:if>	
+		<c:if test="${productionClassification[2]=='SDCard'}">
+			<td><center>${hm2.sdCardPrice.price}</center></td>
+			<td><center>${hm2.sdCardPrice.specialPrice}</center></td>
+			<td><center><font size="2">${hm2.sdCardPrice.discountPrice}元+&nbsp;${hm2.sdCardPrice.discountBonus}點</font></center></td>
+		</c:if>
 		<td><center><font size="2">付款金額x${hm2.reward}</font></center></td>
-		<td><center><font size="2"><a href="javascript:editData(${hm2.id})">編輯</a></font></center></td>
+		<td><center><font size="2"><a href="javascript:editData('${adminId}','${hm2.pid}','${hm2.productionClassification.id}')">編輯</a></font></center></td>
 	</tr>
 	</c:forEach>
 </table>
@@ -77,8 +85,8 @@ function change(){
     document.fm.action="${pageContext.request.contextPath}/allChange.do";
     document.fm.submit();
 }
-function editData(productId){
-    document.fm2.action="${pageContext.request.contextPath}/productDetailData.do?productId="+productId;
+function editData(adminId, productId, productionClassificationId){
+    document.fm2.action="${pageContext.request.contextPath}/productDetailData.do?adminId="+adminId+"&productId="+productId+"&productionClassificationId="+productionClassificationId;
     document.fm2.submit();
 }
 </script>

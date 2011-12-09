@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -23,23 +24,10 @@
 <td Width="200" Height="30" border="0"><font size="2">方案名稱<br></font></td>
 <td Width="200" Height="30" border="0"><font size="2">方案總價<br></font></td>
 <tr>
-<td>
-<font size="2">
-<INPUT type=radio name=prePay value="${prePay[1][0].pPrice}">${prePay[0][0].name}<br>
-<INPUT type=radio name=prePay value="${prePay[1][1].pPrice}">${prePay[0][1].name}<br>
-<INPUT type=radio name=prePay value="${prePay[1][2].pPrice}">${prePay[0][2].name}<br>
-<INPUT type=radio name=prePay value="${prePay[1][3].pPrice}">${prePay[0][3].name}<br>
-<INPUT type=radio name=prePay value="${prePay[1][4].pPrice}">${prePay[0][4].name}
-</font></td>
-<td><font size="2">
-<pre>
-NT$ ${prePay[1][0].pPrice}<br>
-NT$ ${prePay[1][1].pPrice}<br>
-NT$ ${prePay[1][2].pPrice}<br>
-NT$ ${prePay[1][3].pPrice}<br>
-NT$ ${prePay[1][4].pPrice}
-</pre>
-</font></td>
+<c:forEach var="hm" items="${prePay}">
+	<td><font size="2"><INPUT type=radio name="prePay" value="${hm.pid};${hm.prePaidPrice.price}">${hm.name}<br></font></td>
+	<td><font size="2"><pre>NT$ ${hm.prePaidPrice.price}<br></pre></font></td><tr>
+</c:forEach> 
 </table>
 <br>
 <b>您所儲值的點數無使用期限</b>
@@ -60,8 +48,7 @@ function add(){
 	if($("#agree1").attr('checked')==undefined){
 		alert('還未勾選已閱讀同意書');
 		return;
-	}
-	
+	}	
      document.fm.action="${pageContext.request.contextPath}/prepayTwo.do";
      document.fm.submit();
 }

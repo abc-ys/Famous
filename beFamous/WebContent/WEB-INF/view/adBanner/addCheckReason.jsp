@@ -16,7 +16,7 @@
 </form>
 </body>
 <script type="text/javascript">
-function saveModification(adminId, adId){
+function saveModification(){
 	var content = document.form.reason.value;
 	if(content == ""){
 		alert("請輸入審核失敗理由");

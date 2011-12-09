@@ -29,7 +29,7 @@
 	</c:if>
 	</c:forEach>
 </table>
-<input type="hidden" name="adminId" value=2>
+<input type="hidden" name="adminId" value="${adminId}">
 
 </form>
 </body>

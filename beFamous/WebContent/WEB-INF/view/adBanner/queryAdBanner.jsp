@@ -30,7 +30,7 @@
 	<A HREF="javascript:show_calendar('fm.offEndDate');"><img src="${pageContext.request.contextPath}/images/cal.gif" border="0"></img></a><br><br>
 
 	<input type="hidden" name="adminId" value=${admin.id}>
-	<input type="button" value="查詢" onclick="queryAd()">
+	<input type="button" value="查詢" onclick="queryAd(${adminID})">
 	<input type="reset" value="全部清除">
 </form>
 <p>
@@ -69,8 +69,8 @@
 </div>
 </body>
 <script type="text/javascript">
-function queryAd(){   
-	document.fm.action="queryAdBanner.do";
+function queryAd(adminId){   
+	document.fm.action="queryAdBanner.do?adminID="+adminId;
   	document.fm.submit();
 }
 function queryAdDetail(adminId, adId){   

@@ -18,21 +18,15 @@
 	</select>
 	<p>
 	<textarea cols=60 rows=6 name=reason></textarea>
-	<input type="text" name="userId" id="userId" value=1>
-	<input type="text" name="productionCategoryId" id="productionCategoryId" value=4>
+	<input type="hidden" name="userId" id="userId" value=${userId}>
+	<input type="hidden" name="productionCategoryId" id="productionCategoryId" value=${productionCategoryId}>
 	<br>
-	<input type="submit" value="確定" onclick="save()"><input type="submit" value="取消" onclick="window.close()">
+	<input type="button" value="確定" onclick="save()"><input type="button" value="取消" onclick="window.close()">
 	<p>
 </form>
 </body>
 <script type="text/javascript">
 function save(){
-	
-	if($("select[name='offenseType']").val()==''){
-		alert('還未選檢舉類型');
-		return;
-	}
-	
 	if(document.fm.reason.value==''){
 		alert("未填檢舉內容");
 		return;

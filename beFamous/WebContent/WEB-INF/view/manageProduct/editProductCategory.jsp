@@ -11,9 +11,10 @@
 <form name="fm" method="post">
 類別名稱編輯
 <p>
-<font size="2">&nbsp名稱:</font>&nbsp
-<input type="text" name="productionClassificationName" size="15" >
-<input type="hidden" name="productionClassificationId" size="15" value="${productionClassificationId}" >
+<font size="2">&nbsp;名稱:</font>&nbsp;
+<input type="text" name="productionClassificationName" size="15" value="${productionClassification.name}">
+<input type="hidden" name="productionClassificationId" size="15" value="${productionClassification.id}" >
+<input type="hidden" name="adminId" size="15" value="${adminId}" >
 <input type="submit" value="修改" onclick="add()"/>
 </form>
 </body>

@@ -12,7 +12,8 @@
 <br>
 音樂類別管理
 <p>
-<font size="2">&nbsp新增音樂類別:</font>&nbsp
+<input type="hidden" name="adminID" value="${adminID}"/>
+<font size="2">&nbsp;新增音樂類別:</font>&nbsp;
 <input type="text" name="categoryName" size="15">
 <input type="button" value="新增" onclick="add()"/>
 <p>
@@ -26,8 +27,8 @@
 	<c:forEach var="mc" items="${musicCategory}" varStatus="status">
 <tr><td Height="30" valign="top"><font size="2">${status.index+1}</font></td>
 	<td valign="top"><font size="2">${mc.name}</font></td>
-	<td valign="top"><font size="2"><a href="javascript:void(0)" onclick="subCategory('${mc.id}','1')">子目錄</a></font></td>
-	<td valign="top"><font size="2"><a href="javascript:void(0)" onclick="edit('${mc.id}','1')">編輯</a></font></td>
+	<td valign="top"><font size="2"><a href="${pageContext.request.contextPath}/subMusicCategory.do?ID=${mc.id}&adminID=${adminID}">子目錄</a></font></td>
+	<td valign="top"><font size="2"><a href="javascript:void(0)" onclick="edit('${mc.id}','${adminID}')">編輯</a></font></td>
 	<td valign="top"><font size="2"><a href="javascript:void(0)" onclick="deleteCategory('${mc.id}')">刪除</a></font></td></tr>
 	</c:forEach>
 </table>
@@ -37,10 +38,6 @@
 function add(){
      document.fm.action="${pageContext.request.contextPath}/addMusicCategory.do";
      document.fm.submit();
-}
-function subCategory(id,adminID){
-    document.fm.action="${pageContext.request.contextPath}/subMusicCategory.do?ID="+id+"&adminID="+adminID;
-    document.fm.submit();
 }
 function edit(id,adminID){
 	window.open("${pageContext.request.contextPath}/editMusicCategory.do?ID="+id+"&adminID="+adminID,"parent","height=120,width=300,location=no,scrollbars=no,toolbar=no,directories=no,menubar=no,directories=no");

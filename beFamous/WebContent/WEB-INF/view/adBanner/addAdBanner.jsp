@@ -14,7 +14,6 @@
 <form name="addAd" enctype="multipart/form-data" method="post">
 	banner類別:
  	<select name="bannerType" id="bannerType">
- 		<option selected="selected"></option>
 		<option value="1" <c:if test="${Ad.adType.id==1}">selected</c:if>>主banner</option>
 		<option value="2" <c:if test="${Ad.adType.id==2}">selected</c:if>>創作人主打banner</option>
 		<option value="3" <c:if test="${Ad.adType.id==3}">selected</c:if>>超樂活動banner</option>
@@ -30,7 +29,7 @@
 	 下架日期:<input type="text" name="offDate" class="fillbox" value="<fmt:parseDate var="dateObj" value="${Ad.offDate}" type="DATE" pattern="yyyyMMddHHmmss"/><fmt:formatDate value='${dateObj}' pattern='yyyy-MM-dd' />" readonly>&nbsp;<A HREF="javascript:show_calendar('addAd.offDate');"><img src="${pageContext.request.contextPath}/images/cal.gif" border="0"></img></a><br><br>
 	 建立日期:<input type="text" name="createDate" 
 	 <c:if test="${Ad.createDate!=null}">value="<fmt:parseDate var="dateObj" value="${Ad.createDate}" type="DATE" pattern="yyyyMMddHHmmss"/><fmt:formatDate value='${dateObj}' pattern='yyyy-MM-dd' />"</c:if>
-	 <c:if test="${Ad.createDate==null}">value=<fmt:formatDate value="<%=new java.util.Date() %>"pattern ="yyyy-MM-dd"/></c:if>> <br><br>
+	 <c:if test="${Ad.createDate==null}">value=<fmt:formatDate value="<%=new java.util.Date() %>"pattern ="yyyy-MM-dd"/></c:if> readonly> <br><br>
 	<input type="hidden" name="adminID" value="${adminID}" >
 	<input type="hidden" name="picture" value="${Ad.picture}" >
 	 <input type="button" value="儲存" onclick="onSubmit('${adminID}');">

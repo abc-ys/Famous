@@ -40,10 +40,10 @@ public class SongTableTag extends TagSupport {
 			for (int j = 0; j < songs.length; j++) {
 				Song song=songs[j];
 				String strAlbumName =song.getAlbum().getName();
-				String strAlbumId = String.valueOf(song.getAlbum().getId());
+				String strAlbumId = String.valueOf(song.getAlbum().getPid());
 				String strAlbumCreator = song.getAlbum().getCreator().getUserName();
 				String strCreatorId = String.valueOf(song.getAlbum().getCreator().getId());
-				String strSongId=String.valueOf(song.getId());
+				String strSongId=String.valueOf(song.getPid());
 				String strSongName=song.getName();
 				sb.append("<tr>");
 				sb.append("<td>"+(j+1)+"<img src=\""+request.getContextPath()+"/images/play.png\" /></td>");
@@ -57,7 +57,7 @@ public class SongTableTag extends TagSupport {
 				sb.append("	<img src=\""+request.getContextPath()+"/images/repair.png\"  />");
 				sb.append("	<ui class=\"owap\">");
 				sb.append("		<li><a href=\""+request.getContextPath()+LYRIC_URL+strSongId+"\" >歌詞</a></li>");
-				sb.append("		<li><a href=\""+request.getContextPath()+REPORT_URL+strSongId+"\">檢舉</a></li>");
+				sb.append("		<li><a href=\"#\" onclick=\"javaScript:window.open('offense.do?userId="+strCreatorId+"&productionCategoryId="+strSongId+"','son','height=300,width=600,location=no,scrollbars=no,toolbar=no,directories=no,menubar=no,directories=no,status=no,titlebar=no')\">檢舉</a></li>");
 				sb.append("	</ui>");
 				sb.append("	</div>");
 				sb.append("</td>");

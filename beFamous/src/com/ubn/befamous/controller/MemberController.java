@@ -40,6 +40,7 @@ import com.ubn.befamous.entity.ProductionCategory;
 import com.ubn.befamous.entity.Song;
 import com.ubn.befamous.entity.SongPrice;
 import com.ubn.befamous.service.PersonService;
+import com.ubn.befamous.service.TransactionRecordService;
 
 @Controller
 @SessionAttributes
@@ -48,400 +49,311 @@ public class MemberController {
 	@Autowired
 	private PersonService personService;
 	
+	@Autowired
+	private TransactionRecordService transactionRecordService;
+	
 	//創作人頁面
-		@RequestMapping("/creatorProfile")
-		public ModelAndView creatorProfile(long creatorID,Model model) {
-			System.out.println("creatorProfile---"+creatorID);
-			long userID =2;
-			//long userID = (Long)request.getSession().getAttribute("userID");  從session取得userID
-			
-			ArrayList list = personService.queryCreatorData(creatorID);
-			Creator creator = (Creator)list.get(0);
-			
-			//GeneralMember user = personService.queryMemberData(userID);  //user
-			Friend[] arFriend = personService.queryFriend(userID);//user
-			Fan[] arFan = personService.queryFans(userID,creatorID);//user
-			//Fan[] arFan =  (Fan[])FansList.get(1);
-			boolean isFan = false;
-			//判斷是否已加入粉絲
-			for(Fan f : arFan){
-				if(f.getMember().getId() == userID){
-					isFan = true;
-					break;
-				}
-			}
-		
-			boolean isFriend = false;
-			//判斷是否已加入好友
-			for(Friend f : arFriend){
-				System.out.println("1111111111111===>"+f.getInviter().getId());
-				System.out.println("2222222222222===>"+creator.getId());
-				if(f.getFriend().getId() == creator.getId()){
-					isFriend = true;
-					break;
-				}
-			}
-			model.addAttribute("isFan", isFan);
-			model.addAttribute("isFriend", isFriend);	
-			model.addAttribute("creator", creator);
-			model.addAttribute("newAlbum", list.get(2));
-			
-			return new ModelAndView("creatorProfile");		
-		}		
-		
-		//創作人頁面的所有專輯tab(iframe)
-		@RequestMapping("/creatorAllAlbums")
-		public ModelAndView queryAllAlbums(long creatorID,Model model) {		
+			@RequestMapping("/creatorProfile")
+			public ModelAndView creatorProfile(long creatorID,Model model) {
+				System.out.println("creatorProfile---"+creatorID);
+				long userID =3;
+				//long userID = (Long)request.getSession().getAttribute("userID");  從session取得userID
 				
-			System.out.println("AllAlbums---"+creatorID);
-			ArrayList list = personService.queryAllCreatorAlbum(creatorID);
-			model.addAttribute("albumList", list.get(0));
-			model.addAttribute("songList", list.get(1));
-			return new ModelAndView("queryAllAlbums");
-		}
-		
-		//創作人頁面的最新動態tab(iframe)
-		@RequestMapping("/creatorNewActivity")
-		public ModelAndView queryCreatorRecentAction(long creatorID, Model model) {		
-			System.out.println("CreatorRecentAction---"+creatorID);
-			
-			ArrayList list = personService.queryRecentActivity(creatorID);
-			
-			model.addAttribute("albumList", list.get(0));
-			model.addAttribute("likeSongList", list.get(1));
-			model.addAttribute("listenSongList", list.get(2));
-			return new ModelAndView("queryCreatorRecentAction");
-		}
-		
-		//創作人頁面的好友與粉絲tab(iframe)
-		@RequestMapping("/creatorAllFriendsFans")
-		public ModelAndView queryFriendsFans(long creatorID,Model model) {		
-			
-			System.out.println("FriendsFans---"+creatorID);
-			
-			ArrayList list = personService.queryFriendFans(creatorID);
-			model.addAttribute("friendList", list.get(0));
-			model.addAttribute("fanList", list.get(1));
+				ArrayList list = personService.queryCreatorData(creatorID);
+				Creator creator = (Creator)list.get(0);
 				
-			return new ModelAndView("queryFriendsFans");
-		}
-
-		//一般會員頁面
-		@RequestMapping("/memberProfile")
-		public ModelAndView memberProfile(long memberID,Model model) {
-			System.out.println("memberProfile==>"+memberID);
-			long userID =3;
-			//long userID = (Long)request.getSession().getAttribute("userID");  從session取得userID
-			
-			GeneralMember member = personService.queryMemberData(memberID); //會員
-			GeneralMember member2 = personService.queryMemberData(userID);  //user
-			Set<Friend> FriendSet = member.getFriend();
-			Friend[] arFriend = personService.queryFriend(userID);
-			boolean isFriend = false;
-			//判斷是否已加入好友
-			for(Friend f : arFriend){
-				if(f.getFriend().getId() == member.getId()){
-					isFriend = true;
-					break;
+				//GeneralMember user = personService.queryMemberData(userID);  //user
+				Friend[] arFriend = personService.queryFriend(userID);//user
+				Fan[] arFan = personService.queryFans(userID,creatorID);//user
+				//Fan[] arFan =  (Fan[])FansList.get(1);
+				boolean isFan = false;
+				//判斷是否已加入粉絲
+				for(Fan f : arFan){
+					if(f.getMember().getId() == userID){
+						isFan = true;
+						break;
+					}
 				}
+			
+				boolean isFriend = false;
+				//判斷是否已加入好友
+				for(Friend f : arFriend){
+					System.out.println("1111111111111===>"+f.getInviter().getId());
+					System.out.println("2222222222222===>"+creator.getId());
+					if(f.getFriend().getId() == creator.getId()){
+						isFriend = true;
+						break;
+					}
+				}
+				model.addAttribute("isFan", isFan);
+				model.addAttribute("isFriend", isFriend);	
+				model.addAttribute("creator", creator);
+				model.addAttribute("newAlbum", list.get(2));
+				
+				return new ModelAndView("creatorProfile");		
+			}		
+			
+			//創作人頁面的所有專輯tab(iframe)
+			@RequestMapping("/creatorAllAlbums")
+			public ModelAndView queryAllAlbums(long creatorID,Model model) {		
+					
+				System.out.println("AllAlbums---"+creatorID);
+				ArrayList list = personService.queryAllCreatorAlbum(creatorID);
+				model.addAttribute("albumList", list.get(0));
+				model.addAttribute("songList", list.get(1));
+				return new ModelAndView("queryAllAlbums");
 			}
-			model.addAttribute("isFriend", isFriend);	
-			model.addAttribute("GeneralMember", member);	
-			model.addAttribute("FriendSet", FriendSet);	
-			return new ModelAndView("memberProfile");			
-		}
-		
-		//一般會員頁面的最新動態tab(iframe)
-		@RequestMapping("/memberNewActivity")
-		public ModelAndView queryMemberRecentAction(long memberID,Model model) {		
-			System.out.println("MemberRecentAction---"+memberID);
-			/*
-			Creator creator = new Creator();		
-			creator.setId(1111);
-			creator.setUserName("lendy");
-			Creator creator2 = new Creator();
-			creator2.setId(1111);
-			creator2.setUserName("KevinLiu");
-			Creator creator3 = new Creator();		
-			creator3.setId(1111);
-			creator3.setUserName("lendyLin");
 			
-			Album album = new Album();
-			album.setCover("image/image001.png");	
-			album.setName("ccc");
-			album.setCreator(creator);
-			//album.setDate("2011.10.25");
+			//創作人頁面的最新動態tab(iframe)
+			@RequestMapping("/creatorNewActivity")
+			public ModelAndView queryCreatorRecentAction(long creatorID, Model model) {		
+				System.out.println("CreatorRecentAction---"+creatorID);
+				
+				ArrayList list = personService.queryRecentActivity(creatorID);
+				
+				model.addAttribute("albumList", list.get(0));
+				model.addAttribute("likeSongList", list.get(1));
+				model.addAttribute("listenSongList", list.get(2));
+				return new ModelAndView("queryCreatorRecentAction");
+			}
 			
-			Album album1 = new Album();
-			album1.setCover("image/image002.png");	
-			album1.setName("dddd");
-			album1.setCreator(creator2);
-			//album1.setDate("2011.10.25");
-			
-			Album album2 = new Album();
-			album2.setCover("image/image003.png");	
-			album2.setName("eeeee");
-			album2.setCreator(creator3);
-			//album2.setDate("2011.10.25");
-			
-			Album[] albums = { album, album1, album2};
-			
-			Song likeSong = new Song();
-			likeSong.setName("兩隻老虎");
-			likeSong.setAlbum(album);
-			
-			Song likeSong1 = new Song();
-			likeSong1.setName("一隻沒有眼睛");
-			likeSong1.setAlbum(album1);
-			
-			Song likeSong2 = new Song();
-			likeSong2.setName("一隻沒有尾巴");
-			likeSong2.setAlbum(album2);
-			
-			Song[] likeSongs = { likeSong, likeSong1, likeSong2};
-			
-			Song listenSong = new Song();
-			listenSong.setName("小星星");
-			listenSong.setAlbum(album);
-			
-			Song listenSong1 = new Song();
-			listenSong1.setName("一閃一閃");
-			listenSong1.setAlbum(album1);
-			
-			Song listenSong2 = new Song();
-			listenSong2.setName("亮晶晶");
-			listenSong2.setAlbum(album2);
-			
-			Song[] listenSongs = { likeSong, likeSong1, likeSong2};
-					*/
-			ArrayList list = personService.queryMemberRecentAction(memberID);
-			model.addAttribute("albumList", list.get(0));
-			model.addAttribute("likeSongList", list.get(1));
-			model.addAttribute("listenSongList", list.get(2));
-			return new ModelAndView("queryMemberRecentAction");
-		}
+			//創作人頁面的好友與粉絲tab(iframe)
+			@RequestMapping("/creatorAllFriendsFans")
+			public ModelAndView queryFriendsFans(long creatorID,Model model) {		
+				
+				System.out.println("FriendsFans---"+creatorID);
+				
+				ArrayList list = personService.queryFriendFans(creatorID);
+				model.addAttribute("friendList", list.get(0));
+				model.addAttribute("fanList", list.get(1));
+					
+				return new ModelAndView("queryFriendsFans");
+			}
 
-		//一般會員頁面的好友與喜愛創作人tab(iframe)
-		@RequestMapping("/memberAllFriendsCreators")
-		public ModelAndView queryFriendsCreators(String memberID,Model model) {		
-			System.out.println("AllFriendsCreators---"+memberID);
+			//一般會員頁面
+			@RequestMapping("/memberProfile")
+			public ModelAndView memberProfile(long memberID,Model model) {
+				System.out.println("memberProfile==>"+memberID);
+				long userID =3;
+				//long userID = (Long)request.getSession().getAttribute("userID");  從session取得userID
+				
+				GeneralMember member = personService.queryMemberData(memberID); //會員
+				GeneralMember member2 = personService.queryMemberData(userID);  //user
+				Set<Friend> FriendSet = member.getFriend();
+				Friend[] arFriend = personService.queryFriend(userID);
+				boolean isFriend = false;
+				//判斷是否已加入好友
+				for(Friend f : arFriend){
+					if(f.getFriend().getId() == member.getId()){
+						isFriend = true;
+						break;
+					}
+				}
+				model.addAttribute("isFriend", isFriend);	
+				model.addAttribute("GeneralMember", member);	
+				model.addAttribute("FriendSet", FriendSet);	
+				return new ModelAndView("memberProfile");			
+			}
 			
-		/*	Member friend = new Member();
-			friend.setUserName("aaa");
-			friend.setId(001);
-			friend.setPicture("images/title_01.gif");
-			
-			Member friend1 = new Member();
-			friend1.setUserName("bbb");
-			friend1.setId(002);
-			friend1.setPicture("images/title_01.gif");
-			
-			Member friend2 = new Member();
-			friend2.setUserName("ccc");
-			friend2.setId(003);
-			friend2.setPicture("images/title_01.gif");
-			Member friend3 = new Member();
-			friend3.setUserName("ddd");
-			friend3.setId(004);
-			friend3.setPicture("images/title_01.gif");
-			
-			Member[] friends = {friend, friend1, friend2, friend3};
-			
-			Member creator = new Member();
-			creator.setUserName("aaaa");
-			creator.setId(105);
-			creator.setPicture("images/title_01.gif");
-			
-			Member creator1 = new Member();
-			creator1.setUserName("bbbb");
-			creator1.setId(106);
-			creator1.setPicture("images/title_01.gif");
-			
-			Member creator2 = new Member();
-			creator2.setUserName("cccc");
-			creator2.setId(107);
-			creator2.setPicture("images/title_01.gif");
-			
-			Member creator3 = new Member();
-			creator3.setUserName("dddd");
-			creator3.setId(108);
-			creator3.setPicture("images/title_01.gif");
-			
-			Member[] creators = {creator, creator1, creator2, creator3};
-				*/
-			ArrayList list= personService.queryFriendsCreators(4);  //member
-			
-			model.addAttribute("friendList", list.get(0));
-			model.addAttribute("creatorList", list.get(1));
-			return new ModelAndView("queryFriendsCreators");
-		}
+			//一般會員頁面的最新動態tab(iframe)
+			@RequestMapping("/memberNewActivity")
+			public ModelAndView queryMemberRecentAction(long memberID,Model model) {		
+				System.out.println("MemberRecentAction---"+memberID);
+				
+				ArrayList list = personService.queryMemberRecentAction(memberID);
+				model.addAttribute("albumList", list.get(0));
+				model.addAttribute("likeSongList", list.get(1));
+				model.addAttribute("listenSongList", list.get(2));
+				return new ModelAndView("queryMemberRecentAction");
+			}
 
-	//個人資料編輯頁(傳入參數"userID"待新增!!!)
-		@RequestMapping("/editMemberData")
-		public ModelAndView queryMember(String userID, Model model)
-		{
-			System.out.println("editMemberData==>");
-			long userID2 = 1;
-			return new ModelAndView("queryMember", "member",this.personService.queryMember(userID2));
+			//一般會員頁面的好友與喜愛創作人tab(iframe)
+			@RequestMapping("/memberAllFriendsCreators")
+			public ModelAndView queryFriendsCreators(String memberID,Model model) {		
+				System.out.println("AllFriendsCreators---"+memberID);
+				
+				ArrayList list= personService.queryFriendsCreators(Long.parseLong(memberID));  //member
+				
+				model.addAttribute("friendList", list.get(0));
+				model.addAttribute("creatorList", list.get(1));
+				return new ModelAndView("queryFriendsCreators");
+			}
+
+			//個人資料編輯-個人資料編輯頁
+			@RequestMapping("/editMemberData")
+			public ModelAndView queryMember(String userId)
+			{
+				ModelAndView mav = new ModelAndView("queryMember");		
+				System.out.println("editMemberData==>");
+				ArrayList list = this.personService.queryMember(Long.valueOf(userId));
+				Member member = (Member) list.get(0);
+				String likeMusicType = member.getLikeMusicType();
+				String likeSinger = member.getLikeSinger();
+				if(likeSinger ==null){
+					mav.addObject("likeSingers",null);
+				}else{
+					String[] likeSingers  = likeSinger.split(",");
+					mav.addObject("likeSingers",likeSingers);
+				}
+				mav.addObject("likeMusicType",likeMusicType);		
+				mav.addObject("member",member);		
+				return mav; 
+			}
+				
+			//個人資料編輯-儲存個人資料編輯頁的修改
+			@RequestMapping("/saveMemberData")
+			public String saveMemberData(long userId,String identityName,String userName,String location,String city,String birthday, String sex,String webSite,String subscribeStatus,String introduction,String likeMusicTypes,String likeSingers)
+			{
+				System.out.println("saveMemberData==>");
+				String birth = birthday.replaceAll("-", "");
+				birth = birth+"000000";			
+				this.personService.updateMember(userId, identityName, userName, location, city, birth, sex, webSite, subscribeStatus, introduction, likeMusicTypes, likeSingers);		
+				return "redirect:editMemberData.do?userId="+userId;	
+			}
+				
+			//個人資料編輯-修改email(window open)
+			@RequestMapping("/modifyEmail")
+			public ModelAndView modifyEmail(long userId, Model model) {
+				System.out.println("modifyEmail==>");
+				Member member = (Member) this.personService.queryMember(userId).get(0);
+				model.addAttribute("member",member);
+				return new ModelAndView("modifyEmail");
+			}
+				
+			//個人資料編輯-儲存修改email結果
+			@RequestMapping("/saveEmail")
+			public ModelAndView saveEmail(long userId, String newEmail) {
+				System.out.println("saveEmail==>");
+				System.out.println(		"userID="+userId+", newEmail="+newEmail);
+				this.personService.updateEmail(userId, newEmail);
+				return new ModelAndView("saveEmail");
+			}
+				
+			//個人資料編輯-修改密碼(window open)
+			@RequestMapping("/modifyPassword")
+			public ModelAndView modifyPassword(long userId, Model model) {
+				System.out.println("modifyPassword==>");
+				Member member = (Member) this.personService.queryMember(userId).get(0);
+				model.addAttribute("member",member);
+				return new ModelAndView("modifyPassword");
+			}
 			
-		}
-		
-		//儲存個人資料編輯頁的修改並呈現修改後結果
-		@RequestMapping("/saveMemberData")
-		public String saveMemberData(long userID,String identityName,String userName,String location,String city,String birthday, String sex,String webSite,String subscribeStatus,String introduction,String likeMusicTypes,String likeSingers)
-		{
-			System.out.println("saveMemberData==>");
-			this.personService.updateMember(userID, identityName, userName, location, city, birthday, sex, webSite, subscribeStatus, introduction, likeMusicTypes, likeSingers);		
-			return "redirect:editMemberData.do";	
-		}
-		
-		//個人資料編輯頁的修改email(window open)
-		@RequestMapping("/modifyEmail")
-		public ModelAndView modifyEmail(long userID, Model model) {
-			System.out.println("modifyEmail==>");
-			Member member = (Member) this.personService.queryMember(userID).get(0);
-			model.addAttribute("member",member);
-			return new ModelAndView("modifyEmail");
-		}
-		
-		//儲存修改email結果
-		@RequestMapping("/saveEmail")
-		public ModelAndView saveEmail(long userID, String newEmail) {
-			System.out.println("saveEmail==>");
-			System.out.println(		"userID="+userID+", newEmail="+newEmail);
-			this.personService.updateEmail(userID, newEmail);
-			return new ModelAndView("saveEmail");
-		}
-		
-		//個人資料編輯頁的修改密碼(window open)
-		@RequestMapping("/modifyPassword")
-		public ModelAndView modifyPassword(long userID, Model model) {
-			System.out.println("modifyPassword==>");
-			Member member = (Member) this.personService.queryMember(userID).get(0);
-			model.addAttribute("member",member);
-			return new ModelAndView("modifyPassword");
-		}
-		
-		//儲存修改密碼結果
-		@RequestMapping("/savePassword")
-		public ModelAndView savePassword(long userID, String newPassword) {
-			System.out.println("savePassword==>");
-			this.personService.updatePassword(userID, newPassword);
-			return new ModelAndView("savePassword");
-		}
+			//個人資料編輯-儲存修改密碼結果
+			@RequestMapping("/savePassword")
+			public ModelAndView savePassword(long userId, String newPassword) {
+				System.out.println("savePassword==>");
+				this.personService.updatePassword(userId, newPassword);
+				return new ModelAndView("savePassword");
+			}
 
-		//個人資料編輯頁的刪除個人圖片
-		@RequestMapping("/deleteMemberPicture")
-		public String deleteMemberPicture(long userID) {
-			this.personService.deleteMemberPicture(userID);
-			return "redirect:editMemberData.do";
-		}
-		
-		//個人資料編輯頁的上傳個人圖片(window open)
-		@RequestMapping("/uploadMemberPicture")
-		public ModelAndView uploadMemberPicture(long userID, Model model) {
-			System.out.println("uploadMemberPicture==>");
-			System.out.println(userID);
-			Member member = (Member) this.personService.queryMember(userID).get(0);
-			model.addAttribute("member",member);
-			return new ModelAndView("uploadMemberPicture");
-		}
-		
-		//儲存會員上傳的圖片
-		@RequestMapping("/handleUploadPicture")
-		public ModelAndView handleUploadPicture(HttpServletRequest request) throws Exception {
-			
-			int yourMaxMemorySize = 500 * 500* 1024;
-			File yourTempDirectory = new File("/tmp");
-			int yourMaxRequestSize = 500 * 500* 1024;
-			boolean writeToFile = true;
-			String allowedFileTypes = ".gif .jpg .png";
-			String fileName="";
-			long userID = 0;
-			String fName="";
-			String saveDirectory = "D:/UBN_Area/ImageWeb/WebContent/image";
+			//個人資料編輯-刪除個人圖片
+			@RequestMapping("/deleteMemberPicture")
+			public String deleteMemberPicture(long userId) {
+				this.personService.deleteMemberPicture(userId);
+				return "redirect:editMemberData.do?userId="+userId;	
+			}
+				
+			//個人資料編輯-上傳個人圖片(window open)
+			@RequestMapping("/uploadMemberPicture")
+			public ModelAndView uploadMemberPicture(long userId, Model model) {
+				System.out.println("uploadMemberPicture==>");
+				System.out.println(userId);
+				Member member = (Member) this.personService.queryMember(userId).get(0);
+				model.addAttribute("member",member);
+				return new ModelAndView("uploadMemberPicture");
+			}
+				
+			//個人資料編輯-儲存會員上傳的圖片
+			@RequestMapping("/handleUploadPicture")
+			public ModelAndView handleUploadPicture(HttpServletRequest request) throws Exception {
+				int yourMaxMemorySize = 500 * 500* 1024;
+				File yourTempDirectory = new File("/tmp");
+				int yourMaxRequestSize = 500 * 500* 1024;
+				boolean writeToFile = true;
+				String allowedFileTypes = ".gif .jpg .png";
+				String fileName="";
+				String fName="";
+				String userId="";
+				String saveDirectory = "D:/gitTest/ImageWeb/WebContent/image";
+				// Check that we have a file upload request
+				boolean isMultipart = ServletFileUpload.isMultipartContent(request);
+				System.out.println("isMultipart=" + isMultipart + "<br>");
 
-			// Check that we have a file upload request
-			boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-			System.out.println("isMultipart=" + isMultipart + "<br>");
+				// Create a factory for disk-based file items
+				DiskFileItemFactory factory = new DiskFileItemFactory(yourMaxMemorySize, yourTempDirectory);
+				
+				// Create a new file upload handler
+				ServletFileUpload upload = new ServletFileUpload(factory);
 
-			// Create a factory for disk-based file items
-			DiskFileItemFactory factory = new DiskFileItemFactory(yourMaxMemorySize, yourTempDirectory);
-			
-			// Create a new file upload handler
-			ServletFileUpload upload = new ServletFileUpload(factory);
+				// Set overall request size constraint
+				upload.setSizeMax(yourMaxRequestSize);
 
-			// Set overall request size constraint
-			upload.setSizeMax(yourMaxRequestSize);
+				try {
+					// Parse the request
+					List items = upload.parseRequest(request);
+						// Process the uploaded items
+					Iterator iter = items.iterator();
+					while (iter.hasNext()) {
+						FileItem item = (FileItem) iter.next();
 
-			try {
-				// Parse the request
-				List items = upload.parseRequest(request);
-
-				// Process the uploaded items
-				Iterator iter = items.iterator();
-				while (iter.hasNext()) {
-					FileItem item = (FileItem) iter.next();
-
-					if (item.isFormField()) {
-						// Process a regular form field	
-						//processFormField(item);		
-						String name = item.getFieldName();
-						String value = item.getString("UTF-8");
-						if(name.equals("userID")){
-							userID = Long.parseLong(value);
-							fName = value;
-						}
-						System.out.println(name + "=" + value + "<br />");
-					} else {
-						// Process a file upload
-						//processUploadedFile(item);	
-						String fieldName = item.getFieldName();
-						fileName = item.getName();
-						String contentType = item.getContentType();
-						boolean isInMemory = item.isInMemory();
-						long sizeInBytes = item.getSize();
-						//System.out.println("userID=" + userID + "<br />");
-						System.out.println("fieldName=" + fieldName + "<br />");
-						System.out.println("fileName=" + fileName + "<br />");
-						System.out.println("contentType=" + contentType + "<br />");
-						System.out.println("isInMemory=" + isInMemory + "<br />");
-						System.out.println("sizeInBytes=" + sizeInBytes + "<br />");
-						
-					      
-						if (fileName != null && !"".equals(fileName)) {
-							if (writeToFile) {
-								// 副檔名
-								 String formatName = fileName.substring(fileName.length() - 4,fileName.length());
-								 fileName = (fName + formatName).toLowerCase();
-							      
-								System.out.println("fileName to be saved=" + fileName + "<br />");
-								String extension = FilenameUtils.getExtension(fileName);
-								if (allowedFileTypes.indexOf(extension.toLowerCase()) != -1) {
-								    File uploadedFile = new File(saveDirectory,	fileName);						
-								    item.write(uploadedFile);
-								} else {
-									System.out.println("上傳的檔案不能是" + extension + "<br />");
+						if (item.isFormField()) {
+							// Process a regular form field	
+							//processFormField(item);		
+							String name = item.getFieldName();
+							String value = item.getString("UTF-8");
+							if(name.equals("userId")){
+								userId = value;
+								fName = value;
+							}
+							System.out.println(name + "=" + value + "<br />");
+						} else {
+							// Process a file upload
+							//processUploadedFile(item);	
+							String fieldName = item.getFieldName();
+							fileName = item.getName();
+							String contentType = item.getContentType();
+							boolean isInMemory = item.isInMemory();
+							long sizeInBytes = item.getSize();
+							//System.out.println("userID=" + userID + "<br />");
+							System.out.println("fieldName=" + fieldName + "<br />");
+							System.out.println("fileName=" + fileName + "<br />");
+							System.out.println("contentType=" + contentType + "<br />");
+							System.out.println("isInMemory=" + isInMemory + "<br />");
+							System.out.println("sizeInBytes=" + sizeInBytes + "<br />");
+						      
+							if (fileName != null && !"".equals(fileName)) {
+								if (writeToFile) {
+									// 副檔名
+									 String formatName = fileName.substring(fileName.length() - 4,fileName.length());
+									 fileName = (fName + formatName).toLowerCase();
+								      
+									System.out.println("fileName to be saved=" + fileName + "<br />");
+									String extension = FilenameUtils.getExtension(fileName);
+									if (allowedFileTypes.indexOf(extension.toLowerCase()) != -1) {
+									    File uploadedFile = new File(saveDirectory,	fileName);						
+									    item.write(uploadedFile);
+									} else {
+										System.out.println("上傳的檔案不能是" + extension + "<br />");
+									}
+								} else {						
+									//InputStream uploadedStream = item.getInputStream();
+									//...
+									//uploadedStream.close();
+									// Process a file upload in memory
+									byte[] data = item.get();
+									System.out.println("data size=" + data.length + "<br />");
 								}
-							} else {
-								//InputStream uploadedStream = item.getInputStream();
-								//...
-								//uploadedStream.close();
-								// Process a file upload in memory
-								byte[] data = item.get();
-								System.out.println("data size=" + data.length + "<br />");
 							}
 						}
 					}
+				} catch (FileUploadBase.SizeLimitExceededException ex1) {
+					System.out.println("上傳檔案超過最大檔案允許大小" + yourMaxRequestSize / (1024 * 1024) + "MB !");
 				}
-			} catch (FileUploadBase.SizeLimitExceededException ex1) {
-				System.out.println("上傳檔案超過最大檔案允許大小" + yourMaxRequestSize / (1024 * 1024) + "MB !");
+				System.out.println(userId);
+				String picture = "image/"+fileName;
+				this.personService.handleUploadPicture(Long.valueOf(userId), picture);
+				return new ModelAndView("handleUploadPicture");
 			}
-			System.out.println(userID);
-			String picture = "image/"+fileName;
-			this.personService.handleUploadPicture(userID, picture);
-			return new ModelAndView("handleUploadPicture");
-		}
 	
 		
 	//管理者查詢會員資料
@@ -578,222 +490,34 @@ public class MemberController {
 	}
 	
 	//創作人被檢舉清單(專輯)
-		@RequestMapping("/queryOffenseAlbum")
-		public ModelAndView queryOffenseAlbum(String adminId,String memberId, Model model) {						
-			System.out.println("queryOffenseAlbum==>");		
-			System.out.println("    memberId="+memberId+", adminId="+adminId);
-			
-			ArrayList a = new ArrayList();
-			ArrayList b = new ArrayList();
-			ArrayList c = new ArrayList();
-			ArrayList d = new ArrayList();
-			
-			Creator creator = new Creator();
-			creator.setId(1111111);
-					
-			Album a1 = new Album();
-			a1.setId(123);
-			a1.setName("peace");
-			a1.setCreator(creator);
-			a1.setStatus("公開");
-			int number1 = 12;
-			a.add(a1);
-			a.add(number1);
-			
-			Album a2 = new Album();
-			a2.setId(456);
-			a2.setName("peace");
-			a2.setCreator(creator);
-			a2.setStatus("隱藏");
-			int number2 = 33;
-			b.add(a2);
-			b.add(number2);
-			
-			Song s1 = new Song();
-			s1.setId(1234);
-			s1.setAlbum(a1);
-			s1.setName("in your eyes");
-			int number3 = 12;
-			c.add(s1);
-			c.add(number3);
-			
-			Song s2 = new Song();
-			s2.setId(4567);
-			s2.setAlbum(a2);
-			s2.setName("happy");
-			int number4 = 33;
-			d.add(s2);
-			d.add(number4);
-			
-			ArrayList offenseAlbums = new ArrayList();
-			offenseAlbums.add(a);
-			offenseAlbums.add(b);
-			ArrayList offenseSongs = new ArrayList();
-			offenseSongs.add(c);
-			offenseSongs.add(d);
-			
-			model.addAttribute("offenseAlbums", offenseAlbums);
-			model.addAttribute("offenseSongs", offenseSongs);
-			return new ModelAndView("queryOffenseAlbum");
-		}	
-		
-		//創作人被檢舉清單(歌曲)
-		@RequestMapping("/queryOffenseSong")
-		public ModelAndView queryOffenseSong(String adminId,String memberId, Model model) {						
-			System.out.println("queryOffenseSong==>");		
-			System.out.println("    memberId="+memberId+", adminId="+adminId);
-			
-			ArrayList a = new ArrayList();
-			ArrayList b = new ArrayList();
-			ArrayList c = new ArrayList();
-			ArrayList d = new ArrayList();
-			
-			Creator creator = new Creator();
-			creator.setId(1111111);
-					
-			Album a1 = new Album();
-			a1.setId(123);
-			a1.setName("peace");
-			a1.setCreator(creator);
-			a1.setStatus("公開");
-			int number1 = 12;
-			a.add(a1);
-			a.add(number1);
-			
-			Album a2 = new Album();
-			a2.setId(456);
-			a2.setName("peace");
-			a2.setCreator(creator);
-			a2.setStatus("隱藏");
-			int number2 = 33;
-			b.add(a2);
-			b.add(number2);
-			
-			Song s1 = new Song();
-			s1.setId(1234);
-			s1.setAlbum(a1);
-			s1.setName("in your eyes");
-			int number3 = 12;
-			c.add(s1);
-			c.add(number3);
-			
-			Song s2 = new Song();
-			s2.setId(4567);
-			s2.setAlbum(a2);
-			s2.setName("happy");
-			int number4 = 33;
-			d.add(s2);
-			d.add(number4);
-			
-			ArrayList offenseAlbums = new ArrayList();
-			offenseAlbums.add(a);
-			offenseAlbums.add(b);
-			ArrayList offenseSongs = new ArrayList();
-			offenseSongs.add(c);
-			offenseSongs.add(d);
-			
-			model.addAttribute("offenseAlbums", offenseAlbums);
-			model.addAttribute("offenseSongs", offenseSongs);		
-			return new ModelAndView("queryOffenseSong");
-		}
-		
-		//查詢儲值紀錄
-				@RequestMapping("/queryPrePayRecord")
-				public ModelAndView queryPrePayRecord() {
-					ModelAndView mav = new ModelAndView("queryPrePayRecord");
-					Order order = new Order();
-					long id = 89123456;
-					order.setId(id);
-					order.setPurchaseDate("2011/03/31");
-					order.setPayMethod("信用卡付款");
-					order.setPayDate("2011/04/01 12:33:46");
-					order.setBillStatus("已寄送");
-					GsiMoney gsiMoney = new GsiMoney();
-					gsiMoney.setPrepaid("300");
-					gsiMoney.setMemo("test");
-					OrderDetail orderDetail = new OrderDetail();
-					orderDetail.setOrder(order);
-					//orderDetail.setGsiMoney(gsiMoney);
-					
-					Order order2 = new Order();
-					long id2 = 63253456;
-					order2.setId(id2);
-					order2.setPurchaseDate("2011/06/28");
-					order2.setPayMethod("轉帳付款");
-					order2.setPayDate("2011/06/29 12:33:46");
-					order2.setBillStatus("未寄送");
-					GsiMoney gsiMoney2 = new GsiMoney();
-					gsiMoney2.setPrepaid("200");
-					gsiMoney2.setMemo("test");
-					OrderDetail orderDetail2 = new OrderDetail();
-					orderDetail2.setOrder(order2);
-					//orderDetail2.setGsiMoney(gsiMoney2);
-					mav.addObject("orderDetail",orderDetail);
-					mav.addObject("orderDetail2",orderDetail2);
-					return mav;
-				}
+			@RequestMapping("/queryOffenseAlbum")
+			public ModelAndView queryOffenseAlbum(String adminId,String memberId, Model model) {						
+				System.out.println("queryOffenseAlbum==>");		
+				System.out.println("    memberId="+memberId+", adminId="+adminId);
 
-				//查詢訂單詳細紀錄(訂單編號的連結)
-				@RequestMapping("/queryPayDetailRecord")  
-				public ModelAndView queryPayDetailRecord() {
-					ModelAndView mav = new ModelAndView("queryPayDetailRecord");
-					String tPrice="350";
-					Order order = new Order();
-					long id = 89123456;
-					order.setId(id);
-					order.setPurchaseDate("2011/03/31");
-					SongPrice songPrice = new SongPrice();
-					songPrice.setPrice("20");
-					Song song = new Song();
-					song.setName("早安晨之美");
-					song.setSongPrice(songPrice);
-					SongPrice songPrice2 = new SongPrice();
-					songPrice2.setPrice("25");
-					Song song2 = new Song();
-					song2.setName("你");
-					song2.setSongPrice(songPrice2);
-					Album album = new Album();
-					album.setName("盧廣仲");
-					Album album2 = new Album();
-					album2.setName("蕭敬騰");
-					ProductionCategory productionCategory = new ProductionCategory();
-					//productionCategory.setSong(song);
-					//productionCategory.setAlbum(album);
-					ProductionCategory productionCategory2 = new ProductionCategory();
-					//productionCategory2.setSong(song2);
-					//productionCategory2.setAlbum(album2);
-					OrderDetail orderDetail = new OrderDetail();
-					orderDetail.setProductionCategory(productionCategory);
-					orderDetail.setOrder(order);
-					OrderDetail orderDetail2 = new OrderDetail();
-					orderDetail2.setProductionCategory(productionCategory2);
-					OrderDetail[] od = {orderDetail,orderDetail2};
-					mav.addObject("orderDetail",od);
-					mav.addObject("tPrice",tPrice);
-					return mav;
-				}
-					
-				//查詢贈送點數記錄
-				@RequestMapping("/queryRewardRecord")
-				public ModelAndView queryRewardRecord() {
-					ModelAndView mav = new ModelAndView("queryRewardRecord");
-					String waitOnBonus = "0";
-					String OnBonus = "300";
-					String offBonus = "0";
-					Order order = new Order();
-					long id = 89123456;
-					order.setId(id);
-					GsiBonus gsiBonus = new GsiBonus();
-					gsiBonus.setOnDate("2011/03/31");
-					gsiBonus.setOffDate("2011/10/31");
-					OrderDetail orderDetail = new OrderDetail();
-					orderDetail.setOrder(order);
-					//orderDetail.setGsiBonus(gsiBonus);
-					mav.addObject("orderDetail",orderDetail);
-					mav.addObject("waitOnBonus",waitOnBonus);
-					mav.addObject("OnBonus",OnBonus);
-					mav.addObject("offBonus",offBonus);
-					return mav;
-				}
+				ArrayList offenseAlbums = transactionRecordService.queryOffenseAlbumForUser(Long.parseLong(memberId));
+	
+				ArrayList offenseSongs = transactionRecordService.queryOffenseSongForUser(Long.parseLong(memberId));
+
+				model.addAttribute("offenseAlbums", offenseAlbums);
+				model.addAttribute("offenseSongs", offenseSongs);
+				return new ModelAndView("queryOffenseAlbum");
+			}	
+
+			//創作人被檢舉清單(歌曲)
+			@RequestMapping("/queryOffenseSong")
+			public ModelAndView queryOffenseSong(String adminId,String memberId, Model model) {						
+				System.out.println("queryOffenseSong==>");		
+				System.out.println("    memberId="+memberId+", adminId="+adminId);
+
+				ArrayList offenseAlbums = transactionRecordService.queryOffenseAlbumForUser(Long.parseLong(memberId));
+				
+				ArrayList offenseSongs = transactionRecordService.queryOffenseSongForUser(Long.parseLong(memberId));
+
+				model.addAttribute("offenseAlbums", offenseAlbums);
+				model.addAttribute("offenseSongs", offenseSongs);		
+				return new ModelAndView("queryOffenseSong");
+			}
+
 }
 

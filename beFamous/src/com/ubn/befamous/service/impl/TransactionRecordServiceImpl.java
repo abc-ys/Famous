@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -54,6 +55,10 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	@Autowired
 	@Qualifier("prePaidDAO")
 	public IBaseDao<PrePaid, Long> prePaidDAO;
+	
+	@Autowired
+	@Qualifier("creatorDAO")
+	private IBaseDao<Creator, Long> creatorDAO;
 	
 	@Autowired
 	@Qualifier("memberDAO")
@@ -119,332 +124,706 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	private SessionFactory sessionFactory;
 	
 	//購買SD卡與儲值
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public SDCard[] querySDCard() {	
-		SDCard[] sdList = this.sdCardDAO.findAll();		
-		return sdList;		
-	}
+	
+		/**
+		 *購買SD卡第一步:查詢SDCard清單 */
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public SDCard[] querySDCard() {	
+			SDCard[] sdList = this.sdCardDAO.findAll();		
+			return sdList;		
+		}
 
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public PrePaid[] queryPrePaid() {		
-		PrePaid[] pdList = this.prePaidDAO.findAll();
-		return pdList;
-	}
+		/**
+		 *儲值第一步:查詢PrePaid清單 */
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public PrePaid[] queryPrePaid() {		
+			PrePaid[] pdList = this.prePaidDAO.findAll();
+			return pdList;
+		}
 
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList addShoppingCart(long userId, long productId, String amount) {
-		
-		Member member = this.memberDAO.find(userId);	
-		ProductionCategory productionCategory = this.productionCategoryDAO.find(productId);
-		Set<ShoppingCartDetail> sclist = new HashSet();
-		ShoppingCartDetail cartDetail = new ShoppingCartDetail();
-		sclist.add(cartDetail);
-		
-		ShoppingCart cart = new ShoppingCart();
-		cart.setMember(member);
-		cart.setCreateDate(DateFormatUtils.format(new Date(), "yyyyMMddhhmmss"));
-		cart.setShoppingCartDetail(sclist);
-		
-		cartDetail.setShoppingCart(cart);
-		cartDetail.setAmount(amount);
-		cartDetail.setProductionCategory(productionCategory);
-		this.shoppingCartDetailDAO.save(cartDetail);		
-		
-		ArrayList list = new ArrayList();
-		list.add(member);
-		list.add(cart);	
-		
-		return list;
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList purchaseConfirmShoppingCart(long userId, ShoppingCart shoppingCart) {
-		Member member = this.memberDAO.find(userId);		
-		ArrayList list = new ArrayList();
-		list.add(member);
-		list.add(shoppingCart);
-		
-		return list;
-	}
-	//實體幣-購物車變為訂單。
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Order addOrder(long shoppingCartId) {
-		
-		
-		return null;
-	}
-
-	//購買專輯或歌曲
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ShoppingCartDetail[] queryShoppingCart(long userId) {
-		
-		Query query = this.sessionFactory.getCurrentSession().createQuery("from ShoppingCart s where s.member.id =:v1 order by s.id desc");
-		query.setParameter("v1", userId);
-		
-		List<ShoppingCart> shoppingCart = (List<ShoppingCart>)query.list();		
-		ShoppingCart newShoppingCart = shoppingCart.get(0);
-		
-		Set<ShoppingCartDetail> detailSet = newShoppingCart.getShoppingCartDetail();
-		
-		ShoppingCartDetail[] shoppingCartDetail = detailSet.toArray(new ShoppingCartDetail[detailSet.size()]);
-		
-		return shoppingCartDetail;
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ShoppingCartDetail[] deleteShoppingCart(long userId, long transactionId) {
-		this.shoppingCartDetailDAO.delete(transactionId);
-		ShoppingCartDetail[] shoppingCartDetail = this.queryShoppingCart(userId); 		 
-		return shoppingCartDetail;
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ShoppingCartDetail[] forwardPurchase(long userId) {
-		ShoppingCartDetail[] shoppingCartDetail = this.queryShoppingCart(userId); 		 
-		return shoppingCartDetail;
-	}
-
-	//確認購買，轉成訂單!
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void purchaseConfirm(long shoppingCartId, String gsiMoney, String gsiBonus) {
-		
-		String date = DateFormatUtils.format(new Date(), "yyyyMMddhhmmss");
-		
-		ShoppingCart s = this.shoppingCartDAO.find(shoppingCartId);
-		Set<ShoppingCartDetail> detailSet = s.getShoppingCartDetail();
-		Member member = s.getMember();
-		
-		Order order = new Order();
-		order.setMember(member);
-		order.setCreateDate(date);
-		order.setPayDate(date);
-		order.setPurchaseDate(date);
-		order.setBillDate(date);
-		order.setHandleStatus("1");
-		order.setPayStatus("1");
-		order.setPayMethod("1");
-		this.orderDAO.save(order);
-		
-		for (ShoppingCartDetail od:detailSet) {
+		/**
+		 * 第二步:加入購物車*/
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public ArrayList addShoppingCart(long userId, long productId, String amount) {
 			
-			OrderDetail orderDetail = new OrderDetail();			
-			orderDetail.setOrder(order);
-			orderDetail.setAmount("1");
-			orderDetail.setProductionCategory(od.getProductionCategory());
-			orderDetail.setGsiMoney(gsiMoney);
-			orderDetail.setGsiBonus(gsiBonus);
-		
-		this.orderDetailDAO.save(orderDetail);
+			Member member = this.memberDAO.find(userId);	
+			ProductionCategory productionCategory = this.productionCategoryDAO.find(productId);
+			Set<ShoppingCartDetail> shoppingCartList = new HashSet();
+			ShoppingCartDetail cartDetail = new ShoppingCartDetail();		
+			
+			ShoppingCart cart = new ShoppingCart();
+			cart.setMember(member);
+			cart.setCreateDate(DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"));
+			cart.setShoppingCartDetail(shoppingCartList);
+			
+			cartDetail.setShoppingCart(cart);
+			cartDetail.setAmount(amount);
+			cartDetail.setProductionCategory(productionCategory);
+			
+			shoppingCartList.add(cartDetail);
+			this.shoppingCartDetailDAO.save(cartDetail);
+			this.shoppingCartDAO.save(cart);
+			
+			ArrayList list = new ArrayList();
+			list.add(member);
+			list.add(cart);	
+			
+			return list;
+		}
+
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public ArrayList purchaseConfirmShoppingCart(long userId, ShoppingCart shoppingCart) {
+			Member member = this.memberDAO.find(userId);		
+			ArrayList list = new ArrayList();
+			list.add(member);
+			list.add(shoppingCart);
+			
+			return list;
 		}
 		
-		GsiMoney gm = new GsiMoney();
-		gm.setCreateDate(date);
-		gm.setMember(member);
-		gm.setPurchase(gsiMoney);
-		this.gsiMoneyDAO.save(gm);
+		//實體幣-購物車變為訂單。
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public Order addOrder(long shoppingCartId) {
+			
+			
+			return null;
+		}
+
+		//購買專輯或歌曲
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public ShoppingCartDetail[] queryShoppingCart(long userId) {
+			
+			Query query = this.sessionFactory.getCurrentSession().createQuery("from ShoppingCart s where s.member.id =:v1 order by s.id desc");
+			query.setParameter("v1", userId);
+			
+			List<ShoppingCart> shoppingCart = (List<ShoppingCart>)query.list();		
+			ShoppingCart newShoppingCart = shoppingCart.get(0);
+			
+			Set<ShoppingCartDetail> detailSet = newShoppingCart.getShoppingCartDetail();
+			
+			ShoppingCartDetail[] shoppingCartDetail = detailSet.toArray(new ShoppingCartDetail[detailSet.size()]);
+			
+			return shoppingCartDetail;
+		}
+
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public ShoppingCartDetail[] deleteShoppingCart(long userId, long transactionId) {
+			this.shoppingCartDetailDAO.delete(transactionId);
+			ShoppingCartDetail[] shoppingCartDetail = this.queryShoppingCart(userId); 		 
+			return shoppingCartDetail;
+		}
+
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public ShoppingCartDetail[] forwardPurchase(long userId) {
+			ShoppingCartDetail[] shoppingCartDetail = this.queryShoppingCart(userId); 		 
+			return shoppingCartDetail;
+		}
+
+		//確認購買，轉成訂單!
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public void purchaseConfirm(long shoppingCartId, String gsiMoney, String gsiBonus) {
+			
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
+			
+			ShoppingCart s = this.shoppingCartDAO.find(shoppingCartId);
+			Set<ShoppingCartDetail> detailSet = s.getShoppingCartDetail();
+			Member member = s.getMember();
+			
+			Order order = new Order();
+			order.setMember(member);
+			order.setCreateDate(date);
+			order.setPayDate(date);
+			order.setPurchaseDate(date);
+			order.setBillDate(date);
+			order.setHandleStatus("1");
+			order.setPayStatus("1");
+			order.setPayMethod("1");
+			this.orderDAO.save(order);
+			
+			for (ShoppingCartDetail od:detailSet) {
+				
+				OrderDetail orderDetail = new OrderDetail();			
+				orderDetail.setOrder(order);
+				orderDetail.setAmount("1");
+				orderDetail.setProductionCategory(od.getProductionCategory());
+				orderDetail.setGsiMoney(gsiMoney);
+				orderDetail.setGsiBonus(gsiBonus);
+			
+			this.orderDetailDAO.save(orderDetail);
+			}
+			
+			GsiMoney gm = new GsiMoney();
+			gm.setCreateDate(date);
+			gm.setMember(member);
+			gm.setOutgo(gsiMoney);
+			this.gsiMoneyDAO.save(gm);
+			
+			GsiBonus gb = new GsiBonus();
+			gb.setCreateDate(date);
+			gb.setMember(member);
+			gb.setPurchase(gsiBonus);
+			this.gsiBonusDAO.save(gb);
+			
+		}
+
+
+		//訂單管理-實體幣訂單-搜尋實體幣訂單
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public Order[] queryCashTransRcd(String userEmail, String orderId,
+				String startDate, String endDate, String handleStatus) {
+			System.out.println("queryCashTransRcd====>userEmail="+userEmail+", orderId="+orderId+", startDate="+startDate+", endDate="+endDate+", handleStatus="+handleStatus);
+			StringBuffer tempQuery = new StringBuffer();
+			tempQuery.append("select o from Order o where o.payMethod is not null ");		
+			if(!userEmail.isEmpty()){
+				tempQuery.append("and o.member.email = :email ");
+			}
+			if(!orderId.isEmpty()){
+				tempQuery.append("and o.id = :orderId ");
+			}
+			if(!startDate.isEmpty()&&!endDate.isEmpty()){
+				tempQuery.append("and (o.billDate between :startDate and :endDate) ");
+			}
+			if(!handleStatus.isEmpty()&& !handleStatus.equals("0")){
+				tempQuery.append("and o.handleStatus = :handleStatus ");
+			}
+			
+			Query query = this.sessionFactory.getCurrentSession().createQuery(tempQuery.toString());
+			if(!userEmail.isEmpty()){
+				query.setParameter("email", userEmail);
+			}
+			if(!orderId.isEmpty()){
+				query.setLong("orderId", Long.parseLong(orderId));
+			}
+			if(!startDate.isEmpty()&&!endDate.isEmpty()){
+				String sDate = startDate.replaceAll("-", "");
+				sDate = sDate+"000000";
+				String eDate = endDate.replaceAll("-", "");
+				eDate = eDate+"235959";
+				query.setParameter("startDate",sDate);
+				query.setParameter("endDate",eDate);
+			}
+			if(!handleStatus.isEmpty()&& !handleStatus.equals("0")){
+				query.setParameter("handleStatus",handleStatus);
+			}
+			List<Order> orderList = (List<Order>)query.list();
+			Order[] orders = orderList.toArray(new Order[orderList.size()]);
+			return orders;
+		}
+
+		//訂單管理-現金訂單管理-現金訂單明細-儲存出貨登錄
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public void updateShipRegister(long adminId, long orderId, String shipDate, String shipNo, String billNo) {
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
+			Order order = this.orderDAO.find(orderId);
+			order.setShipNo(shipNo);
+			order.setBillNo(billNo);
+			order.setShipDate(shipDate);
+			order.setModifier(String.valueOf(adminId));
+			order.setModifyDate(date);
+			this.orderDAO.update(order);
+		}
+
+		//訂單管理-實體幣訂單-儲存處理實體幣訂單結果
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public void saveCashTransRcd(long adminId, long orderId, String billStatus,
+				String payStatus, String handleStatus, String memo1, String memo2) {
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
+			Order order = this.orderDAO.find(orderId);
+			order.setModifier(String.valueOf(adminId));
+			order.setBillStatus(billStatus);
+			order.setPayStatus(payStatus);
+			order.setHandleStatus(handleStatus);
+			order.setMemo1(memo1);
+			order.setMemo2(memo2);
+			order.setModifyDate(date);
+			this.orderDAO.update(order);
 		
-		GsiBonus gb = new GsiBonus();
-		gb.setCreateDate(date);
-		gb.setMember(member);
-		gb.setPurchase(gsiBonus);
-		this.gsiBonusDAO.save(gb);
+		}
+
+		//訂單管理-虛擬幣訂單-搜尋虛擬幣訂單(起始搜尋)
+		public Order[] queryFirstInventTransRcd(String year, String month){
+			Integer y = Integer.valueOf(year);
+			Integer m = Integer.valueOf(month);
+			Query query = this.sessionFactory.getCurrentSession().createQuery("select o from Order o where (year(o.billDate) in (:y)) and (month(o.billDate) in (:mo)) and (o.gsiMoney is not null) and (o.payMethod is null)");
+			query.setParameter("y", y);
+			query.setParameter("mo", m);
+			List<Order> gsiMoneyList = (List<Order>)query.list();
+			Order[] orders = gsiMoneyList.toArray(new Order[gsiMoneyList.size()]);	
+			return orders;
+			
+		}
+
+		//訂單管理-虛擬幣訂單(根據搜尋條件)
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public Order[] queryInventTransRcd(String userEmail, String orderId, String startDate, String endDate) {
+			StringBuffer tempQuery = new StringBuffer();
+			tempQuery.append("select o from Order o join o.member m where (o.gsiMoney is not null) and (o.payMethod is null)");		
+			if(!userEmail.isEmpty()){
+				tempQuery.append("and m.email = :email ");
+			}
+			if(!orderId.isEmpty()){
+				tempQuery.append("and o.id = :orderId ");
+			}
+			if(!startDate.isEmpty()&&!endDate.isEmpty()){
+				tempQuery.append("and (o.billDate between :startDate and :endDate) ");
+			}
+			
+			Query query = this.sessionFactory.getCurrentSession().createQuery(tempQuery.toString());
+			if(!userEmail.isEmpty()){
+				query.setParameter("email", userEmail);
+			}
+			if(!orderId.isEmpty()){
+				query.setLong("orderId", Long.parseLong(orderId));
+			}
+			if(!startDate.isEmpty()&&!endDate.isEmpty()){
+				String sDate = startDate.replaceAll("-", "");
+				sDate = sDate+"000000";
+				String eDate = endDate.replaceAll("-", "");
+				eDate = eDate+"235959";
+				query.setParameter("startDate",sDate);
+				query.setParameter("endDate",eDate);
+			}
+			List<Order> orderList = (List<Order>)query.list();
+			Order[] orders = orderList.toArray(new Order[orderList.size()]);
+			return orders;
+		}
+
+		//訂單管理-虛擬幣訂單-搜尋訂單MEMO
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public ArrayList queryInventMemo(long orderId) {
+			ArrayList note = new ArrayList();
+			Order order = this.orderDAO.find(orderId);
+			note.add(order.getMemo1());
+			note.add(order.getMemo2());
+			return note;
+		}
+
+		//訂單管理-虛擬幣訂單-儲存訂單MEMO
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public void updateInventMemo(long adminId,long orderId, String memo1, String memo2) {
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
+			Admin admin = this.adminDAO.find(adminId);
+			Order order = this.orderDAO.find(orderId);
+			order.setModifier(String.valueOf(admin.getId()));
+			order.setModifyDate(date);
+			order.setMemo1(memo1);
+			order.setMemo2(memo2);
+			this.orderDAO.update(order);		
+		}
+
+		//發票登錄-兌換金額管理(起始查詢)
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public GsiMoney[] queryFirstExchangeList(){
+			Query query = this.sessionFactory.getCurrentSession().createQuery("from GsiMoney g where g.exchangeDate is not null and g.transactionType='4' and g.exchangeStatus='1'");
+			List<GsiMoney> gsiMoneyList = (List<GsiMoney>)query.list();
+			GsiMoney[] gsiMoney = gsiMoneyList.toArray(new GsiMoney[gsiMoneyList.size()]);	
+			return gsiMoney;
+			
+		}
 		
-	}
+		//發票登錄-兌換金額管理(根據查詢條件)
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public GsiMoney[] queryExchangeList(String year, String month) {		
+			Integer y = Integer.valueOf(year);
+			Integer m = Integer.valueOf(month);
+			Query query = this.sessionFactory.getCurrentSession().createQuery("from GsiMoney g where (year(g.exchangeDate) in (:y)) and (month(g.exchangeDate) in (:mo)) and (g.transactionType='4')and (g.exchangeStatus='1')");
+			query.setParameter("y", y);
+			query.setParameter("mo", m);
+			List<GsiMoney> gsiMoneyList = (List<GsiMoney>)query.list();
+			GsiMoney[] gsiMoney = gsiMoneyList.toArray(new GsiMoney[gsiMoneyList.size()]);	
+			return gsiMoney;
+		}
 
-
-	//訂單管理-實體幣訂單
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Order[] queryCashTransRcd(String userEmail, long transactionId,
-			String startDate, String endDate, String orderStatus) {
-	
-		return null;
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList queryCashTransDetail(long transactionId) {
+		//發票登錄-儲存兌換金額訂單明細
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public void updateExchange(long adminId, long gsiMoneyId,String exchangeTax, String paid, String exchangeStatus, String paidDate, String memo) {
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
+			GsiMoney g = this.gsiMoneyDAO.find(gsiMoneyId);
+			g.setModifier(String.valueOf(adminId));
+			g.setModifyDate(date);
+			g.setExchangeTax(exchangeTax);
+			g.setPaid(paid);
+			g.setExchangeStatus(exchangeStatus);
+			g.setPaidDate(date);
+			g.setMemo(memo);
+			this.gsiMoneyDAO.update(g);
+		}
 		
-		return null;
-	}
+		//發票登錄-訂單發票登錄
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public Order[] queryBillRcd(String year, String month) {
 
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public boolean saveCashTransRcd(long transactionId, String billStatus,
-			String payStatus, String processStatus, String memo1, String memo2) {
-	
-		return false;
-	}
+			System.out.println("queryBillRcd====>");
+			Integer y = Integer.valueOf(year);
+			Integer m = Integer.valueOf(month);
+			Query query = this.sessionFactory.getCurrentSession().createQuery("select o from Order o where (year(o.purchaseDate) in (:y)) and (month(o.purchaseDate) in (:mo)) and o.billNo is null and (o.gsiMoney is null)");
+			query.setParameter("y", y);
+			query.setParameter("mo", m);
+			List<Order> gsiMoneyList = (List<Order>)query.list();	
+			Order[] orders = gsiMoneyList.toArray(new Order[gsiMoneyList.size()]);	
+			return orders;
+		}
 
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Order queryDeliveryRcd(long transactionId) {
+
+		//發票登錄-儲存訂單明細
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public void updateBill(long adminId, long orderId, String billNo, String memo2, String payStatus) {
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
+			Admin admin = this.adminDAO.find(adminId);
+			Order order = this.orderDAO.find(orderId);
+			order.setModifier(String.valueOf(admin.getId()));
+			order.setModifyDate(date);
+			order.setBillNo(billNo);
+			order.setPayStatus(payStatus);
+			order.setMemo2(memo2);
+			this.orderDAO.update(order);
+		}
 		
-		return null;
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList updateDeliveryRcd(long transactionId, String deliveryDate,
-			String deliveryNo, String billNo) {
+		//我的帳本-查看收支表(明細)
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public Order[] queryGsiMoney(long userId, String year, String month) {
+			
+			Integer y = Integer.valueOf(year);
+			Integer m = Integer.valueOf(month);
+			Query query = this.sessionFactory.getCurrentSession().createQuery("select o from Member m join m.order o where m.id = :userId and (year(o.billDate) in (:y)) and (month(o.billDate) in (:mo) and o.gsiMoney is not null)");
+			query.setParameter("userId", userId);
+			query.setParameter("y", y);
+			query.setParameter("mo", m);
+			
+			List<Order> gsiMoneyList = (List<Order>)query.list();
+			Order[] orders = gsiMoneyList.toArray(new Order[gsiMoneyList.size()]);
+			return orders;
+		}
 		
-		return null;
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList returnGoods(long transactionId) {
 		
-		return null;
-	}
+		//我的帳本-查看收支表(最後一筆)
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public List<GsiMoney> queryOneGsiMoney(long userId, String year, String month) {			
+			Integer y = Integer.valueOf(year);
+			Integer m = Integer.valueOf(month);
+			Query query = this.sessionFactory.getCurrentSession().createQuery("select g from Member m join m.gsiMoney g where m.id = :userId and year(g.createDate) in (:y) and month(g.createDate) in (:mo) order by g.createDate desc");
+			query.setParameter("userId", userId);
+			query.setParameter("y", y);
+			query.setParameter("mo", m);
+			List<GsiMoney> gMoneyList = (List<GsiMoney>) query.list();
+			return gMoneyList;
+		}
 
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList cancelOrder(long transactionId) {
+		//我的帳本-查看收支表(這個月的兌換記錄)
+		public List<GsiMoney> queryOneExchangeRcd(long userId, String year, String month){
+			Integer y = Integer.valueOf(year);
+			Integer m = Integer.valueOf(month);
+			Query query = this.sessionFactory.getCurrentSession().createQuery("select g from Member m join m.gsiMoney g where m.id = :userId and year(g.exchangeDate) in (:y) and month(g.exchangeDate) in (:m)");
+			query.setParameter("userId", userId);
+			query.setParameter("y", y);
+			query.setParameter("m", m);
+			List<GsiMoney> gMoneyList = (List<GsiMoney>) query.list();
+			return gMoneyList;
+		}
 		
-		return null;
-	}
+		//根據訂單編號找尋訂單
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public Order queryTransRcd(long orderId){
+			Order order = this.orderDAO.find(orderId);		
+			return order;
+		}
 
-	//訂單管理-虛擬幣訂單
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Order[] queryInventTransRcd(String userEmail, long transactionId,
-			String startDate, String endDate, String orderStatus) {
-	
-		return null;
-	}
+		//我的帳本-儲存兌換申請以及創作者帳戶資料
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public void saveChange(Creator creator, int money, String synUpdate) {
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");		
+			Creator c = this.creatorDAO.find(creator.getId());//更新creator部分資料
+			if(synUpdate.equals("y"))
+			{
+				c.setRealName(creator.getRealName());
+				c.setIdentityNO(creator.getIdentityNO());
+				c.setAddress(creator.getAddress());
+				c.setCellPhone(creator.getCellPhone());
+				c.setTel(creator.getTel());
+				c.setAccountName(creator.getAccountName());
+				c.setAccountNO(creator.getAccountNO());
+				c.setBankBranch(creator.getBankBranch());
+				c.setBankName(creator.getBankName());
+				this.creatorDAO.update(c);
+			}
+			
+			Query query = this.sessionFactory.getCurrentSession().createQuery("from Member m where m.id = :userId");
+			query.setParameter("userId", creator.getId());
+			Member member = (Member) query.uniqueResult();
+			
+			Query query2 = this.sessionFactory.getCurrentSession().createQuery("from GsiMoney g order by g.createDate desc");
+			GsiMoney lastGsiMoney = (GsiMoney) query2.list().get(0);
+			int lastMoney = Integer.parseInt(lastGsiMoney.getBalance());
+			String newBalance = String.valueOf(lastMoney - money);
+			
+			GsiMoney gsiMoney = new GsiMoney();
+			gsiMoney.setCreateDate(date);
+			gsiMoney.setMember(member);
+			gsiMoney.setOutgo(String.valueOf(money));
+			gsiMoney.setTransactionType("4");
+			gsiMoney.setBalance(newBalance);
+			gsiMoney.setExchangeDate(date);
+			gsiMoney.setExchangeStatus("1");//1為待處理
+			gsiMoney.setCreateUser(String.valueOf(creator.getId()));
+			this.gsiMoneyDAO.save(gsiMoney);
+		}
 
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public OrderDetail queryInventTransDetail(long transactionId) {
+		//我的帳本-兌換記錄(起始查詢六個月內)
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public GsiMoney[] queryFirstExchangeLog(long userId, String lastDate, String nowDate) {
+			Query query = this.sessionFactory.getCurrentSession().createQuery("select g from Member m join m.gsiMoney g where m.id = :userId and g.transactionType='4' and (g.exchangeDate between :lastDate and :nowDate) and g.exchangeStatus='2'");
+			query.setParameter("userId", userId);
+			query.setParameter("lastDate", lastDate);
+			query.setParameter("nowDate", nowDate);
+			
+			List<GsiMoney> gsiMoneyList = (List<GsiMoney>)query.list();
+			GsiMoney[] gsiMoney = gsiMoneyList.toArray(new GsiMoney[gsiMoneyList.size()]);
+			return gsiMoney;
+		}
 		
-		return null;
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Order queryInventMemo(long transactionId) {
+		//我的帳本-兌換記錄(查詢條件)
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public GsiMoney[] queryExchangeLog(long userId, String year, String month) {
+			Integer y = Integer.valueOf(year);
+			Integer m = Integer.valueOf(month);
+			Query query = this.sessionFactory.getCurrentSession().createQuery("select g from Member m join m.gsiMoney g where m.id = :userId and (year(g.exchangeDate) in (:y)) and (month(g.exchangeDate) in (:mo)) and g.exchangeStatus='2' and g.transactionType='4'");
+			query.setParameter("userId", userId);
+			query.setParameter("y", y);
+			query.setParameter("mo", m);
+				
+			List<GsiMoney> gsiMoneyList = (List<GsiMoney>)query.list();
+			GsiMoney[] gsiMoney = gsiMoneyList.toArray(new GsiMoney[gsiMoneyList.size()]);
+			return gsiMoney;
+		}
 		
-		return null;
-	}
+		//我的帳本-儲值記錄
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public Order[] queryPrePaidRcd(long userId, String year, String month) {
+			Integer y = Integer.valueOf(year);
+			Integer m = Integer.valueOf(month);
+			Query query = this.sessionFactory.getCurrentSession().createQuery("select o from Member m join m.order o join o.gsiMoney g where m.id = :userId and (year(o.billDate) in (:y)) and (month(o.billDate) in (:mo)) and g.transactionType='1'");
+			query.setParameter("userId", userId);
+			query.setParameter("y", y);
+			query.setParameter("mo", m);
+			
+			List<Order> gsiMoneyList = (List<Order>)query.list();
+			Order[] orders = gsiMoneyList.toArray(new Order[gsiMoneyList.size()]);
+			return orders;
+		}
 
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public boolean updateInventMemo(long transactionId, String memo1,
-			String memo2) {
+		//我的帳本-GSiMoney消費記錄
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public List<Order> queryBuyLogRcd(long userId, String year, String month) {		
+			System.out.println("aaaa");
+			Integer y = Integer.valueOf(year);
+			Integer m = Integer.valueOf(month);
+			Query query = this.sessionFactory.getCurrentSession().createQuery("select o from Member m join m.order o join o.gsiMoney g where m.id = :userId and (year(o.billDate) in (:y)) and (month(o.billDate) in (:mo)) and g.transactionType='3'");
+			query.setParameter("userId", userId);
+			query.setParameter("y", y);
+			query.setParameter("mo", m);
+			List<Order> gsiMoneyList = (List<Order>)query.list();
+			
+		return gsiMoneyList;
+			
+		}
 		
-		return false;
-	}
-
-	//發票登錄-兌換金額管理
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public GsiMoney[] queryExchangeList(String year, String month) {
+		//我的帳本-購買記錄明細(訂單編號的連結)
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public List<Object[]> queryBuyLogDetail(long orderId) {
+			
+			//根據訂單編號找尋其訂單明細
+			Query query2 = this.sessionFactory.getCurrentSession().createQuery("select ots from OrderDetail ots join ots.order o where ots.order.id = :oid");
+			query2.setParameter("oid",orderId);
+			List<OrderDetail> orderDetails =(List<OrderDetail>)query2.list();		
+			
+			//根據訂單明細去判斷產品(專輯/歌曲)
+			List<Object[]> list = new ArrayList();
+			for(OrderDetail ot:orderDetails){
+				Object[] object = new Object[3];
+				Query query = this.sessionFactory.getCurrentSession().createQuery("FROM ProductionCategory p where p.pid = :productId");
+				query.setLong("productId", ot.getProductionCategory().getPid());
+				Object product = query.uniqueResult();
+				if (product instanceof Album) {
+					Album album = (Album)product;			
+					object[0]="1";
+					object[1]= album;
+					object[2]= ot;
+					list.add(object);
+				}else if (product instanceof Song){
+					Song song = (Song)product;
+					object[0]="2";
+					object[1]=song;
+					object[2]= ot;
+					list.add(object);
+				}else if (product instanceof SDCard){
+					SDCard sdCard = (SDCard)product;
+					object[0]="3";
+					object[1]=sdCard;
+					object[2]= ot;
+					list.add(object);
+				}else if (product instanceof PrePaid){
+					PrePaid prePaid = (PrePaid)product;
+					object[0]="4";
+					object[1]=prePaid;
+					object[2]= ot;
+					list.add(object);
+				}
+			}
+			return list;
+		}
 		
-		return null;
-	}
+		//我的帳本-銷售紀錄
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public List<Object[]> querySaleRcd(long userId, String year, String month) {
+			Integer y = Integer.valueOf(year);
+			Integer m = Integer.valueOf(month);
+			Query query = this.sessionFactory.getCurrentSession().createQuery("select o from Order o join o.gsiMoney g where (year(o.billDate) in (:y)) and (month(o.billDate) in (:mo)) and g.transactionType='2'");
+			query.setParameter("y", y);
+			query.setParameter("mo", m);
+			List<Order> gsiMoneyList = (List<Order>)query.list();
+			List<Object[]> list = new ArrayList();
+			for(Order o:gsiMoneyList){
+				//根據訂單編號找尋其訂單明細
+				Query query2 = this.sessionFactory.getCurrentSession().createQuery("select ots from OrderDetail ots join ots.order o where ots.order.id = :oid");
+				query2.setParameter("oid",o.getId());
+				List<OrderDetail> orderDetails =(List<OrderDetail>)query2.list();		
+				
+				//根據訂單明細去判斷產品(專輯/歌曲)
+				for(OrderDetail ot:orderDetails){
+					Object[] object = new Object[3];
+					Query query3 = this.sessionFactory.getCurrentSession().createQuery("FROM ProductionCategory p where p.pid = :productId");
+					query3.setLong("productId", ot.getProductionCategory().getPid());
+					Object product = query3.uniqueResult();
+					if (product instanceof Album) {
+						Album album = (Album)product;					
+						if(album.getCreator().getId()==userId){
+							object[0]="1";
+							object[1]= album;
+							object[2]= ot;
+							list.add(object);						
+						}					
+					}else if (product instanceof Song){
+						Song song = (Song)product;
+						if(song.getAlbum().getCreator().getId()==userId){
+							object[0]="2";
+							object[1]=song;
+							object[2]= ot;
+							list.add(object);
+						}
+					}
+				}
+			}
+			return list;
+		}
 
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public GsiMoney queryExchangeDetail(long gsiMoneyId) {
 		
-		return null;
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public GsiMoney[] updateExchange(GsiMoney gsiMoney, String year,
-			String month) {
+		//我的帳本-贈送Bonus明細
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public ArrayList queryBonusDetail(long userId) {
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");		
+			ArrayList list = new ArrayList(); 
+			Query query = this.sessionFactory.getCurrentSession().createQuery("select g from Member m join m.gsiBonus g where m.id = :userId order by g.createDate desc");
+			query.setParameter("userId", userId);
+			List<GsiBonus> gb = (List<GsiBonus>)query.list();
+			list.add(gb);
+			Query query2 = this.sessionFactory.getCurrentSession().createQuery("select o from Member m join m.order o join o.gsiBonus g where m.id = :userId ");
+			query2.setParameter("userId", userId);
+			List<Order> orderList = (List<Order>)query2.list();
+			list.add(orderList);
+			Query query3 = this.sessionFactory.getCurrentSession().createQuery("select sum(g.reward) from Member m join m.gsiBonus g where m.id = :userId and g.onDate > :date");
+			query3.setParameter("userId", userId);
+			query3.setParameter("date", date);
+			String unBonus = (String) query3.uniqueResult();
+			list.add(unBonus);
+			return list;
+		}
 		
-		return null;
-	}
-	
-	//發票登錄-訂單發票登錄
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Order[] queryBillRcd(String year, String month) {
+		//我的帳本-現金消費記錄
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public Order[] queryCashRcd(long userId, String choice, String orderId) {
+
+			System.out.println("userId======>"+userId);
+			System.out.println("choice======>"+choice);
+			System.out.println("orderId======>"+orderId);
+			StringBuffer tempQuery = new StringBuffer();
+			tempQuery.append("select o from Member m join m.order o where m.id = :userId and (o.gsiMoney is null) ");
+			
+			if(!choice.isEmpty()){
+				if(choice.equals("1")){
+					tempQuery.append("and (o.billDate between :lastDate and :nowDate) and o.shipDate is null ");
+				}
+				if(choice.equals("2")){
+					tempQuery.append("and (o.billDate between :lastDate and :nowDate) and o.shipDate is null ");
+				}
+				if(choice.equals("3")){
+					tempQuery.append("and (o.billDate between :lastDate and :nowDate) and o.applyReturnGoodDate is not null ");
+				}
+				if(choice.equals("4")){
+					tempQuery.append("and (o.billDate between :lastDate and :nowDate) ");
+				}
+			}
+			if(!orderId.isEmpty()){
+				tempQuery.append("and o.id = :orderId ");
+			}
+			Query query = this.sessionFactory.getCurrentSession().createQuery(tempQuery.toString());
+			query.setParameter("userId", userId);
+			
+			if(!choice.isEmpty()){
+				if(choice.equals("1")){
+					String nowDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
+					Date tempDate = DateUtils.addDays(new Date(), -30); 
+					String lastDate = DateFormatUtils.format(tempDate, "yyyyMMddHHmmss");			
+					query.setParameter("nowDate", nowDate);
+					query.setParameter("lastDate", lastDate);
+				}
+				if(choice.equals("2")){
+					String nowDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
+					Date tempDate = DateUtils.addDays(new Date(), -180); 
+					String lastDate = DateFormatUtils.format(tempDate, "yyyyMMddHHmmss");
+					query.setParameter("nowDate", nowDate);
+					query.setParameter("lastDate", lastDate);
+				}
+				if(choice.equals("3")){
+					String nowDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
+					Date tempDate = DateUtils.addDays(new Date(), -180);
+					String lastDate = DateFormatUtils.format(tempDate, "yyyyMMddHHmmss");
+					query.setParameter("nowDate", nowDate);
+					query.setParameter("lastDate", lastDate);
+				}
+				if(choice.equals("4")){
+					String nowDate = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
+					Date tempDate = DateUtils.addDays(new Date(), -180);
+					String lastDate = DateFormatUtils.format(tempDate, "yyyyMMddHHmmss");
+					query.setParameter("nowDate", nowDate);
+					query.setParameter("lastDate", lastDate);
+				}
+			}
+			
+			if(!orderId.isEmpty()){
+				query.setLong("orderId", Long.parseLong(orderId));
+			}
+			List<Order> orderList = (List<Order>)query.list();
+			Order[] orders = orderList.toArray(new Order[orderList.size()]);
+			return orders;
+		}
+
+		//我的帳本-取消現金訂單(XXXXXXXXXXXXXXXXXXXXXXX)
+		public void cancelGoods(long orderId){
+			System.out.println("cancelGoods====>");
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
+			Query query = this.sessionFactory.getCurrentSession().createQuery("select o from Order o where o.id = :orderId");
+			query.setParameter("orderId", orderId);
+			
+			System.out.println("orderId===="+orderId);
+			Order order = (Order) query.uniqueResult();
+			System.out.println("date1===="+order.getApplyReturnGoodDate());
+			order.setApplyReturnGoodDate(date);		
+			this.orderDAO.update(order);
+			Order o = this.orderDAO.find(order.getId());
+			System.out.println("date2===="+o.getApplyReturnGoodDate());
+		}	
 		
-		return null;
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public OrderDetail queryBillDetail(long transactionId) {
-		
-		return null;
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Order[] updateBill(Order order, String year, String month) {
-		
-		return null;
-	}
-
-	
-	
-	//GSiMoney&GSiBonus
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public GsiMoney queryGsiMoney(long userId) {
-		
-		return null;
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList queryTransRcd(long userId, String year, String month) {
-		
-		return null;
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public OrderDetail[] queryTransDetail(long transactionId) {
-	
-		return null;
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList applyChange(long userId) {
-		
-		return null;
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public boolean Savechange(Member member, String money) {
-		
-		return false;
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public GsiMoney[] queryExchangeLog(long userId, String year, String month) {
-	
-		return null;
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Order[] queryPrePaidRcd(long userId, String year, String month) {
-		
-		return null;
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Order[] queryBuyLogRcd(long userId, String year, String month) {
-		
-		return null;
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public OrderDetail[] queryBuyLogDetail(long transactionId) {
-		
-		return null;
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public ArrayList queryBonusDetail(long userId) {
-	
-		return null;
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public Order[] queryCashRcd(long userId, String status, long transactionId) {
-	
-		return null;
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public OrderDetail[] queryCashRcdDetail(long transactionId) {
-	
-		return null;
-	}
-
-	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-	public void downloadReturnList() {
-		
-	}	
-	
-	//檢舉管理-新增檢舉介面
+		//檢舉管理-新增檢舉介面
 		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 		public ArrayList queryOffenseCategory(long productionCategoryId) {
 			OffenseType[] offenseType = this.offenseTypeDAO.findAll();		
@@ -467,7 +846,7 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 			offense.setMember(member);		
 			offense.setReason(reason);
 			offense.setOffenseType(offenseType);
-			offense.setOffenseStatus("1");
+			offense.setOffenseStatus("1");//新增時，檢舉狀態為正常檢舉
 			offense.setCreateUser(String.valueOf(userId));
 			//根據產品類別編號找尋產品(專輯/歌曲)
 			Query query = this.sessionFactory.getCurrentSession().createQuery("FROM ProductionCategory p where p.pid = :id");
@@ -488,11 +867,11 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 		public ArrayList queryUnHandle() {
 			
-			Query query = this.sessionFactory.getCurrentSession().createQuery("select a, COUNT(a) from Offense o join o.album a left join a.hidden h where h is null group by a order by o.createDate desc");
+			Query query = this.sessionFactory.getCurrentSession().createQuery("select a, COUNT(a) from Offense o join o.album a where o.offenseStatus ='1' and a.hidden is null group by a order by o.createDate desc");
 			List<Object[]> albums = (List<Object[]>)query.list();
 			
-			Query query2 = this.sessionFactory.getCurrentSession().createQuery("select s, COUNT(s) from Offense o join o.song s left join s.hidden h where h is null group by s order by o.createDate desc");
-			List<Song> songs = (List<Song>)query2.list();
+			Query query2 = this.sessionFactory.getCurrentSession().createQuery("select s, COUNT(s) from Offense o join o.song s where o.offenseStatus ='1' and s.hidden is null group by s order by o.createDate desc");
+			List<Object[]> songs = (List<Object[]>)query2.list();
 			
 			ArrayList list = new ArrayList();
 			list.add(albums);
@@ -568,34 +947,42 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 		//檢舉管理-查詢被系統自動隱藏的專輯/歌曲(起始查詢)
 		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 		public ArrayList queryAutoHide() {
+			//Query query = this.sessionFactory.getCurrentSession().createQuery("select a, COUNT(o) from Album a join a.offense o where (o.offenseStatus ='1') and (a.hidden.endDate is null) and (a.hidden.createUser.id='1')");
+			ArrayList allList = new ArrayList();
+			Query query = this.sessionFactory.getCurrentSession().createQuery("select a from Album a where (a.hidden is not null) and (a.hidden.endDate is null) and (a.hidden.createUser.id='1')");
+			List<Album> albums = (List<Album>)query.list();
+			for(Album s:albums){
+				ArrayList list = new ArrayList();
+				list.add(s);
+				Query query2 = this.sessionFactory.getCurrentSession().createQuery("select COUNT(a) from Offense o join o.album a where (a.pid=:albumId) and (o.offenseStatus ='1')");
+				query2.setParameter("albumId", s.getPid());
+				long times = (Long) query2.uniqueResult();
+				list.add(times);
+				allList.add(list);
+			}
 			
-			Query query = this.sessionFactory.getCurrentSession().createQuery("select a, COUNT(o) from Album a join a.offense o left join a.hidden h where (o.modifier is null) and (h.endDate is null) and (h.createUser.id='1')");
-			List<Object[]> albums = (List<Object[]>)query.list();
-			
-			//Query query2 = this.sessionFactory.getCurrentSession().createQuery("select s, COUNT(o) from Song s join s.offense o left join s.hidden h where (o.modifier is null) and (h.endDate is null) and (h.createUser.id='1')");
-			//List<Song> songs = (List<Song>)query2.list();
-			
-			ArrayList list = new ArrayList();
-			list.add(albums);
-			//list.add(songs);
-			return list;
+			return allList;
 		}
 
 		//檢舉管理-查詢被系統自動隱藏的專輯/歌曲(根據查詢條件)
 		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 		public ArrayList queryAutoHideByDate(String type, String year, String month,
 				String creator) {		
-			List albums = new ArrayList();
-			List songs = new ArrayList();
+			List<Album> albums = new ArrayList();
+			List<Song> songs = new ArrayList();
 			StringBuffer tempQuery = new StringBuffer();
-			ArrayList list = new ArrayList();
+			ArrayList allList = new ArrayList();
 			
 			if (type.equals("1")){ //type=1為專輯		
+				System.out.println("atype=============="+type);
+				System.out.println("ayear=============="+year);
+				System.out.println("amonth=============="+month);
+				System.out.println("acreator=============="+creator);
 				
-				tempQuery.append("select a, COUNT(o) from Album a join a.offense o left join a.hidden h where (o.modifier is null) and (h.endDate is null) and (h.createUser.id='1')");
+				tempQuery.append("select a from Album a where (a.hidden is not null) and (a.hidden.endDate is null) and (a.hidden.createUser.id='1') ");
 				
-				if (!year.isEmpty()&&!month.isEmpty()){
-					tempQuery.append("and ((year(h.createDate) in (:year)) and (month(h.createDate) in (:month))) ");
+				if (!year.equals("0") && !month.equals("0")){
+					tempQuery.append("and ((year(a.hidden.createDate) in (:year)) and (month(a.hidden.createDate) in (:month))) ");
 				}
 				if (!creator.isEmpty()){
 					tempQuery.append("and a.creator.userName in (:creator) ");
@@ -603,26 +990,38 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 				
 				Query query = this.sessionFactory.getCurrentSession().createQuery(tempQuery.toString());
 			
-				if (!year.isEmpty()&&!month.isEmpty()){
+				if (!year.equals("0") && !month.equals("0")){
 					Integer y = Integer.valueOf(year); //year轉型為Integer，以便查詢。
 					Integer m = Integer.valueOf(month); //month轉型為Integer，以便查詢。
-					System.out.println("=============="+y);
-					System.out.println("=============="+m);
+					System.out.println("a=============="+y);
+					System.out.println("a=============="+m);
 					query.setParameter("year", y);
 					query.setParameter("month", m);
 				}
 				if (!creator.isEmpty()){
 					query.setParameter("creator", creator);
 				}
-				 albums = (List<Album>)query.list();
-				 list.add(albums);
 				
-			}else{
+				albums = (List<Album>)query.list();
+				for(Album s:albums){
+					ArrayList list = new ArrayList();
+					list.add(s);
+					Query query2 = this.sessionFactory.getCurrentSession().createQuery("select COUNT(a) from Offense o join o.album a where (a.pid=:albumId) and (o.offenseStatus ='1')");
+					query2.setParameter("albumId", s.getPid());
+					long times = (Long) query2.uniqueResult();
+					list.add(times);
+					allList.add(list);
+				}
+			
+			}else{  //type=2為歌曲	
+				System.out.println("stype=============="+type);
+				System.out.println("syear=============="+year);
+				System.out.println("smonth=============="+month);
+				System.out.println("screator=============="+creator);
+				tempQuery.append("select s from Song s where (s.hidden is not null) and (s.hidden.endDate is null) and (s.hidden.createUser.id='1') ");
 				
-				tempQuery.append("select s, COUNT(o) from Song s join s.offense o left join s.hidden h where (o.modifier is null) and (h.endDate is null) and (h.createUser.id='1')");
-				
-				if (!year.isEmpty()&&!month.isEmpty()){
-					tempQuery.append("and ((year(h.createDate) in (:year)) and (month(h.createDate) in (:month))) ");
+				if (!year.equals("0") && !month.equals("0")){
+					tempQuery.append("and ((year(s.hidden.createDate) in (:year)) and (month(s.hidden.createDate) in (:month))) ");
 				}
 				if (!creator.isEmpty()){
 					tempQuery.append("and s.album.creator.userName in (:creator) ");
@@ -630,7 +1029,7 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 				
 				Query query = this.sessionFactory.getCurrentSession().createQuery(tempQuery.toString());
 			
-				if (!year.isEmpty()&&!month.isEmpty()){
+				if (!year.equals("0") && !month.equals("0")){
 					Integer y = Integer.valueOf(year); //year轉型為Integer，以便查詢。
 					Integer m = Integer.valueOf(month); //month轉型為Integer，以便查詢。
 					System.out.println("=============="+y);
@@ -642,9 +1041,17 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 					query.setParameter("creator", creator);
 				}
 				songs = (List<Song>)query.list();
-				list.add(songs);
+				for(Song s:songs){
+					ArrayList list = new ArrayList();
+					list.add(s);
+					Query query2 = this.sessionFactory.getCurrentSession().createQuery("select COUNT(s) from Offense o join o.song s where (s.pid=:songId) and (o.offenseStatus ='1')");
+					query2.setParameter("songId", s.getPid());
+					long times = (Long) query2.uniqueResult();
+					list.add(times);
+					allList.add(list);
+				}
 			}
-			return list;
+			return allList;
 		}
 		
 		//檢舉管理-取消隱藏狀態 
@@ -680,19 +1087,12 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 			Integer year = Integer.valueOf(nowDate.substring(0,4)); //year轉型為Integer，以便查詢。
 			Integer month = Integer.valueOf(nowDate.substring(4,6));//month轉型為Integer，以便查詢。
 			System.out.println("year="+year+", month="+month);
-			Query query = this.sessionFactory.getCurrentSession().createQuery("select a, COUNT(o) from Album a " +
-					"join a.hidden h left join a.offense o where (h.endDate is null) and (h.createUser!= 1) and" +
-					" (o.modifier is null) and (year(h.createDate) in (:year)) and (month(h.createDate) in" +
-					" (:month)) order by a");
+			Query query = this.sessionFactory.getCurrentSession().createQuery("select a from Hidden h join h.album a where (h.endDate is null) and (h.createUser!= 1) and (year(h.createDate) in (:year)) and (month(h.createDate) in (:month))");
 			query.setParameter("year", year);
 			query.setParameter("month", month);
 			
-			List<Object[]> albums = (List<Object[]>)query.list();
-			
-			/*Query query2 = this.sessionFactory.getCurrentSession().createQuery("select s, COUNT(o) from Hidden h join h.song s left join s.offense o where h.endDate is null and h.createUser!='1' and ((year(h.createDate) in (:year)) and (month(h.createDate) in (:month))) ");
-			query2.setParameter("year", year);
-			query2.setParameter("month", month);	
-			List<Song> songs = (List<Song>)query2.list();*/		
+			List<Album> albums = (List<Album>)query.list();
+
 			ArrayList list = new ArrayList();
 			list.add(albums);
 			//list.add(songs);
@@ -702,17 +1102,13 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 		//檢舉管理-查詢已被隱藏的專輯/歌曲(根據查詢條件)
 		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 		public ArrayList queryAlreadyHideByDate(String type, String year, String month,
-				String creator) {		
-			List albums = new ArrayList();
-			List songs = new ArrayList();
+				String creator) {
+			System.out.println("type===="+type);
 			StringBuffer tempQuery = new StringBuffer();
 			ArrayList list = new ArrayList();
 			
-			if (type.equals("1")){ //type=1為專輯		
-				
-				tempQuery.append("select a, COUNT(o) from Album a " +
-					"join a.hidden h left join a.offense o where (h.endDate is null) and (h.createUser!= 1) and" +
-					" (o.modifier is null) ");
+			if (type.equals("1")){ //type=1為專輯			
+				tempQuery.append("select a from Hidden h join h.album a where (h.endDate is null) and (h.createUser.id != '1')");
 				
 				if (!year.isEmpty()&&!month.isEmpty()){
 					tempQuery.append("and ((year(h.createDate) in (:year)) and (month(h.createDate) in (:month))) ");
@@ -734,14 +1130,12 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 				if (!creator.isEmpty()){
 					query.setParameter("creator", creator);
 				}
-				 albums = (List<Album>)query.list();
+				List<Album> albums = (List<Album>)query.list();
 				 list.add(albums);
 				
 			}else{
 				
-				tempQuery.append("select s, COUNT(o) from Song s " +
-					"join s.hidden h left join s.offense o where (h.endDate is null) and (h.createUser!= 1) and" +
-					" (o.modifier is null) ");
+				tempQuery.append("select s from Hidden h join h.song s where (h.endDate is null) and (h.createUser.id != '1') ");
 				
 				if (!year.isEmpty()&&!month.isEmpty()){
 					tempQuery.append("and ((year(h.createDate) in (:year)) and (month(h.createDate) in (:month))) ");
@@ -763,7 +1157,7 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 				if (!creator.isEmpty()){
 					query.setParameter("creator", creator);
 				}
-				songs = (List<Song>)query.list();
+				List<Song> songs = (List<Song>)query.list();
 				list.add(songs);
 			}
 			return list;
@@ -778,27 +1172,87 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 			Offense[] offenseList = offenseSet.toArray(new Offense[offenseSet.size()]);
 			return offenseList;
 		}
-
 		
-		//商品管理-新增商品 //尚未parseEXCEL部分
-		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-		public void addProduct(File file) {
+		//會員詳細資料頁-該會員被檢舉的專輯清單
+		public ArrayList queryOffenseAlbumForUser(long userId){
+			ArrayList list = new ArrayList();
 			
+			Query query = this.sessionFactory.getCurrentSession().createQuery("select distinct b from Creator a join a.album b, Offense d where a.id = :userId and d.album.pid=b");
+			query.setParameter("userId", userId);
+			List<Album> resultList = (List<Album>)query.list();
+			Album[] raList = new Album[resultList.size()];
+	    	Long[] raList2 = new Long[resultList.size()];
+			System.out.println("CreatorAlbum==>"+resultList.size());
+				int j=0;
+				for (Album mc2:resultList) {
+					ArrayList list2 = new ArrayList();
+					raList[j]=mc2;
+					list2.add(mc2);             
+					System.out.println("Album==>"+raList[j].getName());
+					
+					Query query2 = this.sessionFactory.getCurrentSession().createQuery("select count(a.album.pid) from Offense a where a.album.pid=:id");
+					query2.setLong("id", raList[j].getPid());
+					raList2[j]=(Long)query2.uniqueResult();
+					System.out.println("AlbumAmount==>"+raList2[j]);
+					list2.add(raList2[j]);                                            //被檢舉數
+					list.add(list2);
+					
+					j++;
+				}
+			
+			return list;
+		}
+				
+		//會員詳細資料頁-該會員被檢舉的歌曲清單
+		public ArrayList queryOffenseSongForUser(long userId){
+			ArrayList list = new ArrayList();
+			
+			Query query = this.sessionFactory.getCurrentSession().createQuery("select distinct c from Creator a join a.album b join b.songSet c, Offense d where a.id = :userId and d.song.pid=c");
+			query.setParameter("userId", userId);
+			List<Song> resultList = (List<Song>)query.list();
+			Song[] raList = new Song[resultList.size()];
+	    	Long[] raList2 = new Long[resultList.size()];
+			System.out.println("CreatorAlbum==>"+resultList.size());
+				int j=0;
+				for (Song mc2:resultList) {
+					ArrayList list2 = new ArrayList();
+					raList[j]=mc2;
+					list2.add(mc2);             
+					System.out.println("song==>"+raList[j].getName());
+					
+					Query query2 = this.sessionFactory.getCurrentSession().createQuery("select count(a.song.pid) from Offense a where a.song.pid=:id");
+					query2.setLong("id", raList[j].getPid());
+					raList2[j]=(Long)query2.uniqueResult();
+					System.out.println("AlbumAmount==>"+raList2[j]);
+					list2.add(raList2[j]);                                            //被檢舉數
+					list.add(list2);
+					
+					j++;
+				}
+			
+			return list;
 		}
 
-		//商品管理-查詢商品類別 
+
+		//商品管理-查詢所有商品類別 
 		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 		public ProductionClassification[] queryProductionClassification() {
 			ProductionClassification[] pClassificationList= this.productionClassificationDAO.findAll();	
 			return pClassificationList;
 		}
+		
+		//商品管理-查詢單一商品類別 
+		public ProductionClassification queryOneProductionClassification(long productionClassificationId){
+			ProductionClassification productionClassification = this.productionClassificationDAO.find(productionClassificationId);
+			return productionClassification;
+		}
 
 		//商品管理-新增商品類別
 		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-		public void addProductionClassification(String productionClassificationName) {
-			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
-			
+		public void addProductionClassification(long adminId, String productionClassificationName) {
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");		
 			ProductionClassification productionClassification = new ProductionClassification(); //新增一個商品分類
+			productionClassification.setCreateUser(String.valueOf(adminId));
 			productionClassification.setCreateDate(date);
 			productionClassification.setName(productionClassificationName);
 			this.productionClassificationDAO.save(productionClassification); //儲存
@@ -806,13 +1260,13 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 
 		//商品管理-編輯商品類別
 		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-		public void editProductionClassification(long productionClassificationId,
+		public void editProductionClassification(long adminId, long productionClassificationId,
 				String productionClassificationName) {
 			
-			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
-			
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");		
 			ProductionClassification productionClassification = this.productionClassificationDAO.find(productionClassificationId);
 			productionClassification.setName(productionClassificationName);
+			productionClassification.setModifier(String.valueOf(adminId));
 			productionClassification.setModifyDate(date);
 			this.productionClassificationDAO.update(productionClassification);
 			
@@ -820,11 +1274,12 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 
 		//商品管理-刪除商品類別
 		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-		public ProductionClassification[] deleteProductionClassification(long productionClassificationId) {
+		public ProductionClassification[] deleteProductionClassification(long adminId, long productionClassificationId) {
 			
 			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
 			
 			ProductionClassification productionClassification = this.productionClassificationDAO.find(productionClassificationId);
+			productionClassification.setModifier(String.valueOf(adminId));
 			productionClassification.setDropDate(date);
 			this.productionClassificationDAO.update(productionClassification);
 			
@@ -879,7 +1334,8 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 
 		//商品管理-批次更新商品
 		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-		public void updateProductBatch(long productionClassificationId, String condition, double rate) { //condition為選擇的條件(1:定價 2:贈送點數)
+		public void updateProductBatch(long adminId, long productionClassificationId, String condition, double rate) { //condition為選擇的條件(1:定價 2:贈送點數)
+			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
 			int sdPrice = 0;
 			int sdReward = 0;
 			int prePaidPrice = 0;
@@ -891,20 +1347,27 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 			if(list.get(2).equals("SDCard")){ 
 				List<SDCard> sdCardList= (List<SDCard>) list.get(1);
 				if(condition.equals("1")){
-					for (SDCard s:sdCardList) {					
-						sdPrice = Integer.valueOf(s.getSdCardPrice().getPrice());
+					for (SDCard s:sdCardList) {
+						if(s.getSdCardPrice().getPrice().isEmpty()){
+							sdPrice=0;
+						}else{
+							sdPrice = Integer.valueOf(s.getSdCardPrice().getPrice());
+						}
 						System.out.println(sdPrice);
 						BigDecimal temp = new BigDecimal(sdPrice*rate);
 						finalPrice = String.valueOf(temp.setScale(0, RoundingMode.HALF_UP));
 						s.getSdCardPrice().setPrice(finalPrice);
+						s.setModifier(String.valueOf(adminId));
+						s.setModifyDate(date);
 						this.sdCardDAO.update(s);
 					}
 				}else if(condition.equals("2")){
 					for (SDCard s:sdCardList) {
-						sdReward = Integer.valueOf(s.getReward());
-						BigDecimal temp = new BigDecimal(sdReward*rate);
+						BigDecimal temp = new BigDecimal(rate);
 						finalReward = String.valueOf(temp.setScale(0, RoundingMode.HALF_UP));
 						s.setReward(finalReward);
+						s.setModifier(String.valueOf(adminId));
+						s.setModifyDate(date);
 						this.sdCardDAO.update(s);
 					}
 				}
@@ -912,17 +1375,25 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 				List<PrePaid> prePaidList= (List<PrePaid>) list.get(1);
 				if(condition.equals("1")){
 					for (PrePaid s:prePaidList) {
-						prePaidPrice = Integer.valueOf(s.getPrePaidPrice().getPrice());
-						
-						finalPrice = String.valueOf(prePaidPrice*rate);
+						if(s.getPrePaidPrice().getPrice().isEmpty()){
+							prePaidPrice=0;
+						}else{
+							prePaidPrice = Integer.valueOf(s.getPrePaidPrice().getPrice());
+						}
+						BigDecimal temp = new BigDecimal(prePaidPrice*rate);
+						finalPrice = String.valueOf(temp.setScale(0, RoundingMode.HALF_UP));
 						s.getPrePaidPrice().setPrice(finalPrice);
+						s.setModifier(String.valueOf(adminId));
+						s.setModifyDate(date);
 						this.prePaidDAO.update(s);
 					}
 				}else if(condition.equals("2")){
-					for (PrePaid s:prePaidList) {
-						prePaidReward = Integer.valueOf(s.getReward());					
-						finalReward = String.valueOf(prePaidReward*rate);
+					for (PrePaid s:prePaidList) {			
+						BigDecimal temp = new BigDecimal(rate);
+						finalReward = String.valueOf(temp.setScale(0, RoundingMode.HALF_UP));
 						s.setReward(finalReward);
+						s.setModifier(String.valueOf(adminId));
+						s.setModifyDate(date);
 						this.prePaidDAO.update(s);
 					}
 				}
@@ -933,16 +1404,21 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
 		public ArrayList queryProductDetail(long productId) {
 			ArrayList list = new ArrayList();		
-			
+			String type="";
 			Query query = this.sessionFactory.getCurrentSession().createQuery("FROM ProductionCategory p where p.pid = :productId");
 			query.setParameter("productId", productId);
 			Object product = query.uniqueResult();
 			if (product instanceof SDCard) {
+				type = "SDCard";
 				SDCard sdCard = (SDCard)product;
 				list.add(sdCard);
+				list.add(type);
+				
 			}else{
+				type = "PrePaid";
 				PrePaid prePaid = (PrePaid)product;
 				list.add(prePaid);
+				list.add(type);			
 			}
 			
 			ProductionClassification[] proClassList = this.productionClassificationDAO.findAll();
@@ -950,28 +1426,6 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 			
 			return list;
 		}
-
-
-		/*//商品管理-更新商品資訊(查詢商品資訊頁) (修改者Modifier未加入)
-		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-		public long saveModify(long productId, String realPrice,
-				String specialPrice, String status, long productionClassificationId) {
-			String date = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");
-			
-			Query query = this.sessionFactory.getCurrentSession().createQuery("FROM ProductionCategory p where p.pid = :productId");
-			query.setParameter("productId", productId);
-			Object product = query.uniqueResult();
-			
-			if (product instanceof SDCard) {			
-				SDCard sdCard = (SDCard)product;
-				sdCard.setModifyDate(date);
-				sdCard.getSdCardPrice().setPrice(realPrice);			
-				sdCard.setStatus(status);
-				this.sdCardDAO.update(sdCard);	
-			}
-			return productionClassificationId;
-		}*/
-
 		
 		//商品管理-更新商品資訊(查詢商品細節頁) //只有SD卡和儲值的部分
 		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
@@ -1032,4 +1486,118 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 			return productionClassificationId;
 		}
 
+		/**=====================kevin add===========================**/
+		//會員
+			@Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
+			public Member queryMember(long userID){
+				
+				//1. Member Bean
+				Member user = memberDAO.find(userID);	
+				return user;
+			}
+		
+		//修改收件人資訊
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public Member addMemberData(long userID,Member member){
+			  Member user = memberDAO.find(userID);	
+			  user.setReceiver(member.getReceiver());
+			  user.setCity(member.getCity());
+			  user.setTel(member.getTel());
+			  user.setAddress(member.getAddress());
+			  return user;
+		}
+		
+		//儲值轉訂單
+		public Order purchasePrepaid(PrePaid prePaid,Order order){
+			
+			OrderDetail detail = new OrderDetail();
+			detail.setProductionCategory(prePaid);
+			detail.setOrder(order);
+			Set<OrderDetail> detailSet = new HashSet<OrderDetail>();
+			detailSet.add(detail);
+			
+			order.setOrderDetail(detailSet);
+			
+			orderDAO.save(order);
+			return order;
+		}
+
+		//SD卡轉訂單
+		public Order purchaseSDCard(SDCard adCard,Order order,String amount){
+				
+			OrderDetail detail = new OrderDetail();
+			detail.setAmount(amount);
+			detail.setProductionCategory(adCard);
+			detail.setOrder(order);
+			Set<OrderDetail> detailSet = new HashSet<OrderDetail>();
+			detailSet.add(detail);
+				
+			order.setOrderDetail(detailSet);
+				
+			orderDAO.save(order);
+			return order;
+		}
+		
+		
+		/**
+		 * 第二步:加入購物車*/
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public ArrayList addMusicShoppingCart(long userId, long productId) {
+			
+			
+			
+			Member member = this.memberDAO.find(userId);	
+			ProductionCategory productionCategory = this.productionCategoryDAO.find(productId);
+			Set<ShoppingCartDetail> shoppingCartList = new HashSet();
+			ShoppingCartDetail cartDetail = new ShoppingCartDetail();		
+			
+			ShoppingCart cart = new ShoppingCart();
+			cart.setMember(member);
+			cart.setCreateDate(DateFormatUtils.format(new Date(), "yyyyMMddhhmmss"));
+			cart.setShoppingCartDetail(shoppingCartList);
+			
+			cartDetail.setShoppingCart(cart);
+			cartDetail.setProductionCategory(productionCategory);
+			
+			shoppingCartList.add(cartDetail);
+			this.shoppingCartDetailDAO.save(cartDetail);
+			this.shoppingCartDAO.save(cart);
+			
+			ArrayList list = new ArrayList();
+			list.add(member);
+			list.add(cart);	
+			
+			return list;
+			
+		}
+		
+		
+		
+		//購買專輯或歌曲
+		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+		public ShoppingCartDetail[] queryMusicShoppingCart(long userId) {
+				
+			Query query = this.sessionFactory.getCurrentSession().createQuery("select d from ShoppingCart s join s.shoppingCartDetail d where s.member.id =:v1 order by s.id desc");
+			query.setParameter("v1", userId);
+				
+			List<ShoppingCartDetail> detailList = (List<ShoppingCartDetail>)query.list();		
+				
+			for(ShoppingCartDetail d : detailList){
+				System.out.println("id===>"+d.getId());
+				Object productionCategory = d.getProductionCategory();
+				if(productionCategory instanceof Song){
+					System.out.println("true------");
+					Song song = (Song)productionCategory;
+				}
+				
+			}
+				
+				//ShoppingCart newShoppingCart = shoppingCart.get(0);
+				
+				//Set<ShoppingCartDetail> detailSet = newShoppingCart.getShoppingCartDetail();
+				
+				ShoppingCartDetail[] shoppingCartDetail = detailList.toArray(new ShoppingCartDetail[detailList.size()]);
+				
+				return shoppingCartDetail;
+		}
 }

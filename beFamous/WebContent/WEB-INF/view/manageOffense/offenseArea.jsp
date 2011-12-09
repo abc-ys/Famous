@@ -9,7 +9,7 @@ pageEncoding="UTF-8"%>
 </head>
 <body>
 <h3>被檢舉區<h3>
-<table width="500"> 
+<table width="500">
 	<div id="navi" class="navigation">
    		<td colspan=2>
 			 <a href="#" title="offenseAlbum" onClick="display('offenseAlbum')">專輯</a>
@@ -21,10 +21,10 @@ pageEncoding="UTF-8"%>
  	<td height="1000" width="740"> 		
 	 	<div id="offenseAlbum">
 	 		 <br>
-	 		 <iframe name="offenseAlbum" src="${pageContext.request.contextPath}/offenseAlbum.do" height="1000" width="740" frameborder="0"></iframe> 
+	 		 <iframe name="offenseAlbum" src="${pageContext.request.contextPath}/offenseAlbum.do?adminId=${adminId}" height="1000" width="740" frameborder="0"></iframe> 
 	 	</div>	
 	 	<div id="offenseSong" style="display:none">
-	 		<iframe name="offenseSong" src="${pageContext.request.contextPath}/offenseSong.do" height="1000" width="740" frameborder="0"></iframe> 
+	 		<iframe name="offenseSong" src="${pageContext.request.contextPath}/offenseSong.do?adminId=${adminId}" height="1000" width="740" frameborder="0"></iframe> 
 	 	</div>		
  	</td>
  	</table>

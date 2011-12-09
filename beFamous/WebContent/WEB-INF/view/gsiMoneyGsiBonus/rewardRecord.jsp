@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -9,10 +11,14 @@
 <body>
 <form name="fm" method="post">
 <br>
-贈送點數記錄
+<h4>贈送點數記錄</h4>
 <p>
 <table border="1" BorderColor="#000000" cellpadding="0" cellspacing="0">
-<td Width="200" valign="top">目前可用GSiBonus:&nbsp200</td><td valign="top" Width="200">待生效GSiBonus:&nbsp50</td>
+	<td Width="200" valign="top">目前可用GSiBonus:&nbsp;
+		<c:if test="${noRecord == 'T'}">0元</c:if>
+		<c:if test="${noRecord == 'F'}">${lastBonus.balance}元</c:if>
+	</td>
+	<td valign="top" Width="200">待生效GSiBonus:&nbsp;${unBonus}元</td>
 </table>
 <p>
 <table border="1" BorderColor="#000000" cellpadding="0" cellspacing="0">
@@ -23,14 +29,33 @@
 	<td valign="top" Width="100"><font size="2">失效</font></td>
 	<td valign="top" Width="100"><font size="2">生效日期</font></td>
 	<td valign="top" Width="100"><font size="2">到期日期</font></td></tr>
-<tr><td Width="100" Height="30" valign="top"><font size="2"><a href="${pageContext.request.contextPath}/payDetailRecord.do">${orderDetail.order.orderRid}</a></font></td>
-	<td valign="top" Width="100"><font size="2">test</font></td>
-	<td valign="top" Width="100"><font size="2">${waitOnBonus}</font></td>
-	<td valign="top" Width="100"><font size="2">${OnBonus}</font></td>
-	<td valign="top" Width="100"><font size="2">${offBonus}</font></td>
-	<td valign="top" Width="100"><font size="2">${orderDetail.gsiBonus.onDate}</font></td>
-	<td valign="top" Width="140"><font size="2">${orderDetail.gsiBonus.offDate}</font></td></tr>
-
+<c:forEach var="hm" items="${orders}">
+<tr><td Width="100" Height="30" valign="top"><font size="2"><a href="${pageContext.request.contextPath}/payDetailRecord.do?orderId=${hm.id}">${hm.id}</a></font></td>
+	<td valign="top" Width="100"><font size="2"></font></td>
+	<fmt:parseDate var="nDate" value="${nowDate}" type="DATE" pattern="yyyyMMddHHmmss"/> 
+	<td valign="top" Width="100"><font size="2">
+		<c:choose>
+			<c:when test="${hm.gsiBonus.onDate > nDate}">${hm.gsiBonus.reward}</c:when>
+			<c:otherwise>0</c:otherwise>
+		</c:choose>
+	</font></td>
+	<td valign="top" Width="100"><font size="2">
+		<c:choose>
+			<c:when test="${hm.gsiBonus.onDate < nDate}">${hm.gsiBonus.reward}</c:when>
+			<c:otherwise>0</c:otherwise>
+		</c:choose>
+	</font></td>
+	<td valign="top" Width="100"><font size="2">
+		<c:choose>
+			<c:when test="${hm.gsiBonus.offDate > nDate}">${hm.gsiBonus.reward}</c:when>
+			<c:otherwise>0</c:otherwise>
+		</c:choose>
+	</font></td>
+	<fmt:parseDate var="onDate" value="${hm.gsiBonus.onDate}" type="DATE" pattern="yyyyMMddHHmmss"/> 
+	<td valign="top" Width="100"><font size="2"><fmt:formatDate value='${onDate}' pattern='yyyy-MM-dd' /></font></td>
+	<fmt:parseDate var="offDate" value="${hm.gsiBonus.offDate}" type="DATE" pattern="yyyyMMddHHmmss"/> 
+	<td valign="top" Width="140"><font size="2"><fmt:formatDate value='${offDate}' pattern='yyyy-MM-dd' /></font></td></tr>
+</c:forEach>
 </table>
 <p>
 目前可用GSiBonus:....<br>

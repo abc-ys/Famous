@@ -37,11 +37,11 @@ function add(){
      document.fm.action="${pageContext.request.contextPath}/addSubMusicCategory.do";
      document.fm.submit();
 }
-function edit(id){
+function edit(id,adminID){
 	window.open("${pageContext.request.contextPath}/editMusicCategory.do?ID="+id+"&adminID="+adminID,"parent","height=120,width=300,location=no,scrollbars=no,toolbar=no,directories=no,menubar=no,directories=no");
 }
 function deleteCategory(id){
-	document.fm.action="${pageContext.request.contextPath}/deleteMusicCategory.do?ID="+id;
+	document.fm.action="${pageContext.request.contextPath}/deleteSubMusicCategory.do?ID="+id;
     document.fm.submit();
 }
 </script>

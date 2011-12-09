@@ -10,7 +10,7 @@
 
 <table name=friends>
 		<c:forEach var="hm2" items="${friends}">
-	 	<td><img alt="" src="${hm2.friend.picture}"  width="50"　height="20"></img></td>
+	 	<td><img alt="" src="/${initParam.ImageWeb}/${hm2.friend.picture}"  width="50"　height="20"></img></td>
 	 	<td width="100"><a href="javascript:void(0)" onclick="identity('${hm2.friend.identityName}','${hm2.friend.id}')">${hm2.friend.userName}</a></td>
 	 	<td><input type="button" value="刪除" onclick="confirmDelFriend('${userID}','${hm2.friend.id}')"></td><tr>
 	 	</c:forEach> 

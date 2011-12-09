@@ -2,8 +2,13 @@ package com.ubn.befamous.service.impl;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
@@ -26,12 +31,19 @@ import com.ubn.befamous.entity.InelegantKeyword;
 import com.ubn.befamous.entity.Keyword;
 import com.ubn.befamous.entity.Member;
 import com.ubn.befamous.entity.MemberStatus;
+import com.ubn.befamous.entity.MonthRanking;
 import com.ubn.befamous.entity.MusicCategory;
 import com.ubn.befamous.entity.News;
+import com.ubn.befamous.entity.Order;
+import com.ubn.befamous.entity.OrderDetail;
+import com.ubn.befamous.entity.PrePaid;
+import com.ubn.befamous.entity.PromotionActivity;
 import com.ubn.befamous.entity.Question;
 import com.ubn.befamous.entity.RecommendActivity;
 import com.ubn.befamous.entity.Song;
 import com.ubn.befamous.entity.SongPrice;
+import com.ubn.befamous.entity.TransactionRcd;
+import com.ubn.befamous.entity.WeekRanking;
 import com.ubn.befamous.service.MusicService;
 
 @Service("musicService")
@@ -40,6 +52,14 @@ public class MusicServiceImpl implements MusicService{
 	
 	@Autowired
 	private SessionFactory sessionfactory;
+	
+	@Autowired
+	@Qualifier("creatorDAO")
+	private IBaseDao<Creator, Long> creatorDAO;
+	
+	@Autowired
+	@Qualifier("weekRankingDAO")
+	private IBaseDao<WeekRanking, Long> weekRankingDAO;
 	
 	@Autowired
 	@Qualifier("albumDAO")
@@ -81,73 +101,228 @@ public class MusicServiceImpl implements MusicService{
 	@Qualifier("hiddenDAO")
 	private IBaseDao<Hidden, Long> hiddenDAO;
 	
+	@Autowired
+	@Qualifier("promotionActivityDAO")
+	private IBaseDao<PromotionActivity, Long> promotionActivityDAO;
+	
 	
 	//瀏覽專輯與排行榜 - 怡秀write-1115
 	
 	//瀏覽排行榜
 	
 	/**
-     * 查詢專輯周榜       (還未完成  預計1114)
+     * 查詢專輯周榜       
      * @param datetime 現在日期時間
      */
-    public Album[] queryAlbumsWeekRanking(String datetime){
-    	Album[] albumList = {};
+    public Album[] queryAlbumsWeekRanking(){
     	
-    	return albumList;
+    	Calendar c = Calendar.getInstance();
+    	Date d =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_WEEK)+1);
+		Date d2 =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_WEEK)-5);
+		String sunday = DateFormatUtils.format(d, "yyyyMMdd")+"235959";    //上禮拜的週日
+		String monday = DateFormatUtils.format(d2, "yyyyMMdd")+"000000";   //上星期一
+		/*
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d, "yyyyMMdd"));
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d2, "yyyyMMdd"));*/
+		
+		Query query = this.sessionfactory.getCurrentSession().createQuery("Select distinct a from Album a where (a.createDate between :monday and :sunday)");
+		query.setString("sunday", sunday);
+		query.setString("monday", monday);
+		
+		List<Album> resultList=(List<Album>)query.list();
+		Album[] albumSet = new Album[resultList.size()];
+		System.out.println("resultList.size()=="+query.list());
+			int i=0;
+			for (Album as:resultList) {
+				albumSet[i]=as;
+				System.out.println("album==>"+albumSet[i].getPid());
+				i++;
+		}
+    	
+    	return albumSet;
     } 
 	
 	/**
-     * 查詢專輯月榜         (還未完成  預計1114)
+     * 查詢專輯月榜         
      * @param datetime 現在日期時間
      */
-    public Album[] queryAlbumsMonthRanking(String datetime){
-    	Album[] albumList = {};
+    public Album[] queryAlbumsMonthRanking(){
+    	Calendar c = Calendar.getInstance();
+    	Date d =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_MONTH));
+		Date d2 =DateUtils.addMonths(new Date(), -1);
+		String sunday = DateFormatUtils.format(d, "yyyyMMdd")+"235959";    //上個月的最後一天
+		String monday = DateFormatUtils.format(d2, "yyyyMMdd")+"000000";   //上個月的第一天
+		/*
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d, "yyyyMMdd"));
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d2, "yyyyMMdd"));*/
+		
+		Query query = this.sessionfactory.getCurrentSession().createQuery("Select distinct a from Album a where (a.createDate between :monday and :sunday)");
+		query.setString("sunday", sunday);
+		query.setString("monday", monday);
+		
+		List<Album> resultList=(List<Album>)query.list();
+		Album[] albumSet = new Album[resultList.size()];
+		System.out.println("resultList.size()=="+query.list());
+			int i=0;
+			for (Album as:resultList) {
+				albumSet[i]=as;
+				System.out.println("album==>"+albumSet[i].getPid());
+				i++;
+		}
     	
-    	return albumList;
+    	return albumSet;
     }
     
     /**
-     * 查詢歌曲周榜         (還未完成  預計1114)
+     * 查詢歌曲周榜        
      * @param datetime 現在日期時間
      */
-    public Song[] querySongsWeekRanking(String datetime){
-    	Song[] songList = {};
+    public Song[] querySongsWeekRanking(){
+    	Calendar c = Calendar.getInstance();
+    	Date d =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_WEEK)+1);
+		Date d2 =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_WEEK)-5);
+		String sunday = DateFormatUtils.format(d, "yyyyMMdd")+"235959";    //上禮拜的週日
+		String monday = DateFormatUtils.format(d2, "yyyyMMdd")+"000000";   //上星期一
+		/*
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d, "yyyyMMdd"));
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d2, "yyyyMMdd"));*/
+		
+		Query query = this.sessionfactory.getCurrentSession().createQuery("Select distinct a from Song a where (a.createDate between :monday and :sunday)");
+		query.setString("sunday", sunday);
+		query.setString("monday", monday);
+		
+		List<Song> resultList=(List<Song>)query.list();
+		Song[] songSet = new Song[resultList.size()];
+		System.out.println("resultList.size()=="+query.list());
+			int i=0;
+			for (Song as:resultList) {
+				songSet[i]=as;
+				System.out.println("album==>"+songSet[i].getPid());
+				i++;
+		}
     	
-    	return songList;
+    	return songSet;
     }
     
     /**
-     * 查詢歌曲月榜          (還未完成  預計1114)
+     * 查詢歌曲月榜  
      * @param datetime 現在日期時間
      */
-    public Song[] querySongsMonthRanking(String datetime){
-    	Song[] songList = {};
+    public Song[] querySongsMonthRanking(){
+    	Calendar c = Calendar.getInstance();
+    	Date d =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_MONTH));
+		Date d2 =DateUtils.addMonths(new Date(), -1);
+		String sunday = DateFormatUtils.format(d, "yyyyMMdd")+"235959";    //上個月的最後一天
+		String monday = DateFormatUtils.format(d2, "yyyyMMdd")+"000000";   //上個月的第一天
+		/*
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d, "yyyyMMdd"));
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d2, "yyyyMMdd"));*/
+		
+		Query query = this.sessionfactory.getCurrentSession().createQuery("Select distinct a from Song a where (a.createDate between :monday and :sunday)");
+		query.setString("sunday", sunday);
+		query.setString("monday", monday);
+		
+		List<Song> resultList=(List<Song>)query.list();
+		Song[] songSet = new Song[resultList.size()];
+		System.out.println("resultList.size()=="+query.list());
+			int i=0;
+			for (Song as:resultList) {
+				songSet[i]=as;
+				System.out.println("album==>"+songSet[i].getPid());
+				i++;
+		}
     	
-    	return songList;
+    	return songSet;
     }
     
     /**
-     * 查詢創作人週榜      (還未完成  預計1114)
+     * 查詢創作人週榜  
      * @param datetime 現在日期時間
      */
-    public Creator[] queryCreatorWeekRanking(String datetime){
-    	Creator[] creatorList = {};
+    public ArrayList queryCreatorWeekRanking(){
+    	ArrayList list = new ArrayList();
     	
-    	return creatorList;
+    	Calendar c = Calendar.getInstance();
+    	Date d =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_WEEK)+1);
+		Date d2 =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_WEEK)-5);
+		String sunday = DateFormatUtils.format(d, "yyyyMMdd")+"235959";    //上禮拜的週日
+		String monday = DateFormatUtils.format(d2, "yyyyMMdd")+"000000";   //上星期一
+		/*
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d, "yyyyMMdd"));
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d2, "yyyyMMdd"));*/
+		
+		Query query = this.sessionfactory.getCurrentSession().createQuery("Select distinct a from Creator a where (a.createDate between :monday and :sunday)");
+		query.setString("sunday", sunday);
+		query.setString("monday", monday);
+		
+		List<Creator> resultList=(List<Creator>)query.list();
+		Creator[] creatorSet = new Creator[resultList.size()];
+		Long[] creatorSet2 = new Long[resultList.size()];
+		System.out.println("resultList.size()=="+query.list());
+			int i=0;
+			for (Creator as:resultList) {
+				ArrayList list2 = new ArrayList();
+				creatorSet[i]=as;
+				list2.add(creatorSet[i]);                                            //創作人
+				System.out.println("album==>"+creatorSet[i].getId());
+				
+				Query query2 = this.sessionfactory.getCurrentSession().createQuery("Select count(a) from Album a where a.creator.id=:id");
+				query2.setLong("id", creatorSet[i].getId());
+				creatorSet2[i]=(Long)query2.uniqueResult();
+				list2.add(creatorSet2[i]);                                          //專輯數
+				
+				list.add(list2);
+				i++;
+		}
+    	
+    	return list;
     }
     
     /**
-     * 查詢創作人月榜      (還未完成  預計1114)
+     * 查詢創作人月榜   
      * @param datetime 現在日期時間
      */
-    public Creator[] queryCreatorMonthRanking(String datetime){
-    	Creator[] creatorList = {};
+    public ArrayList queryCreatorMonthRanking(){
+    	ArrayList list = new ArrayList();
     	
-    	return creatorList;
+    	Calendar c = Calendar.getInstance();
+    	Date d =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_MONTH));
+		Date d2 =DateUtils.addMonths(new Date(), -1);
+		String sunday = DateFormatUtils.format(d, "yyyyMMdd")+"235959";    //上個月的最後一天
+		String monday = DateFormatUtils.format(d2, "yyyyMMdd")+"000000";   //上個月的第一天
+		/*
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d, "yyyyMMdd"));
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d2, "yyyyMMdd"));*/
+		
+		Query query = this.sessionfactory.getCurrentSession().createQuery("Select distinct a from Creator a where (a.createDate between :monday and :sunday)");
+		query.setString("sunday", sunday);
+		query.setString("monday", monday);
+		
+		List<Creator> resultList=(List<Creator>)query.list();
+		Creator[] creatorSet = new Creator[resultList.size()];
+		Long[] creatorSet2 = new Long[resultList.size()];
+		System.out.println("resultList.size()=="+query.list());
+			int i=0;
+			for (Creator as:resultList) {
+				ArrayList list2 = new ArrayList();
+				creatorSet[i]=as;
+				list2.add(creatorSet[i]);                                            //創作人
+				System.out.println("album==>"+creatorSet[i].getId());
+				
+				Query query2 = this.sessionfactory.getCurrentSession().createQuery("Select count(a) from Album a where a.creator.id=:id");
+				query2.setLong("id", creatorSet[i].getId());
+				creatorSet2[i]=(Long)query2.uniqueResult();
+				list2.add(creatorSet2[i]);                                          //專輯數
+				
+				list.add(list2);
+				i++;
+		}
+    	
+    	return list;
     }
     
     /**
-     * 查詢專輯資料(就是專輯profile頁)     (再確認一下，為什麼要有RecommendAlbum[]和song[])
+     * 查詢專輯資料(就是專輯profile頁) 
      * @param albumID 專輯編號
      */
     public ArrayList queryAlbumData(long albumID){
@@ -176,11 +351,12 @@ public class MusicServiceImpl implements MusicService{
     	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");   //今天日期時間  yyyyMMddhhmmss
     	String newest = DateFormatUtils.format(DateUtils.addMonths(new Date(), -3), "yyyyMMddHHmmss");    //最近三個月發表的專輯就算最新專輯
     	
-    	Query query = this.sessionfactory.getCurrentSession().createQuery("from Album a where (a.createDate between :newest and :datetime) and (a.musicCategory.id = :musicCatrgoryID) and (a.hidden is empty) and (a.dropDate is null) and (a.creator.memberStatus.statusName = :memberStatus) ORDER BY a.createDate DESC");
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("from Album a where (a.createDate between :newest and :datetime) and (a.musicCategory.id = :musicCatrgoryID) and (a.dropDate is null) ORDER BY a.createDate DESC");
+    	//Query query = this.sessionfactory.getCurrentSession().createQuery("from Album a where (a.createDate between :datetime and :newest) and (a.musicCategory.id = :musicCatrgoryID) and (a.hidden is empty) and (a.dropDate is null) and (a.creator.memberStatus.statusName = :memberStatus) ORDER BY a.createDate DESC");
 		query.setString("datetime", datetime);
 		query.setString("newest", newest);
 		query.setLong("musicCatrgoryID", musicCatrgoryID);
-		query.setString("memberStatus", "1");       //1: 會員狀態為正常 
+		//query.setString("memberStatus", "1");       //1: 會員狀態為正常 
     	
 		List<Album> resultList=(List<Album>)query.list();
 		Album[] albumset = new Album[resultList.size()];
@@ -348,6 +524,10 @@ public class MusicServiceImpl implements MusicService{
     	song.setCreateDate(datetime);
     	song.setCreateUser(String.valueOf(creatorId));
     	song.setSongFile(fileName);
+    	SongPrice sp = new SongPrice();
+    	sp.setCreateDate(datetime);
+    	sp.setCreateUser(String.valueOf(creatorId));
+    	song.setSongPrice(sp);
     	
     	this.songDAO.save(song);
     	
@@ -369,6 +549,7 @@ public class MusicServiceImpl implements MusicService{
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
     public void saveSongDetail (long songId,long creatorId, long albumId, String name, String date, String musicCategory, String status, String price, String price2, String discount, String tag){
     	
+    	date= StringUtils.replaceChars(date, "-", "")+"000000";
     	
     	//把音樂類別的資料撈出來
     	Query query = this.sessionfactory.getCurrentSession().createQuery("from MusicCategory where id = :musicCategoryId");
@@ -380,8 +561,19 @@ public class MusicServiceImpl implements MusicService{
     	song.setCreateDate(date);
     	song.setMusicCategory(mc);
     	song.setSeconds(status);
-    	SongPrice sp = this.songPriceDAO.find(song.getSongPrice().getId());
-    	sp.setDiscountPrice(discount);
+    	SongPrice sp = new SongPrice();
+    	//SongPrice sp = this.songPriceDAO.find(song.getSongPrice().getId());
+    	if(discount.equals("1")){                 
+    		sp.setDiscountPrice("5");            //小紅包5元
+    		sp.setCreatorReward("8");          //回饋給創作人8點GSiBonus
+    	}else if(discount.equals("2")){         
+    		sp.setDiscountPrice("15");           //大紅包15元
+    		sp.setCreatorReward("3");          //回饋給創作人3點GSiBonus
+    	}else{
+    		sp.setDiscountPrice("");              //不提供打賞
+    		sp.setCreatorReward("");            //不回饋給創作人GSiBonus
+    	}
+    	
     	sp.setCreateUser(String.valueOf(creatorId));
     	if(price2.equals(null)&&price.equals("2")){
     		sp.setPrice("");
@@ -403,7 +595,7 @@ public class MusicServiceImpl implements MusicService{
     public Album queryMusic(long albumID){
     	
     	Album album = this.albumDAO.find(albumID);
-    	/*
+    	
     	System.out.println("albumName=="+album.getName());
     	Song[] c2 = new Song[album.getSongSet().size()];
 		int w = 0;
@@ -411,10 +603,10 @@ public class MusicServiceImpl implements MusicService{
 		for (Song c3:album.getSongSet()) {
 			c2[w]=c3;
 			System.out.println("aaaaa");
-			System.out.println("ID==>"+c2[w].getId());
+			System.out.println("ID==>"+c2[w].getPid());
 			System.out.println("s==>"+c2[w].getName());
 			w++;
-		}*/
+		}
     	
     	return album;
     }
@@ -464,8 +656,7 @@ public class MusicServiceImpl implements MusicService{
     	album.setModifyDate(datetime);
     	album.setModifier(String.valueOf(creatorId));
     	album.setBrand(brand);    	
-    	MusicCategory mc = this.musicCategoryDAO.find(album.getMusicCategory().getId());
-    	mc.setName(musicCategory);
+    	MusicCategory mc = this.musicCategoryDAO.find(Long.parseLong(musicCategory));
     	album.setMusicCategory(mc);
     	album.setTag(tag);
     	if(cover.equals("")){
@@ -503,14 +694,24 @@ public class MusicServiceImpl implements MusicService{
     	
     	Song song = this.songDAO.find(songID);
     	song.setName(songName);
-    	MusicCategory mc = this.musicCategoryDAO.find(song.getMusicCategory().getId());
-    	mc.setName(musicType);
+    	MusicCategory mc = this.musicCategoryDAO.find(Long.parseLong(musicType));
     	song.setMusicCategory(mc);
     	song.setModifyDate(datetime);
     	song.setModifier(String.valueOf(creatorId));
     	song.setSeconds(status);
     	SongPrice sp = this.songPriceDAO.find(song.getSongPrice().getId());
-    	sp.setDiscountPrice(discount);
+    	
+    	if(discount.equals("1")){                 
+    		sp.setDiscountPrice("5");            //小紅包5元
+    		sp.setCreatorReward("8");          //回饋給創作人8點GSiBonus
+    	}else if(discount.equals("2")){         
+    		sp.setDiscountPrice("15");           //大紅包15元
+    		sp.setCreatorReward("3");          //回饋給創作人3點GSiBonus
+    	}else{
+    		sp.setDiscountPrice("");              //不提供打賞
+    		sp.setCreatorReward("");            //不回饋給創作人GSiBonus
+    	}
+    	
     	sp.setModifier(String.valueOf(creatorId));
     	sp.setModifyDate(datetime);
     	if(price2.equals("")&&price.equals("2")){
@@ -775,15 +976,25 @@ public class MusicServiceImpl implements MusicService{
 		
 		List<MusicCategory> resultList=(List<MusicCategory>)query.list();
 		MusicCategory[] mcSet = new MusicCategory[resultList.size()];
-		/*
+		
 			int i=0;
 			for (MusicCategory mc2:resultList) {
 				mcSet[i]=mc2;
 				System.out.println("ssss==>"+mcSet[i].getName());
 				i++;
 			}
-    	*/
+    	
     	return mcSet;
+    }
+    
+    /**
+     * 查詢音樂類別
+     */
+    public MusicCategory musicCategory (String mcID){
+    	
+    	MusicCategory musicCategory = this.musicCategoryDAO.find(Long.parseLong(mcID));
+    	
+    	return musicCategory;
     }
     
     /**
@@ -865,7 +1076,7 @@ public class MusicServiceImpl implements MusicService{
 			int i=0;
 			for (MusicCategory mc2:resultList) {
 				mcSet[i]=mc2;
-				System.out.println("ssss==>"+mcSet[i].getName());
+				System.out.println("category==>"+mcSet[i].getName());
 				i++;
 			}
     	
@@ -874,6 +1085,16 @@ public class MusicServiceImpl implements MusicService{
     
     //管理排行榜
     /**
+     * 查詢音樂類別清單
+     */
+    public MusicCategory[] musicCategoryList(){
+
+    	MusicCategory[] musicCategory = this.musicCategoryDAO.findAll();
+    	
+    	return musicCategory;
+    }
+    
+    /**
      * 管理者查詢專輯週榜
      * @param albumName 專輯名稱
      * @param creatorName 創作人姓名
@@ -881,9 +1102,87 @@ public class MusicServiceImpl implements MusicService{
      * @param startDate 專輯上架起始日期
      * @param endDate 專輯上架結束日期
      */
-    public Album[] queryAlbumWeekRankingForAdmin (String albumName, String creatorName, long musicCategoryID, String startDate, String endDate){
-    	Album[] a = {};
-    	return a;
+    public ArrayList queryAlbumWeekRankingForAdmin(String albumName, String creatorName, String musicCategoryID, String startDate, String endDate){
+
+    	ArrayList list = new ArrayList();
+    	
+    	Calendar c = Calendar.getInstance();
+    	Date d =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_WEEK)+1);
+		Date d2 =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_WEEK)-5);
+		String sunday = DateFormatUtils.format(d, "yyyyMMdd")+"235959";    //上禮拜的週日
+		String monday = DateFormatUtils.format(d2, "yyyyMMdd")+"000000";   //上星期一
+		/*
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d, "yyyyMMdd"));
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d2, "yyyyMMdd"));*/
+		
+		StringBuilder queryString = new StringBuilder();
+			queryString.append("from Album a where (1=1) ");
+			
+		if(StringUtils.isNotBlank(startDate)&& StringUtils.isNotBlank(endDate)) {
+			startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
+			endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
+			
+			queryString.append(" and (a.createDate  between :startDate and :endDate)");
+		}
+		if (StringUtils.isNotBlank(albumName)) {
+			queryString.append(" and (a.name=:albumName)");
+		}
+		if (StringUtils.isNotBlank(creatorName)) {
+			queryString.append(" and (a.creator.userName = :creatorName)");
+		}
+		if (StringUtils.isNotBlank(musicCategoryID)) {
+			queryString.append(" and (a.musicCategory.id = :musicCategoryID)");
+		}		
+		
+		
+		System.out.println("queryString=="+queryString);
+		Query query = this.sessionfactory.getCurrentSession().createQuery(queryString.toString());
+
+		if(StringUtils.isNotBlank(startDate)&& StringUtils.isNotBlank(endDate)) {
+			query.setString("startDate", startDate);
+			query.setString("endDate", endDate);
+		}
+		if (StringUtils.isNotBlank(albumName)) {
+		query.setString("albumName", albumName);
+		}
+		if (StringUtils.isNotBlank(creatorName)) {
+		query.setString("creatorName", creatorName);
+		}
+		if (StringUtils.isNotBlank(musicCategoryID)) {
+		query.setString("musicCategoryID", musicCategoryID);
+		}
+		
+		
+		List<Album> resultList=(List<Album>)query.list();
+		Album[] albumSet = new Album[resultList.size()];
+		Integer[] albumSet2 = new Integer[resultList.size()];
+		Long[] albumSet3 = new Long[resultList.size()];
+			int i=0;
+			for (Album as:resultList) {
+				ArrayList list2 = new ArrayList();
+				albumSet[i]=as;
+				list2.add(as);                                                        //專輯
+				
+				Query query3 = this.sessionfactory.getCurrentSession().createQuery("select size(b) from Album a join a.audition b where (b.createDate between :monday and :sunday) and a.pid=:id");
+				query3.setString("sunday", sunday);
+				query3.setString("monday", monday);
+				query3.setLong("id", albumSet[i].getPid());
+				albumSet2[i]=(Integer)query3.uniqueResult();
+				list2.add(albumSet2[i]);                                           //試聽數
+				
+				Query query2 = this.sessionfactory.getCurrentSession().createQuery("select count(b.productionCategory.pid) from Order a join a.orderDetail b where b.productionCategory.pid = :id and a.createDate between :monday and :sunday");
+				query2.setLong("id", albumSet[i].getPid());
+				query2.setString("sunday", sunday);
+				query2.setString("monday", monday);
+				albumSet3[i]=(Long)query2.uniqueResult();
+				list2.add(albumSet3[i]);                                            //被購買數
+				list.add(list2);
+				System.out.println("buy==>"+query2.uniqueResult());
+				System.out.println("song==>"+albumSet[i].getPid());
+				System.out.println("count==>"+albumSet2[i]);
+				i++;
+		}
+    	return list;
     }
     
     /**
@@ -894,9 +1193,88 @@ public class MusicServiceImpl implements MusicService{
      * @param startDate 專輯上架起始日期
      * @param endDate 專輯上架結束日期
      */
-    public Album[] queryAlbumMonthRankingForAdmin (String albumName, String creatorName, long musicCategoryID, String startDate, String endDate){
-    	Album[] a = {};
-    	return a;
+    public ArrayList queryAlbumMonthRankingForAdmin (String albumName, String creatorName, String musicCategoryID, String startDate, String endDate){
+    	
+    	ArrayList list = new ArrayList();
+    	
+    	Calendar c = Calendar.getInstance();
+    	Date d =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_MONTH));
+		Date d2 =DateUtils.addMonths(new Date(), -1);
+		String sunday = DateFormatUtils.format(d, "yyyyMMdd")+"235959";    //上個月的最後一天
+		String monday = DateFormatUtils.format(d2, "yyyyMMdd")+"000000";   //上個月的第一天
+		/*
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d, "yyyyMMdd"));
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d2, "yyyyMMdd"));*/
+		
+		StringBuilder queryString = new StringBuilder();
+		queryString.append("from Album a where (1=1) ");
+		
+		System.out.println("queryString=="+queryString);
+		if(StringUtils.isNotBlank(startDate)&& StringUtils.isNotBlank(endDate)) {
+			startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
+			endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
+			
+			queryString.append(" and (a.createDate  between :startDate and :endDate)");
+		}
+		if (StringUtils.isNotBlank(albumName)) {
+			queryString.append(" and (a.name=:albumName)");
+		}
+		if (StringUtils.isNotBlank(creatorName)) {
+			queryString.append(" and (a.creator.userName = :creatorName)");
+		}
+		if (StringUtils.isNotBlank(musicCategoryID)) {
+			queryString.append(" and (a.musicCategory.id = :musicCategoryID)");
+		}				
+		
+		System.out.println("queryString=="+queryString);
+		Query query = this.sessionfactory.getCurrentSession().createQuery(queryString.toString());
+
+		if(StringUtils.isNotBlank(startDate)&& StringUtils.isNotBlank(endDate)) {
+			query.setString("startDate", startDate);
+			query.setString("endDate", endDate);
+		}
+		if (StringUtils.isNotBlank(albumName)) {
+		query.setString("albumName", albumName);
+		}
+		if (StringUtils.isNotBlank(creatorName)) {
+		query.setString("creatorName", creatorName);
+		}
+		if (StringUtils.isNotBlank(musicCategoryID)) {
+		query.setString("musicCategoryID", musicCategoryID);
+		}		
+		
+		List<Album> resultList=(List<Album>)query.list();
+		Album[] albumSet = new Album[resultList.size()];
+		Integer[] albumSet2 = new Integer[resultList.size()];
+		Long[] albumSet3 = new Long[resultList.size()];
+		
+			int i=0;
+			for (Album as:resultList) {
+				ArrayList list2 = new ArrayList();
+				albumSet[i]=as;
+				list2.add(as);                                                          //專輯
+				
+				Query query3 = this.sessionfactory.getCurrentSession().createQuery("select size(b) from Album a join a.audition b where (b.createDate between :monday and :sunday) and a.pid=:id");
+				query3.setString("sunday", sunday);
+				query3.setString("monday", monday);
+				query3.setLong("id", albumSet[i].getPid());
+				albumSet2[i]=(Integer)query3.uniqueResult();
+				list2.add(albumSet2[i]);                                            //試聽數
+				
+				Query query2 = this.sessionfactory.getCurrentSession().createQuery("select count(b.productionCategory.pid) from Order a join a.orderDetail b where b.productionCategory.pid = :id and a.createDate between :monday and :sunday");
+				query2.setLong("id", albumSet[i].getPid());
+				query2.setString("sunday", sunday);
+				query2.setString("monday", monday);
+				albumSet3[i]=(Long)query2.uniqueResult();
+				list2.add(albumSet3[i]);                                            //被購買數
+				list.add(list2);
+				System.out.println("buy==>"+query2.uniqueResult());
+				System.out.println("song==>"+albumSet[i].getPid());
+				System.out.println("count==>"+albumSet2[i]);
+				i++;
+		}
+    	
+    	return list;
     }
     
     /**
@@ -908,9 +1286,93 @@ public class MusicServiceImpl implements MusicService{
      * @param startDate 專輯上架起始日期
      * @param endDate 專輯上架結束日期
      */
-    public Song[] querySongWeekRankingForAdmin (String songName, String albumName, String creatorName, long musicCategoryID, String startDate, String endDate){
-    	Song[] s = {};
-    	return s;
+    public ArrayList querySongWeekRankingForAdmin(String songName, String albumName, String creatorName, String musicCategoryID, String startDate, String endDate){
+    	
+    	ArrayList list = new ArrayList();
+    	
+    	Calendar c = Calendar.getInstance();
+    	Date d =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_WEEK)+1);
+		Date d2 =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_WEEK)-5);
+		String sunday = DateFormatUtils.format(d, "yyyyMMdd")+"235959";    //上禮拜的週日
+		String monday = DateFormatUtils.format(d2, "yyyyMMdd")+"000000";   //上星期一
+		/*
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d, "yyyyMMdd"));
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d2, "yyyyMMdd"));*/
+		
+		StringBuilder queryString = new StringBuilder();
+		queryString.append("from Song a where (1=1)");
+		
+		if(StringUtils.isNotBlank(startDate)&& StringUtils.isNotBlank(endDate)) {
+			startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
+			endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
+			
+			queryString.append(" and (a.createDate between :startDate and :endDate)");
+		}
+		if (StringUtils.isNotBlank(songName)) {
+			queryString.append(" and (a.name=:songName)");
+		}
+		if (StringUtils.isNotBlank(albumName)) {
+			queryString.append(" and (a.album.name=:albumName)");
+		}
+		if (StringUtils.isNotBlank(creatorName)) {
+			queryString.append(" and (a.album.creator.userName like :creatorName)");
+		}
+		if (StringUtils.isNotBlank(musicCategoryID)) {
+			queryString.append(" and (a.musicCategory.id = :musicCategoryID)");
+		}		
+				
+		System.out.println("queryString=="+queryString);
+		Query query = this.sessionfactory.getCurrentSession().createQuery(queryString.toString());
+
+		if(StringUtils.isNotBlank(startDate)&& StringUtils.isNotBlank(endDate)) {
+			query.setString("startDate", startDate);
+			query.setString("endDate", endDate);
+		}
+		if (StringUtils.isNotBlank(songName)) {
+			query.setString("songName", songName);
+		}
+		if (StringUtils.isNotBlank(albumName)) {
+		query.setString("albumName", albumName);
+		}
+		if (StringUtils.isNotBlank(creatorName)) {
+		query.setString("creatorName", creatorName);
+		}
+		if (StringUtils.isNotBlank(musicCategoryID)) {
+		query.setString("musicCategoryID", musicCategoryID);
+		}
+		
+				
+		List<Song> resultList=(List<Song>)query.list();
+		Song[] songSet = new Song[resultList.size()];
+		Integer[] songSet2 = new Integer[resultList.size()];
+		Long[] songSet3 = new Long[resultList.size()];
+			int i=0;
+			for (Song as:resultList) {
+				ArrayList list2 = new ArrayList();
+				songSet[i]=as;
+				list2.add(as);                                                      //歌曲
+				
+				Query query3 = this.sessionfactory.getCurrentSession().createQuery("select size(b) from Song a join a.audition b where (b.createDate between :monday and :sunday) and a.pid=:id");
+				query3.setString("sunday", sunday);
+				query3.setString("monday", monday);
+				query3.setLong("id", songSet[i].getPid());
+				songSet2[i]=(Integer)query3.uniqueResult();
+				list2.add(songSet2[i]);                                          //試聽數
+				
+				Query query2 = this.sessionfactory.getCurrentSession().createQuery("select count(b.productionCategory.pid) from Order a join a.orderDetail b where b.productionCategory.pid = :id and a.createDate between :monday and :sunday");
+				query2.setLong("id", songSet[i].getPid());
+				query2.setString("sunday", sunday);
+				query2.setString("monday", monday);
+				songSet3[i]=(Long)query2.uniqueResult();
+				list2.add(songSet3[i]);                                          //被購買數
+				list.add(list2);
+				System.out.println("buy==>"+query2.uniqueResult());
+				System.out.println("song==>"+songSet[i].getPid());
+				System.out.println("count==>"+songSet2[i]);
+				i++;
+				}
+				
+		return list;
     }
     
     /**
@@ -922,27 +1384,211 @@ public class MusicServiceImpl implements MusicService{
      * @param startDate 專輯上架起始日期
      * @param endDate 專輯上架結束日期
      */
-    public Song[] querySongMonthRankingForAdmin (String songName, String albumName, String creatorName, long musicCategoryID, String startDate, String endDate){
-    	Song[] s = {};
-    	return s;
+    public ArrayList querySongMonthRankingForAdmin (String songName, String albumName, String creatorName, String musicCategoryID, String startDate, String endDate){
+    	
+    	ArrayList list = new ArrayList();
+    	
+    	Calendar c = Calendar.getInstance();
+    	Date d =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_MONTH));
+		Date d2 =DateUtils.addMonths(new Date(), -1);
+		String sunday = DateFormatUtils.format(d, "yyyyMMdd")+"235959";    //上個月的最後一天
+		String monday = DateFormatUtils.format(d2, "yyyyMMdd")+"000000";   //上個月的第一天
+		
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d, "yyyyMMdd"));
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d2, "yyyyMMdd"));
+		
+		StringBuilder queryString = new StringBuilder();
+		queryString.append("from Song a where (1=1)");
+		
+		System.out.println("queryString=="+queryString);
+		if(StringUtils.isNotBlank(startDate)&& StringUtils.isNotBlank(endDate)) {
+			startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
+			endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
+			
+			queryString.append(" and (a.createDate  between :startDate and :endDate)");
+		}
+		if (StringUtils.isNotBlank(songName)) {
+			queryString.append(" and (a.name=:songName)");
+		}
+		if (StringUtils.isNotBlank(albumName)) {
+			queryString.append(" and (a.album.name=:albumName)");
+		}
+		if (StringUtils.isNotBlank(creatorName)) {
+			queryString.append(" and (a.album.creator.userName = :creatorName)");
+		}
+		if (StringUtils.isNotBlank(musicCategoryID)) {
+			queryString.append(" and (a.musicCategory.id = :musicCategoryID)");
+		}		
+				
+		System.out.println("queryString=="+queryString);
+		Query query = this.sessionfactory.getCurrentSession().createQuery(queryString.toString());
+
+		if(StringUtils.isNotBlank(startDate)&& StringUtils.isNotBlank(endDate)) {
+			query.setString("startDate", startDate);
+			query.setString("endDate", endDate);
+		}
+		if (StringUtils.isNotBlank(songName)) {
+			query.setString("songName", songName);
+		}
+		if (StringUtils.isNotBlank(albumName)) {
+		query.setString("albumName", albumName);
+		}
+		if (StringUtils.isNotBlank(creatorName)) {
+		query.setString("creatorName", creatorName);
+		}
+		if (StringUtils.isNotBlank(musicCategoryID)) {
+		query.setString("musicCategoryID", musicCategoryID);
+		}
+				
+		List<Song> resultList=(List<Song>)query.list();
+		Song[] songSet = new Song[resultList.size()];
+		Integer[] songSet2 = new Integer[resultList.size()];
+		Long[] songSet3 = new Long[resultList.size()];
+		System.out.println("resultList.size()=="+query.list());
+			int i=0;
+			for (Song as:resultList) {
+				ArrayList list2 = new ArrayList();
+				songSet[i]=as;
+				list2.add(as);                                                 //歌曲
+				
+				Query query3 = this.sessionfactory.getCurrentSession().createQuery("select size(b) from Song a join a.audition b where (b.createDate between :monday and :sunday) and a.pid=:id");
+				query3.setString("sunday", sunday);
+				query3.setString("monday", monday);
+				query3.setLong("id", songSet[i].getPid());
+				songSet2[i]=(Integer)query3.uniqueResult();
+				list2.add(songSet2[i]);                                     //試聽數
+				                       
+				Query query2 = this.sessionfactory.getCurrentSession().createQuery("select count(b.productionCategory.pid) from Order a join a.orderDetail b where b.productionCategory.pid = :id and a.createDate between :monday and :sunday");
+				query2.setLong("id", songSet[i].getPid());
+				query2.setString("sunday", sunday);
+				query2.setString("monday", monday);
+				songSet3[i]=(Long)query2.uniqueResult();
+				list2.add(songSet3[i]);                                     //被購買數
+				list.add(list2);
+				System.out.println("buy==>"+query2.uniqueResult());
+				System.out.println("song==>"+songSet[i].getPid());
+				System.out.println("count==>"+songSet2[i]);
+				i++;
+		}
+    	return list;
     }
     
     /**
      * 管理者查詢創作人週榜
      * @param creatorName 創作人姓名
      */
-    public Creator[] queryCreatorWeekRankingForAdmin (String creatorName){
-    	Creator[] c = {};
-    	return c;
+    public ArrayList queryCreatorWeekRankingForAdmin (String creatorName){
+    	
+    	ArrayList list = new ArrayList();
+    	
+    	Calendar c = Calendar.getInstance();
+    	Date d =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_WEEK)+1);
+		Date d2 =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_WEEK)-5);
+		String sunday = DateFormatUtils.format(d, "yyyyMMdd")+"235959";    //上禮拜的週日
+		String monday = DateFormatUtils.format(d2, "yyyyMMdd")+"000000";   //上星期一
+		
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d, "yyyyMMdd"));
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d2, "yyyyMMdd"));
+		
+		StringBuilder queryString = new StringBuilder();
+		queryString.append("from Creator a where (1=1) ");
+		
+		if (StringUtils.isNotBlank(creatorName)) {
+			queryString.append(" and (a.userName = :creatorName)");
+		}
+				
+		System.out.println("queryString=="+queryString);
+		Query query = this.sessionfactory.getCurrentSession().createQuery(queryString.toString());
+
+		if (StringUtils.isNotBlank(creatorName)) {
+		query.setString("creatorName", creatorName);
+		}
+		
+		List<Creator> resultList=(List<Creator>)query.list();
+		Creator[] creatorSet = new Creator[resultList.size()];
+		Integer[] creatorSet2 = new Integer[resultList.size()];
+		Integer[] creatorSet3 = new Integer[resultList.size()];
+		System.out.println("resultList.size()=="+query.list());
+			int i=0;
+			for (Creator as:resultList) {
+				ArrayList list2 = new ArrayList();
+				creatorSet[i]=as;                               
+				list2.add(as);                                                 //創作人
+				creatorSet2[i]=creatorSet[i].getFan().size();     
+				list2.add(creatorSet2[i]);                                 //粉絲數
+				
+				Query query3 = this.sessionfactory.getCurrentSession().createQuery("select size(b) from Member a join a.hit b where (b.createDate between :monday and :sunday) and a.id=:id");
+				query3.setString("sunday", sunday);
+				query3.setString("monday", monday);
+				query3.setLong("id", creatorSet[i].getId());
+				creatorSet3[i]=(Integer)query3.uniqueResult();
+				list2.add(creatorSet3[i]);                                 //點閱數
+				list.add(list2);
+				System.out.println("song==>"+creatorSet[i].getId());
+				System.out.println("count1==>"+creatorSet[i].getFan().size());
+				System.out.println("count2==>"+creatorSet2[i]);
+				i++;
+		}
+    	return list;
     }
     
     /**
      * 管理者查詢創作人月榜
      * @param creatorName 創作人姓名
      */
-    public Creator[] queryCreatorMonthRankingForAdmin (String creatorName){
-    	Creator[] c = {};
-    	return c;
+    public ArrayList queryCreatorMonthRankingForAdmin (String creatorName){
+    	
+    	ArrayList list = new ArrayList();
+    	
+    	Calendar c = Calendar.getInstance();
+    	Date d =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_MONTH));
+		Date d2 =DateUtils.addMonths(new Date(), -1);
+		String sunday = DateFormatUtils.format(d, "yyyyMMdd")+"235959";    //上個月的最後一天
+		String monday = DateFormatUtils.format(d2, "yyyyMMdd")+"000000";   //上個月的第一天
+		
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d, "yyyyMMdd"));
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d2, "yyyyMMdd"));
+		
+		StringBuilder queryString = new StringBuilder();
+		queryString.append("from Creator a where (1=1) ");
+		
+		if (StringUtils.isNotBlank(creatorName)) {
+			queryString.append(" and (a.userName = :creatorName)");
+		}
+				
+		System.out.println("queryString=="+queryString);
+		Query query = this.sessionfactory.getCurrentSession().createQuery(queryString.toString());
+
+		if (StringUtils.isNotBlank(creatorName)) {
+		query.setString("creatorName", creatorName);
+		}
+		
+		List<Creator> resultList=(List<Creator>)query.list();
+		Creator[] creatorSet = new Creator[resultList.size()];
+		Integer[] creatorSet2 = new Integer[resultList.size()];
+		Integer[] creatorSet3 = new Integer[resultList.size()];
+		System.out.println("resultList.size()=="+query.list());
+			int i=0;
+			for (Creator as:resultList) {
+				ArrayList list2 = new ArrayList();
+				creatorSet[i]=as;
+				list2.add(as);
+				creatorSet2[i]=creatorSet[i].getFan().size();        //粉絲數
+				list2.add(creatorSet2[i]);
+				
+				Query query3 = this.sessionfactory.getCurrentSession().createQuery("select size(b) from Member a join a.hit b where (b.createDate between :monday and :sunday) and a.id=:id");
+				query3.setString("sunday", sunday);
+				query3.setString("monday", monday);
+				query3.setLong("id", creatorSet[i].getId());
+				creatorSet3[i]=(Integer)query3.uniqueResult();
+				list2.add(creatorSet3[i]);
+				list.add(list2);                                                 //點閱數
+				System.out.println("song==>"+creatorSet[i].getId());
+				System.out.println("count1==>"+creatorSet[i].getFan().size());
+				System.out.println("count2==>"+creatorSet2[i]);
+				i++;
+		}
+    	return list;
     }
     
     /**
@@ -953,9 +1599,28 @@ public class MusicServiceImpl implements MusicService{
      * @param endDate 專輯周架結束日期
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
-    public Album[] updateAlbumWeekCP (String startDate, String endDate, String modifyDate, int CP){
-    	Album[] a = {};
-    	return a;
+    public void updateAlbumWeekCP (String adminID,String albumID, int CP){
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");  //建立當天日期時間
+    	Calendar c = Calendar.getInstance();
+		Date d =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_WEEK)+2);       //這裡拜的星期一
+		Date d2 =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_WEEK)+8);//這裡拜的星期日
+		String monday = DateFormatUtils.format(d, "yyyyMMdd")+"000000";    
+		String sunday = DateFormatUtils.format(d2, "yyyyMMdd")+"235959";   
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d, "yyyyMMdd"));
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d2, "yyyyMMdd"));
+    	
+		Album s = this.albumDAO.find(Long.parseLong(albumID));
+    	WeekRanking wk = new WeekRanking();
+    	wk.setModifyValue(String.valueOf(CP));
+    	wk.setCreateDate(datetime);
+    	wk.setEndDate(sunday);
+    	wk.setModifyDate(datetime);
+    	wk.setStartDate(monday);
+    	wk.setCreateUser(adminID);
+    	wk.setModifier(adminID);
+    	s.getWeekRanking().add(wk);
+        this.albumDAO.update(s);
+    	
     }
     
     /**
@@ -966,9 +1631,27 @@ public class MusicServiceImpl implements MusicService{
      * @param endDate 專輯周架結束日期
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
-    public Album[] updateAlbumMonthCP (String startDate, String endDate, String modifyDate, int CP){
-    	Album[] a = {};
-    	return a;
+    public void updateAlbumMonthCP (String adminID,String albumID, int CP){
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");  //建立當天日期時間
+    	Calendar c = Calendar.getInstance();
+    	Date d =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_MONTH)+1);       //這個月的第一天
+		Date d2 =DateUtils.addMonths(new Date(), -1);//這個月的最後一天
+		String monday = DateFormatUtils.format(d, "yyyyMMdd")+"000000";    
+		String sunday = DateFormatUtils.format(d2, "yyyyMMdd")+"235959";   
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d, "yyyyMMdd"));
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d2, "yyyyMMdd"));
+    	
+		Album s = this.albumDAO.find(Long.parseLong(albumID));
+    	MonthRanking wk = new MonthRanking();
+    	wk.setModifyValue(String.valueOf(CP));
+    	wk.setCreateDate(datetime);
+    	wk.setEndDate(sunday);
+    	wk.setModifyDate(datetime);
+    	wk.setStartDate(monday);
+    	wk.setCreateUser(adminID);
+    	wk.setModifier(adminID);
+    	s.getMonthRanking().add(wk);
+        this.albumDAO.update(s);
     }
     
     /**
@@ -979,9 +1662,27 @@ public class MusicServiceImpl implements MusicService{
      * @param endDate 專輯周架結束日期
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
-    public Song[] updateSongWeekCP (String startDate, String endDate, String modifyDate, int CP){
-    	Song[] s = {};
-    	return s;
+    public void updateSongWeekCP (String adminID,String songID, int CP){
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");  //建立當天日期時間
+    	Calendar c = Calendar.getInstance();
+		Date d =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_WEEK)+2);       //這裡拜的星期一
+		Date d2 =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_WEEK)+8);//這裡拜的星期日
+		String monday = DateFormatUtils.format(d, "yyyyMMdd")+"000000";    
+		String sunday = DateFormatUtils.format(d2, "yyyyMMdd")+"235959";   
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d, "yyyyMMdd"));
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d2, "yyyyMMdd"));
+    	
+		Song s = this.songDAO.find(Long.parseLong(songID));
+    	WeekRanking wk = new WeekRanking();
+    	wk.setModifyValue(String.valueOf(CP));
+    	wk.setCreateDate(datetime);
+    	wk.setEndDate(sunday);
+    	wk.setModifyDate(datetime);
+    	wk.setStartDate(monday);
+    	wk.setCreateUser(adminID);
+    	wk.setModifier(adminID);
+    	s.getWeekRanking().add(wk);
+        this.songDAO.update(s);
     }
     
     /**
@@ -992,9 +1693,27 @@ public class MusicServiceImpl implements MusicService{
      * @param endDate 專輯月榜結束日期
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
-    public Song[] updateSongMonthCP (String startDate, String endDate, String modifyDate, int CP){
-    	Song[] s = {};
-    	return s;
+    public void updateSongMonthCP (String adminID,String songID, int CP){
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");  //建立當天日期時間
+    	Calendar c = Calendar.getInstance();
+    	Date d =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_MONTH)+1);       //這個月的第一天
+		Date d2 =DateUtils.addMonths(new Date(), -1);//這個月的最後一天
+		String monday = DateFormatUtils.format(d, "yyyyMMdd")+"000000";    
+		String sunday = DateFormatUtils.format(d2, "yyyyMMdd")+"235959";   
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d, "yyyyMMdd"));
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d2, "yyyyMMdd"));
+    	
+		Song s = this.songDAO.find(Long.parseLong(songID));
+    	MonthRanking wk = new MonthRanking();
+    	wk.setModifyValue(String.valueOf(CP));
+    	wk.setCreateDate(datetime);
+    	wk.setEndDate(sunday);
+    	wk.setModifyDate(datetime);
+    	wk.setStartDate(monday);
+    	wk.setCreateUser(adminID);
+    	wk.setModifier(adminID);
+    	s.getMonthRanking().add(wk);
+        this.songDAO.update(s);
     }
     
     /**
@@ -1005,9 +1724,27 @@ public class MusicServiceImpl implements MusicService{
      * @param endDate 專輯周架結束日期
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
-    public Creator[] updateCreatorWeekCP (String startDate, String endDate, String modifyDate, int CP){
-    	Creator[] c = {};
-    	return c;
+    public void updateCreatorWeekCP (String adminID,String creatorID, int CP){
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");  //建立當天日期時間
+    	Calendar c = Calendar.getInstance();
+		Date d =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_WEEK)+2);       //這裡拜的星期一
+		Date d2 =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_WEEK)+8);//這裡拜的星期日
+		String monday = DateFormatUtils.format(d, "yyyyMMdd")+"000000";    
+		String sunday = DateFormatUtils.format(d2, "yyyyMMdd")+"235959";   
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d, "yyyyMMdd"));
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d2, "yyyyMMdd"));
+    	
+		Creator s = this.creatorDAO.find(Long.parseLong(creatorID));
+    	WeekRanking wk = new WeekRanking();
+    	wk.setModifyValue(String.valueOf(CP));
+    	wk.setCreateDate(datetime);
+    	wk.setEndDate(sunday);
+    	wk.setModifyDate(datetime);
+    	wk.setStartDate(monday);
+    	wk.setCreateUser(adminID);
+    	wk.setModifier(adminID);
+    	s.getWeekRanking().add(wk);
+        this.creatorDAO.update(s);
     }
     
     /**
@@ -1018,9 +1755,27 @@ public class MusicServiceImpl implements MusicService{
      * @param endDate 專輯月榜結束日期
      */
     @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
-    public Creator[] updateCreatorMonthCP (String startDate, String endDate, String modifyDate, int CP){
-    	Creator[] c = {};
-    	return c;
+    public void updateCreatorMonthCP (String adminID,String creatorID, int CP){
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");  //建立當天日期時間
+    	Calendar c = Calendar.getInstance();
+    	Date d =DateUtils.addDays(new Date(), -c.get(Calendar.DAY_OF_MONTH)+1);       //這個月的第一天
+		Date d2 =DateUtils.addMonths(new Date(), -1);//這個月的最後一天
+		String monday = DateFormatUtils.format(d, "yyyyMMdd")+"000000";    
+		String sunday = DateFormatUtils.format(d2, "yyyyMMdd")+"235959";   
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d, "yyyyMMdd"));
+		System.out.println("Calendar.MONDAY=="+DateFormatUtils.format(d2, "yyyyMMdd"));
+    	
+		Creator s = this.creatorDAO.find(Long.parseLong(creatorID));
+    	MonthRanking wk = new MonthRanking();
+    	wk.setModifyValue(String.valueOf(CP));
+    	wk.setCreateDate(datetime);
+    	wk.setEndDate(sunday);
+    	wk.setModifyDate(datetime);
+    	wk.setStartDate(monday);
+    	wk.setCreateUser(adminID);
+    	wk.setModifier(adminID);
+    	s.getMonthRanking().add(wk);
+        this.creatorDAO.update(s);
     }
     
     /**
@@ -1298,7 +2053,7 @@ public class MusicServiceImpl implements MusicService{
     public Song[] queryForSongs(String albumName,String creatorName,String musicCatrgory){
 		
 		StringBuilder queryString = new StringBuilder();
-		queryString.append("from Song a where (1=1)");   
+		queryString.append("from Song a where (a.dropDate is null)");   
 		
 		if (StringUtils.isNotBlank(albumName)) {
 			queryString.append("and (a.album.name=:albumName)");
@@ -1407,5 +2162,454 @@ public class MusicServiceImpl implements MusicService{
     public Song querySongLyrics(long songID){
     	Song s =this.songDAO.find(songID);
     	return s;
+    }
+    
+    
+    //大力推活動-新增活動
+    /**
+     * 儲存推薦活動
+     * @param songID 歌曲編號
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
+    public void saveRecommendActivityForAlbum(String adminID,String recommendActName,String startDate,String endDate,String[] recommendActContent,String recommendActState){
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");  //建立當天日期時間
+    	startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
+		endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
+    	
+		RecommendActivity ra =new RecommendActivity();
+    	
+    	for(int i=0;i<recommendActContent.length;i++){
+    	Album a = this.albumDAO.find(Long.parseLong(recommendActContent[i]));
+    	ra.getAlbumSet().add(a);
+    	}
+    	
+    	ra.setStartDate(startDate);
+    	ra.setEndDate(endDate);
+    	ra.setCreateDate(datetime);
+    	ra.setCreateUser(adminID);
+    	ra.setTitle(recommendActName);
+    	ra.setStatus(recommendActState);
+    	this.recommendActivityDAO.save(ra);
+    }
+    
+    /**
+     * 查詢推薦活動清單
+     * @param songID 歌曲編號
+     */
+    public RecommendActivity[] queryRecommendActivities(String year,String month){
+    	
+    	Integer y = Integer.valueOf(year); //year轉型為Integer，以便查詢。
+		Integer m = Integer.valueOf(month); //month轉型為Integer，以便查詢。
+    	
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("from RecommendActivity a where ((year(a.createDate) in (:year)) and (month(a.createDate) in (:month)))");
+    	query.setInteger("year", y);
+    	query.setInteger("month", m);
+    	
+    	List<RecommendActivity> resultList2=(List<RecommendActivity>)query.list();
+    	RecommendActivity[] raList = new RecommendActivity[resultList2.size()];
+		System.out.println("amount==>"+resultList2.size());
+			int j=0;
+			for (RecommendActivity mc2:resultList2) {
+				raList[j]=mc2;
+				System.out.println("CreatorAlbum==>"+raList[j].getTitle());
+				j++;
+			}
+    	
+    	return raList;
+    }
+    
+    /**
+     * 查詢推薦活動
+     * @param songID 歌曲編號
+     */
+    public RecommendActivity queryRecommendActivity(String recommendActID){
+    	RecommendActivity ra= this.recommendActivityDAO.find(Long.parseLong(recommendActID));
+    	return ra;
+    }
+    
+    /**
+     * 更新推薦活動
+     * @param songID 歌曲編號
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
+    public void updateRecommendActivity(String adminID,String recommendActID,String recommendActName,String startDate,String endDate,String[] recommendActContent,String recommendActState){
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");  //建立當天日期時間
+    	startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
+		endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
+    	
+		RecommendActivity ra =this.recommendActivityDAO.find(Long.parseLong(recommendActID));
+    	
+    	for(int i=0;i<recommendActContent.length;i++){
+    	Album a = this.albumDAO.find(Long.parseLong(recommendActContent[i]));
+    	ra.getAlbumSet().add(a);
+    	}
+
+    	ra.setStartDate(startDate);
+    	ra.setEndDate(endDate);
+    	ra.setModifyDate(datetime);
+    	ra.setModifier(adminID);
+    	ra.setTitle(recommendActName);
+    	ra.setStatus(recommendActState);
+    	this.recommendActivityDAO.update(ra);
+    }
+
+    /**
+     * 查詢專輯，然後將專輯加至推薦活動中
+     * @param songID 歌曲編號
+     */
+    public Map queryJoinAlbumsForRec(String recommendActID){
+    	Album a = this.albumDAO.find(Long.parseLong(recommendActID));
+    	System.out.println("a"+a.getName());
+        Map<String,String> map = new HashMap();
+        map.put("name", a.getName());
+        map.put("albumID", String.valueOf(a.getPid()));
+        map.put("creatorID", String.valueOf(a.getCreator().getId()));
+        map.put("creatorName", a.getCreator().getUserName());
+    	return map;
+    }
+    
+    /**
+     * 查詢歌曲，然後將歌曲加至推薦活動中
+     * @param songID 歌曲編號
+     */
+    public Map queryJoinSongsForRec(String recommendActID){
+    	Song a = this.songDAO.find(Long.parseLong(recommendActID));
+    	 Map<String,String> map = new HashMap();
+         map.put("name", a.getName());
+         map.put("songID", String.valueOf(a.getPid()));
+         map.put("albumName", a.getAlbum().getName());
+         map.put("albumID", String.valueOf(a.getAlbum().getPid()));
+         map.put("creatorID", String.valueOf(a.getAlbum().getCreator().getId()));
+         map.put("creatorName", a.getAlbum().getCreator().getUserName());
+     	return map;
+    }
+    
+    /**
+     * 查詢推薦活動裡專輯被購買數
+     * @param songID 歌曲編號
+     */
+    public ArrayList  queryJoinAlbumForRec(String recommendActID){
+    	ArrayList list = new ArrayList();
+    	
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("select b from RecommendActivity a join a.albumSet b,TransactionRcd d where b=d.productionCategory.pid and a.id=:activity");
+    	query.setString("activity", recommendActID);
+    	
+    	List<Album> resultList2=(List<Album>)query.list();
+    	Album[] raList = new Album[resultList2.size()];
+    	Long[] raList2 = new Long[resultList2.size()];
+		System.out.println("CreatorAlbum==>"+resultList2.size());
+			int j=0;
+			for (Album mc2:resultList2) {
+				ArrayList list2 = new ArrayList();
+				raList[j]=mc2;
+				list2.add(mc2);                                                  //參加的專輯
+				
+				Query query2 = this.sessionfactory.getCurrentSession().createQuery("select count(d.productionCategory.pid) from RecommendActivity a join a.albumSet b,TransactionRcd d where b=d.productionCategory.pid and a.id=:activity");
+				query2.setString("activity", recommendActID);
+				raList2[j]=(Long)query2.uniqueResult();
+				System.out.println("AlbumAmount==>"+raList2[j]);
+				list2.add(raList2[j]);                                            //被購買數
+				list.add(list2);
+				
+				System.out.println("CreatorAlbum==>"+raList[j].getName());
+				j++;
+			}
+    	
+    	return list;
+    }
+    
+    /**
+     * 查詢有購買推薦活動裡專輯的會員
+     * @param songID 歌曲編號
+     */
+    public Member[] queryJoinMembersForRec(String recommendActID){
+    	
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("select distinct c.member from RecommendActivity a join a.albumSet b,TransactionRcd d,Order c join c.orderDetail e where b=d.productionCategory.pid and a.id=:activity and d.id=e.id");
+    	query.setString("activity", recommendActID);
+    	
+    	List<Member> resultList2=(List<Member>)query.list();
+    	Member[] raList = new Member[resultList2.size()];
+		System.out.println("amount==>"+resultList2.size());
+			int j=0;
+			for (Member mc2:resultList2) {
+				raList[j]=mc2;                                                      //有購買此活動裡專輯的會員
+				
+				System.out.println("CreatorAlbum==>"+raList[j].getUserName());
+				j++;
+			}
+    	
+    	return raList;
+    }
+    
+    //行銷活動
+    /**
+     * 儲存行銷活動
+     * @param songID 歌曲編號
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
+    public void savePromotionActivity(String adminID,String promotionActName,String startDate,String endDate,String prepaidMoney,String prepaidCount,String promotionActContentType,String[] promotionActContent,String promotionActCondition,String presentType,int presentBonus,String presentDeadline,String promotionActState){
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");  //建立當天日期時間
+    	startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
+		endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
+    	
+		PromotionActivity pa =new PromotionActivity();
+    	
+		if(promotionActContentType.equals("1")){
+			pa.setContent(prepaidMoney);
+	    }else if(promotionActContentType.equals("2")){
+	    	pa.setContent(prepaidCount);
+	    }else if(promotionActContentType.equals("3")){
+    	for(int i=0;i<promotionActContent.length;i++){
+    	Album a = this.albumDAO.find(Long.parseLong(promotionActContent[i]));
+    	pa.getAlbumSet().add(a);
+    	}}else if(promotionActContentType.equals("4")){
+    	for(int i=0;i<promotionActContent.length;i++){
+        	Song a = this.songDAO.find(Long.parseLong(promotionActContent[i]));
+        	pa.getSongSet().add(a);
+        }}
+		
+    	pa.setStartDate(startDate);
+    	pa.setEndDate(endDate);
+    	pa.setCreateDate(datetime);
+    	pa.setCreateUser(adminID);
+    	pa.setTitle(promotionActName);
+    	pa.setStatus(promotionActState);
+    	pa.setContentCondition(promotionActContentType);
+    	pa.setRewardCondition(presentType);
+    	pa.setReward(String.valueOf(presentBonus));
+    	pa.setRewardDeadline(presentDeadline);
+    	pa.setCondition(promotionActCondition);
+    	this.promotionActivityDAO.save(pa);
+    }
+    
+    /**
+     * 查詢推薦的專輯
+     * @param songID 歌曲編號
+     */
+    public PromotionActivity[] queryPromotionActivities(String year,String month){
+    	Integer y = Integer.valueOf(year); //year轉型為Integer，以便查詢。
+		Integer m = Integer.valueOf(month); //month轉型為Integer，以便查詢。
+    	
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("from PromotionActivity a where ((year(a.createDate) in (:year)) and (month(a.createDate) in (:month)))");
+    	query.setInteger("year", y);
+    	query.setInteger("month", m);
+    	
+    	List<PromotionActivity> resultList2=(List<PromotionActivity>)query.list();
+    	PromotionActivity[] paList = new PromotionActivity[resultList2.size()];
+		System.out.println("CreatorAlbum==>"+resultList2.size());
+			int j=0;
+			for (PromotionActivity mc2:resultList2) {
+				paList[j]=mc2;
+				System.out.println("CreatorAlbum==>"+paList[j].getTitle());
+				j++;
+			}
+    	return paList;
+    }
+     
+    /**
+     * 查詢推薦的專輯
+     * @param songID 歌曲編號
+     */
+    public PromotionActivity queryPromotionActivity(String promotionActID){
+    	PromotionActivity pa =this.promotionActivityDAO.find(Long.parseLong(promotionActID));
+    	return pa;
+    }
+    
+    /**
+     * 查詢推薦的專輯
+     * @param songID 歌曲編號
+     */
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = false)
+    public void updatePromotionActivity(String adminID,String promotionActID,String promotionActName,String startDate,String endDate,String prepaidMoney,String prepaidCount,String promotionActContentType,String[] promotionActContent,String promotionActCondition,String presentType,int presentBonus,String presentDeadline,String promotionActState){
+    	String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");  //建立當天日期時間
+    	startDate= StringUtils.replaceChars(startDate, "-", "")+"000000";
+		endDate= StringUtils.replaceChars(endDate, "-", "")+"235959";
+    	
+		PromotionActivity pa =this.promotionActivityDAO.find(Long.parseLong(promotionActID));
+    	
+    	if(promotionActContentType.equals("1")){
+			pa.setContent(prepaidMoney);
+	    }else if(promotionActContentType.equals("2")){
+	    	pa.setContent(prepaidCount);
+	    }else if(promotionActContentType.equals("3")){
+    	for(int i=0;i<promotionActContent.length;i++){
+    	Album a = this.albumDAO.find(Long.parseLong(promotionActContent[i]));
+    	pa.getAlbumSet().add(a);
+    	}}else if(promotionActContentType.equals("4")){
+    	for(int i=0;i<promotionActContent.length;i++){
+        	Song a = this.songDAO.find(Long.parseLong(promotionActContent[i]));
+        	pa.getSongSet().add(a);
+        }}
+		
+    	pa.setStartDate(startDate);
+    	pa.setEndDate(endDate);
+    	pa.setCreateDate(datetime);
+    	pa.setCreateUser(adminID);
+    	pa.setTitle(promotionActName);
+    	pa.setStatus(promotionActState);
+    	pa.setContentCondition(promotionActContentType);
+    	pa.setRewardCondition(presentType);
+    	pa.setReward(String.valueOf(presentBonus));
+    	pa.setRewardDeadline(presentDeadline);
+    	pa.setCondition(promotionActCondition);
+    	
+    	this.promotionActivityDAO.update(pa);
+    }
+    
+    /**
+     * 查詢行銷活動的會員
+     * @param songID 歌曲編號
+     */
+    public Member[] queryJoinMembersForPro(String promotionActID){
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("select distinct c.member from PromotionActivity a join a.albumSet b,PromotionActivity h join h.songSet f,TransactionRcd d,Order c join c.orderDetail e, PrePaid g where b=d.productionCategory.pid or f=d.productionCategory.pid or g=d.productionCategory.pid and a.id=:activity and d.id=e.id");
+    	query.setString("activity", promotionActID);
+    	
+    	List<Member> resultList2=(List<Member>)query.list();
+    	Member[] raList = new Member[resultList2.size()];
+		System.out.println("amount==>"+resultList2.size());
+			int j=0;
+			for (Member mc2:resultList2) {
+				raList[j]=mc2;                                                      //有購買此活動裡專輯的會員
+				
+				System.out.println("CreatorAlbum==>"+raList[j].getUserName());
+				j++;
+			}
+			return raList;
+    }
+    
+    /**
+     * 查詢行銷活動的GSiMoney
+     * @param songID 歌曲編號
+     */
+    public Order[] queryJoinGSiMoneyForPro(String promotionActID){
+    	ArrayList list = new ArrayList();
+    	
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("select c from PromotionActivity a, PrePaid b, Order c join c.orderDetail e, TransactionRcd d where a.contentCondition = 1 and b.pid=d.productionCategory.pid and a.id=:activity and d=e");
+    	query.setString("activity", promotionActID);
+    	
+    	List<Order> resultList2=(List<Order>)query.list();
+    	Order[] raList = new Order[resultList2.size()];
+		System.out.println("CreatorAlbum==>"+resultList2.size());
+			int j=0;
+			for (Order mc2:resultList2) {
+				raList[j]=mc2;
+				
+				//System.out.println("CreatorAlbum==>"+raList[j].getGsiMoney().getIncome());
+				j++;
+			}
+    	
+    	return raList;
+    }
+    
+    /**
+     * 查詢行銷活動的儲值次數
+     * @param songID 歌曲編號
+     */
+    public ArrayList queryJoinTimesForPro(String promotionActID){
+    	ArrayList list = new ArrayList();
+    	
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("select c.member from PromotionActivity a, PrePaid b, Order c join c.orderDetail e, TransactionRcd d where a.contentCondition = 1 and b.pid=d.productionCategory.pid and a.id=:activity and d=e");
+    	query.setString("activity", promotionActID);
+    	
+    	List<Member> resultList2=(List<Member>)query.list();
+    	Member[] raList = new Member[resultList2.size()];
+    	Long[] raList2 = new Long[resultList2.size()];
+    	String[] raList3 = new String[resultList2.size()];
+		System.out.println("resultList2.size()==>"+resultList2.size());
+			int j=0;
+			for (Member mc2:resultList2) {
+				ArrayList list2 = new ArrayList();
+				raList[j]=mc2;
+				list2.add(mc2);                                                  //參加的會員
+				
+				Query query2 = this.sessionfactory.getCurrentSession().createQuery("select count(d.productionCategory.pid) from PromotionActivity a, PrePaid b, Order c join c.orderDetail e, TransactionRcd d where a.contentCondition = 1 and b.pid=d.productionCategory.pid and a.id=:activity and d=e and c.member.id=:member");
+				query2.setString("activity", promotionActID);
+				query2.setLong("member", raList[j].getId());
+				raList2[j]=(Long)query2.uniqueResult();
+				System.out.println("會員==>"+raList[j].getId());
+				System.out.println("儲值次數==>"+raList2[j]);
+				list2.add(raList2[j]);                                            //儲值次數
+				
+				Query query3 = this.sessionfactory.getCurrentSession().createQuery("select sum(e.gsiMoney) from PromotionActivity a, PrePaid b, Order c join c.orderDetail e, TransactionRcd d where a.contentCondition = 1 and b.pid=d.productionCategory.pid and a.id=:activity and d=e and c.member.id=:member");
+				query3.setString("activity", promotionActID);
+				query3.setLong("member", raList[j].getId());
+				raList3[j]=(String)query3.uniqueResult();
+				System.out.println("儲值總金額==>"+raList3[j]);
+				list2.add(raList3[j]);                                            //儲值總金額
+				
+				list.add(list2);
+				
+				j++;
+			}
+    	
+    	return list;
+    }
+    
+    /**
+     * 查詢行銷活動的專輯
+     * @param songID 歌曲編號
+     */
+    public ArrayList queryJoinAlbumsForPro(String promotionActID){
+    ArrayList list = new ArrayList();
+    	
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("select b from PromotionActivity a join a.albumSet b,TransactionRcd d where b=d.productionCategory.pid and a.id=:activity");
+    	query.setString("activity", promotionActID);
+    	
+    	List<Album> resultList2=(List<Album>)query.list();
+    	Album[] raList = new Album[resultList2.size()];
+    	Long[] raList2 = new Long[resultList2.size()];
+		System.out.println("CreatorAlbum==>"+resultList2.size());
+			int j=0;
+			for (Album mc2:resultList2) {
+				ArrayList list2 = new ArrayList();
+				raList[j]=mc2;
+				list2.add(mc2);                                                  //參加的專輯
+				
+				Query query2 = this.sessionfactory.getCurrentSession().createQuery("select count(d.productionCategory.pid) from PromotionActivity a join a.albumSet b,TransactionRcd d where b=d.productionCategory.pid and a.id=:activity");
+				query2.setString("activity", promotionActID);
+				raList2[j]=(Long)query2.uniqueResult();
+				System.out.println("AlbumAmount==>"+raList2[j]);
+				list2.add(raList2[j]);                                            //被購買數
+				list.add(list2);
+				
+				System.out.println("CreatorAlbum==>"+raList[j].getName());
+				j++;
+			}
+    	
+    	return list;
+    }
+    
+    /**
+     * 查詢行銷活動的歌曲
+     * @param songID 歌曲編號
+     */
+    public ArrayList queryJoinSongsForPro(String promotionActID){
+ArrayList list = new ArrayList();
+    	
+    	Query query = this.sessionfactory.getCurrentSession().createQuery("select b from PromotionActivity a join a.songSet b,TransactionRcd d where b=d.productionCategory.pid and a.id=:activity");
+    	query.setString("activity", promotionActID);
+    	
+    	List<Song> resultList2=(List<Song>)query.list();
+    	Song[] raList = new Song[resultList2.size()];
+    	Long[] raList2 = new Long[resultList2.size()];
+		System.out.println("CreatorAlbum==>"+resultList2.size());
+			int j=0;
+			for (Song mc2:resultList2) {
+				ArrayList list2 = new ArrayList();
+				raList[j]=mc2;
+				list2.add(mc2);                                                  //參加的專輯
+				
+				Query query2 = this.sessionfactory.getCurrentSession().createQuery("select count(d.productionCategory.pid) from PromotionActivity a join a.songSet b,TransactionRcd d where b=d.productionCategory.pid and a.id=:activity");
+				query2.setString("activity", promotionActID);
+				raList2[j]=(Long)query2.uniqueResult();
+				System.out.println("AlbumAmount==>"+raList2[j]);
+				list2.add(raList2[j]);                                            //被購買數
+				list.add(list2);
+				
+				System.out.println("CreatorAlbum==>"+raList[j].getName());
+				j++;
+			}
+    	
+    	return list;
     }
 }

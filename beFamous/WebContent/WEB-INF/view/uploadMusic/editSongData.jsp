@@ -6,6 +6,7 @@
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/jquery-1.6.1.min.js"></script>
 <script type="text/javascript" src="${pageContext.request.contextPath}/js/calendar.js"></script>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 </head>
 <body>
@@ -17,10 +18,10 @@
 音樂類型<br>
 <select name="musicType">
 <c:forEach var="hm" items="${mType}">
-<option value="${hm.name}" <c:if test="${song.musicCategory.name} == ${hm.name}"> selected </c:if>>${hm.name}</option>
+<option value="${hm.id}" <c:if test="${song.musicCategory.id == hm.id}"> selected </c:if>>${hm.name}</option>
 </c:forEach>
 </select><p>
-發行日期<br><input name="MOPEND" value="${song.createDate}" type="text" class="fillbox" readonly>&nbsp;
+發行日期<br><input name="MOPEND" value="<fmt:parseDate var="dateObj" value="${song.createDate}" type="DATE" pattern="yyyyMMddHHmmss"/><fmt:formatDate value='${dateObj}' pattern='yyyy-MM-dd' />" type="text" class="fillbox" readonly>&nbsp;
 <A HREF="javascript:show_calendar('fm.MOPEND');"><img src="images/cal.gif" border="0"></img></a><p>
 試聽狀態<br>
 <INPUT type=radio name=status value="1" <c:if test="${song.seconds == '1'}"> checked </c:if>>全曲
@@ -31,9 +32,9 @@
 <INPUT type=radio name=price value="2" <c:if test="${song.songPrice.price == ''}"> checked </c:if>>僅供試聽，不給下載<br>
 歌曲價格任你訂，請填入0-99的數字，最高價格為99<p>
 紅包打賞<br>讓消費者以紅包價購買您的作品。感謝您優惠消費者，我們將回饋您GSiBonus點數<br>
-<INPUT type=radio name=discount value="1" <c:if test="${song.songPrice.discountPrice == '1'}"> checked </c:if>>小紅包5元&nbsp&nbsp將回饋您GSiBonus 8點<br>
-<INPUT type=radio name=discount value="2" <c:if test="${song.songPrice.discountPrice == '2'}"> checked </c:if>>小紅包15元&nbsp&nbsp將回饋您GSiBonus 3點<br>
-<INPUT type=radio name=discount value="3" <c:if test="${song.songPrice.discountPrice == '3'}"> checked </c:if>>不提供紅包打賞<p>
+<INPUT type=radio name=discount value="1" <c:if test="${song.songPrice.discountPrice == '5'}"> checked </c:if>>小紅包5元&nbsp&nbsp將回饋您GSiBonus 8點<br>
+<INPUT type=radio name=discount value="2" <c:if test="${song.songPrice.discountPrice == '15'}"> checked </c:if>>小紅包15元&nbsp&nbsp將回饋您GSiBonus 3點<br>
+<INPUT type=radio name=discount value="3" <c:if test="${song.songPrice.discountPrice == ''}"> checked </c:if>>不提供紅包打賞<p>
 標籤<br><input type="text" size="20" value="${song.tag}" name=tag><br>
 請輸入與此唱片相關的標籤，並用半形逗點(,)隔開。<br>例如:流行,愛情,獨立創作等</td>
 

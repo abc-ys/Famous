@@ -45,6 +45,9 @@
 	<definition name="sdCardTwo" extends="base.definition">
 		<put-attribute name="body" value="/WEB-INF/view/shoppingCart/sdCardTwo.jsp" />
 	</definition>
+	<definition name="sdCardThree" extends="base.definition">
+		<put-attribute name="body" value="/WEB-INF/view/shoppingCart/sdCardThree.jsp" />
+	</definition>
 	<definition name="shoppingCartOne" extends="base.definition">
 		<put-attribute name="body" value="/WEB-INF/view/shoppingCart/shoppingCartOne.jsp" />
 	</definition>
@@ -60,14 +63,27 @@
 	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/incomeOutgo.jsp" />
 	</definition>
-	<definition name="applyExchange" extends="base.definition">
+	<definition name="queryIncomeOutgo" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/incomeOutgo.jsp" />
+	</definition>
+	<definition name="applyExchange" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/applyExchange.jsp" />
 	</definition>
 	<definition name="prePayRecord" extends="general.definition">
 	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/prePayRecord.jsp" />
 	</definition>
+	<definition name="prePayRecords" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/prePayRecord.jsp" />
+	</definition>
 	<definition name="payRecord" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/payRecord.jsp" />
+	</definition>
+	<definition name="payRecords" extends="general.definition">
 	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/payRecord.jsp" />
 	</definition>
@@ -76,6 +92,10 @@
 		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/payDetailRecord.jsp" />
 	</definition>
 	<definition name="saleRecord" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/saleRecord.jsp" />
+	</definition>
+	<definition name="saleRecords" extends="general.definition">
 	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/saleRecord.jsp" />
 	</definition>
@@ -115,6 +135,10 @@
 	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/manageOrder/manageCashOrder.jsp" />
 	</definition>
+	<definition name="manageCashOrders" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageOrder/manageCashOrder.jsp" />
+	</definition>
 	<definition name="cashOrderDetail" extends="general.definition">
 	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/manageOrder/cashOrderDetail.jsp" />
@@ -124,6 +148,10 @@
 		<put-attribute name="body" value="/WEB-INF/view/manageOrder/shipRegister.jsp" />
 	</definition>
 	<definition name="manageGSiMoneyOrder" extends="general.definition">
+	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/manageOrder/manageGSiMoneyOrder.jsp" />
+	</definition>
+	<definition name="manageGSiMoneyOrders" extends="general.definition">
 	    <put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/manageOrder/manageGSiMoneyOrder.jsp" />
 	</definition>
@@ -140,7 +168,15 @@
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/accountingQuery/billRegister.jsp" />
 	</definition>
+	<definition name="billRegisters" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/accountingQuery/billRegister.jsp" />
+	</definition>
 	<definition name="exchangeCash" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/accountingQuery/exchangeCash.jsp" />
+	</definition>
+	<definition name="exchangeCashs" extends="general.definition">
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu2.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/accountingQuery/exchangeCash.jsp" />
 	</definition>
@@ -577,13 +613,17 @@
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/cashPay.jsp" />
 	</definition>
-	<definition name="cashpaydetail" extends="general.definition">
-	    <put-attribute name="menu" value="/WEB-INF/view/menu.jsp" />
-		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/cashPayDetail.jsp" />
+	<definition name="queryCashRcds" extends="general.definition">
+	   	<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/cashPay.jsp" />
 	</definition>
 	
 	<!-- 兌換記錄 -->
 	<definition name="queryExchangeRcd" extends="general.definition">
+		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
+		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/exchangeRecord.jsp" />
+	</definition>
+	<definition name="queryExchangeRcds" extends="general.definition">
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/gsiMoneyGsiBonus/exchangeRecord.jsp" />
 	</definition>
@@ -602,7 +642,10 @@
 	</definition>		
 	<definition name="modifyNews" extends="iframe.definition">
 		<put-attribute name="body" value="/WEB-INF/view/news/modifyNews.jsp" />
-	</definition>	
+	</definition>
+	<definition name="showNews" extends="iframe.definition">
+		<put-attribute name="body" value="/WEB-INF/view/news/newsDetail.jsp" />
+	</definition>		
 	<definition name="queryNews" extends="general.definition">
 		<put-attribute name="menu" value="/WEB-INF/view/layoutMenu/menu.jsp" />
 		<put-attribute name="body" value="/WEB-INF/view/news/queryNews.jsp" />

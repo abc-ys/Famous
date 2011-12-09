@@ -18,9 +18,9 @@
 	<INPUT type=radio name="type" value="1">單曲
 	<INPUT type=radio name="type" value="2">EP
 	<INPUT type=radio name="type" value="3">專輯<br><br>
-	公開日期區間:&nbsp<input name="MOPEND" type="text" class="fillbox" readonly>&nbsp;
+	公開日期區間:&nbsp<input name="MOPEND" type="text" class="fillbox" >&nbsp;
 	<A HREF="javascript:show_calendar('fm.MOPEND');"><img src="images/cal.gif" border="0"></img></a>&nbsp-&nbsp
-	<input name="MCLOSED" type="text" class="fillbox" readonly >&nbsp;
+	<input name="MCLOSED" type="text" class="fillbox" >&nbsp;
 	<A HREF="javascript:show_calendar('fm.MCLOSED');"><img src="images/cal.gif" border="0"></img></a><br><br>
 	創作人:&nbsp<input type="text" name="name" size="10"><br><br>
 	音樂類別:&nbsp<select name="musicType">
@@ -31,7 +31,7 @@
 		</select><br><br>
 	<center><input type="button" value="查詢" onclick="queryAlbum('${adminID}')">&nbsp&nbsp<input type="reset" value="全部清除"></center>
 <p>
-<c:if test="${Album != ''}">
+<c:if test="${Album != null}">
 查詢結果
 <table border="1" BorderColor="#000000" cellpadding="0" cellspacing="0">
 <tr><td Width="30" Height="35" valign="top"><font size="2">形式</font></td>
@@ -52,8 +52,8 @@
 	<c:if test="${hm.type == 2}">EP</c:if>
 	<c:if test="${hm.type == 3}">專輯</c:if></font></td>
 	<td><font size="2">${hm.pid}</font></td>
-	<td><font size="2"><a href="javascript:album('${hm.pid}')">${hm.name}</a></font></td>	
-	<td><font size="2"><a href="javascript:song('${hm.pid}')">4</a></font></td>	
+	<td><font size="2"><a href="javascript:album('${hm.pid}','${adminID}')">${hm.name}</a></font></td>	
+	<td><font size="2"><a href="javascript:song('${hm.name}')">4</a></font></td>	
 	<td><font size="2"><a href="javascript:creator('${hm.creator.id}','${adminID}')">${hm.creator.userName}</a></font></td>
 	<td><font size="2">${hm.musicCategory.name}</font></td>
 	<td><font size="2">
@@ -83,13 +83,14 @@ function queryAlbum(adminID){
 	document.fm.action="${pageContext.request.contextPath}/queryAlbum.do?adminID="+adminID;
   	document.fm.submit();
 }
-function album(albumId){
-	window.open("${pageContext.request.contextPath}/queryAlbumData.do?albumid="+albumId);
+function album(albumId,adminID){
+	window.open("${pageContext.request.contextPath}/queryAlbumData.do?albumid="+albumId+"&userId="+adminID);
 }
 function creator(memberId,adminId){
 	window.open("${pageContext.request.contextPath}/manageCreatorDetail/get/"+adminId+"/"+memberId+".do");
 }
 function song(albumName){
+	alert(albumName);
 	window.open("${pageContext.request.contextPath}/querySong.do?albumName="+albumName);
 }
 function hiddenAlbum(albumId,adminID){

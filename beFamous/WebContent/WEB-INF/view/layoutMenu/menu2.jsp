@@ -6,20 +6,20 @@ pageEncoding="UTF-8"%>
 <table>
   <tr>
   <td>
-    <a href="${pageContext.request.contextPath}/manageMusicCategory.do">音樂類別管理</a><br>
+    <a href="${pageContext.request.contextPath}/manageMusicCategory.do?adminId=2">音樂類別管理</a><br>
   </td>
   <tr>
   <td>
     <h4>訂單管理</h4>
-    <a href="${pageContext.request.contextPath}/manageCashOrder.do">現金訂單</a><br>
-    <a href="${pageContext.request.contextPath}/manageGSiMoneyOrder.do">GSiMoney訂單</a><br>
+    <a href="${pageContext.request.contextPath}/manageCashOrder.do?adminId=2">現金訂單</a><br>
+    <a href="${pageContext.request.contextPath}/manageGSiMoneyOrder.do?adminId=2">GSiMoney訂單</a><br>
     <!-- <a href="">運費規則登錄</a><br> -->
   </td>
   <tr>
   <td>
     <h4>帳務管理</h4>
-    <a href="${pageContext.request.contextPath}/billRegister.do">訂單發票登錄</a><br>
-    <a href="${pageContext.request.contextPath}/exchangeCash.do">兌換金額管理</a><br>
+    <a href="${pageContext.request.contextPath}/billRegister.do?adminId=2">訂單發票登錄</a><br>
+    <a href="${pageContext.request.contextPath}/exchangeCash.do?adminId=2">兌換金額管理</a><br>
   </td>
   <tr>
   <td>
@@ -31,14 +31,14 @@ pageEncoding="UTF-8"%>
   <tr>
   <td>
     <h4>檢舉內容管理</h4>
-    <a href="${pageContext.request.contextPath}/offenseArea.do">查詢檢舉內容</a><br>
-    <a href="${pageContext.request.contextPath}/systemAutoHidden.do">查詢系統自動隱藏內容</a><br>
-    <a href="${pageContext.request.contextPath}/hiddened.do">查詢已被隱藏內容</a><br>
+    <a href="${pageContext.request.contextPath}/offenseArea.do?adminId=2">查詢檢舉內容</a><br>
+    <a href="${pageContext.request.contextPath}/systemAutoHidden.do?adminId=2">查詢系統自動隱藏內容</a><br>
+    <a href="${pageContext.request.contextPath}/hiddened.do?adminId=2">查詢已被隱藏內容</a><br>
   </td>
   <tr>
   <td>
     <h4>會員管理</h4>
-    <a href="${pageContext.request.contextPath}/manageMember.do">查詢會員資料</a><br>
+    <a href="${pageContext.request.contextPath}/manageMember.do?adminID=1">查詢會員資料</a><br>
   </td>
   <tr> 
   <td>
@@ -50,7 +50,7 @@ pageEncoding="UTF-8"%>
   <tr> 
   <td>
     <h4>關鍵字管理</h4>
-    <a href="${pageContext.request.contextPath}/manageKeyWord.do">排除字詞組設定</a><br>
+    <a href="${pageContext.request.contextPath}/manageKeyWord.do?adminID=1">排除字詞組設定</a><br>
   </td>
   <tr> 
   <td>
@@ -61,8 +61,8 @@ pageEncoding="UTF-8"%>
   <tr> 
   <td>
     <h4>訊息管理</h4>
-    <a href="${pageContext.request.contextPath}/addManagerNews.do">新增最新消息</a><br>
-    <a href="${pageContext.request.contextPath}/queryManagerNews.do">查詢最新消息</a><br>
+    <a href="${pageContext.request.contextPath}/addManagerNews.do?adminId=1">新增最新消息</a><br>
+    <a href="${pageContext.request.contextPath}/queryManagerNews.do?adminId=1">查詢最新消息</a><br>
   </td>
   <tr> 
   <td>

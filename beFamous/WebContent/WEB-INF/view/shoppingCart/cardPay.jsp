@@ -8,6 +8,8 @@
 <body>
 <form name="fm" method="post">
 <INPUT type=hidden name=discountBonus value="${discountBonus}">
+<INPUT type=hidden name="amount" value="${amount}">
+
 <p>
 <table border="3" BorderColor="white" align="center">
 <td Width="100" Height="30"><img alt="" src=${pageContext.request.contextPath}/images/card001.jpg width="100" height="35"></td>
@@ -17,12 +19,15 @@
 </table>
 <center><font size="2">請輸入您的信用卡資料(Please enter your Credit Card Information)</font></center>
 <center><table border="3" BorderColor="white">
+<tr><td Width="150" align="right"><font size="2">數量(Merchant)</font></td><td align="left" Width="200" colspan="3"><font size="2">${amount}</font></td></tr>
 <tr><td Width="150" align="right"><font size="2">特約商店(Merchant)</font></td><td align="left" Width="200" colspan="3"><font size="2">全球商業網股份有限公司</font></td></tr>
 <tr><td Width="150" align="right"><font size="2">訂單編號(Order Number)</font></td><td align="left" Width="200" colspan="3"><font size="2">20110905004584</font></td></tr>
 <tr><td Width="150" align="right"><font size="2">交易日期(Trans. Date)</font></td><td align="left" Width="200" colspan="3"><font size="2">20110905</font></td></tr>
 <tr><td Width="150" align="right"><font size="2">交易金額(Trans. Amount)</font></td><td align="left" Width="200" colspan="3"><font size="2">新台幣(NT$)394元</font></td></tr>
 <tr><td Width="150" align="right"><font size="2">信用卡卡號(Card Number)*</font></td><td align="left" Width="200" colspan="3"><input type="text" name="msg" size="15"></td></tr>
 <tr><td Width="150" align="right"><font size="2">有效期限(Expiration Date)*</font></td>
+
+
 <td align="left" Width="200" colspan="3">
 <select name="city"> 
 <option value="0"></option> 
@@ -52,12 +57,18 @@
 <td align="left" Width="80"><img alt="" src=images/card005.jpg width="100" height="35"></td></tr>
 </table></center>
 
-<center><input type="submit" value="確認付款(Confirm)" onclick="add()"><input type="reset" value="清除(Clear)"></center>
+<center><input type="button" value="確認付款(Confirm)" onclick="add('${productType}')"><input type="reset" value="清除(Clear)"></center>
 </form>
 </body>
 <script>
-function add(){
-    document.fm.action="${pageContext.request.contextPath}/prepayFinal.do";
+function add(productType){
+	var page;
+	if(productType=='sdCard'){
+		page="${pageContext.request.contextPath}/sdCardFinal.do";
+	}else{
+		page="${pageContext.request.contextPath}/prepayFinal.do";
+	}
+    document.fm.action=page;
     document.fm.submit();
 }
 </script>

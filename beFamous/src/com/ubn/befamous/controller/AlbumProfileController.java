@@ -9,6 +9,7 @@ import org.apache.commons.lang3.time.DateFormatUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,9 +33,10 @@ public class AlbumProfileController {
 	
 	
 	//瀏覽專輯profile
-	@RequestMapping(value = "/queryAlbumData", method = RequestMethod.GET)
-	public ModelAndView queryAlbumData(long albumid) {
-		System.out.println("albumid"+albumid);
+	@RequestMapping(value = "/queryAlbumData")
+	public ModelAndView queryAlbumData(long albumid,long userId) {
+		System.out.println("albumid="+albumid);
+		System.out.println("userId="+userId);
 		
 		ModelAndView mav = new ModelAndView("queryAlbumData");
 		
@@ -44,6 +46,7 @@ public class AlbumProfileController {
 		mav.addObject("discountPrice", "20");
 		mav.addObject("discountBonus", "10");
 		mav.addObject("album", list);
+		mav.addObject("userId", userId);
 		return mav;
 
 	} 
@@ -86,7 +89,7 @@ public class AlbumProfileController {
 	//最新專輯
 	@RequestMapping(value = "/queryNewAlbum")
 	public ModelAndView queryNewAlbum(Model model) {
-		String datetime = DateFormatUtils.format(new Date(), "yyyy-MM-dd");   //現在日期時間
+		String datetime = DateFormatUtils.format(new Date(), "yyyyMMddHHmmss");   //現在日期時間
 		Album[] arAlbum = musicService.queryNewAlbums(datetime);
 		
 		for(Album a:arAlbum){
@@ -99,23 +102,25 @@ public class AlbumProfileController {
 	
 
 	//分類名稱-最新發佈
-	@RequestMapping(value = "/queryNewAlbumsForMusicCategory")
-	public ModelAndView queryNewAlbumsForMusicCategory() {
+	@RequestMapping(value = "/queryNewAlbumsForMusicCategory/{categoryID}")
+	public ModelAndView queryNewAlbumsForMusicCategory(@PathVariable("categoryID") String categoryID,Model model) {
 		
 		long musicCatrgoryID = 1;
-		Album[] arAlbum = musicService.queryNewAlbumsForMusicCatrgory(musicCatrgoryID);
+		//Album[] arAlbum = musicService.queryAlbumsWeekRanking();
+		Album[] arAlbum = musicService.queryNewAlbumsForMusicCatrgory(Long.parseLong(categoryID));
 		
 		for(Album a:arAlbum){
 			System.out.println(a.getCover());
 		}
-		
-		return new ModelAndView("queryNewAlbumsForMusicCategory","arAlbum",arAlbum);
+		model.addAttribute("categoryID", categoryID);
+		model.addAttribute("arAlbum", arAlbum);
+		return new ModelAndView("queryNewAlbumsForMusicCategory");
 	}
 	
 	
 	//分類名稱-最受歡迎
-	@RequestMapping(value = "/queryHotAlbumsForMusicCategory")
-	public ModelAndView queryHotAlbumsForMusicCategory() {
+	@RequestMapping(value = "/queryHotAlbumsForMusicCategory/{categoryID}")
+	public ModelAndView queryHotAlbumsForMusicCategory(@PathVariable("categoryID") String categoryID,Model model) {
 		
 		Creator creator = new Creator();
 		creator.setAccountName("kevin");
@@ -126,7 +131,7 @@ public class AlbumProfileController {
 		
 		Album album = new Album();
 		album.setName("日不落");
-		album.setId(1234567);
+		//album.setId(1234567);
 		album.setCreator(creator);
 		album.setBrand("UBN");
 		album.setCover("image/image001.png");
@@ -136,7 +141,7 @@ public class AlbumProfileController {
 		album.setIntroduction("This is very good album!");
 		Album album2 = new Album();
 		album2.setName("bird2");
-		album2.setId(1234567);
+		//album2.setId(1234567);
 		album2.setCreator(creator);
 		album2.setBrand("UBN2");
 		album2.setCover("image/image002.png");
@@ -145,7 +150,9 @@ public class AlbumProfileController {
 		album2.setMusicCategory(musicCategory);
 		album2.setIntroduction("This is very good album!");
 		Album[] arAlbum = {album,album2};
-		return new ModelAndView("queryHotAlbumsForMusicCategory","arAlbum",arAlbum);
+		model.addAttribute("categoryID", categoryID);
+		model.addAttribute("arAlbum", arAlbum);
+		return new ModelAndView("queryHotAlbumsForMusicCategory");
 	}
 	
 	
@@ -154,34 +161,7 @@ public class AlbumProfileController {
 	@RequestMapping(value = "/queryAlbumsWeekRanking")
 	public ModelAndView queryAlbumsWeekRanking() {
 		
-		Creator creator = new Creator();
-		creator.setAccountName("kevin");
-		creator.setAccountNO("12345678");
-		creator.setUserName("kevin");
-		MusicCategory musicCategory = new MusicCategory();
-		musicCategory.setName("rock");
-		
-		Album album = new Album();
-		album.setName("日不落");
-		album.setId(1234567);
-		album.setCreator(creator);
-		album.setBrand("UBN");
-		album.setCover("image/image001.png");
-		album.setType("MP3");
-		album.setCreateDate("2011/10/25");
-		album.setMusicCategory(musicCategory);
-		album.setIntroduction("This is very good album!");
-		Album album2 = new Album();
-		album2.setName("bird2");
-		album2.setId(1234567);
-		album2.setCreator(creator);
-		album2.setBrand("UBN2");
-		album2.setCover("image/image002.png");
-		album2.setType("MP3");
-		album2.setCreateDate("2011/10/25");
-		album2.setMusicCategory(musicCategory);
-		album2.setIntroduction("This is very good album!");
-		Album[] arAlbum = {album,album2};
+		Album[] arAlbum = musicService.queryAlbumsWeekRanking();
 		return new ModelAndView("queryAlbumsWeekRanking","arAlbum",arAlbum);
 	}
 	
@@ -189,33 +169,8 @@ public class AlbumProfileController {
 	//查詢歌曲排行榜(週)
 	@RequestMapping(value = "/querySongsWeekRanking")
 	public ModelAndView querySongsWeekRanking(Model model) {
-		//歌曲
-		Song song = new Song();
-		SongPrice songPrice = new SongPrice();
-		songPrice.setPrice("30");
-		songPrice.setDiscountBonus("15");
-		songPrice.setDiscountPrice("15");
-		Creator creator = new Creator();
-		creator.setAccountName("kevin");
-		creator.setAccountNO("12345678");
-		creator.setUserName("kevin");
-		Album album = new Album();
-		album.setCover("image/image001.png");	
-		album.setName("ccc");
-		album.setCreator(creator);
-		album.setCreateDate("2011.10.25");
-		album.setId(1234567);
 		
-		song.setName("AAA");
-		song.setSongPrice(songPrice);
-		song.setAlbum(album);
-		
-		
-		Song song2 = new Song();
-		song2.setName("AAA");
-		song2.setSongPrice(songPrice);
-		song2.setAlbum(album);
-		Song[] arSong = {song,song2};
+		Song[] arSong = musicService.querySongsWeekRanking();
 		model.addAttribute("arSong", arSong);
 		return new ModelAndView("querySongsWeekRanking");
 		
@@ -226,38 +181,8 @@ public class AlbumProfileController {
 	@RequestMapping(value = "/queryCreatorWeekRanking")
 	public ModelAndView queryCreatorWeekRanking(Model model) {
 		
-		Creator creator = new Creator();
-		creator.setAccountName("kevin");
-		creator.setAccountNO("12345678");
-		creator.setUserName("kevin");
-		creator.setPicture("images/title_01.gif");
 		
-		Creator creator2 = new Creator();
-		creator2.setAccountName("kevin");
-		creator2.setAccountNO("12345678");
-		creator2.setUserName("rose");
-		creator2.setPicture("images/title_01.gif");
-		
-		Album album = new Album();
-		album.setCover("image/image001.png");	
-		album.setName("ccc");
-		album.setCreator(creator);
-		album.setCreateDate("2011.10.25");
-		album.setId(1234567);
-		Album album2 = new Album();
-		album.setCover("image/image001.png");	
-		album.setName("ccc");
-		album.setCreator(creator);
-		album.setCreateDate("2011.10.25");
-		album.setId(1234567);
-		Set<Album> set = new HashSet();
-		set.add(album);
-		set.add(album2);
-		creator.setAlbum(set);
-		creator2.setAlbum(set);
-		
-		//model.addAttribute(arg0, "2");
-		Creator[] arCreator = {creator,creator2};
+		ArrayList arCreator = musicService.queryCreatorWeekRanking();
 		model.addAttribute("arCreator", arCreator);
 		return new ModelAndView("queryCreatorWeekRanking");
 		
@@ -269,34 +194,7 @@ public class AlbumProfileController {
 	@RequestMapping(value = "/queryAlbumsMonthRanking")
 	public ModelAndView queryAlbumsMonthRanking() {
 		
-		Creator creator = new Creator();
-		creator.setAccountName("kevin");
-		creator.setAccountNO("12345678");
-		creator.setUserName("kevin");
-		MusicCategory musicCategory = new MusicCategory();
-		musicCategory.setName("rock");
-		
-		Album album = new Album();
-		album.setName("日不落國");
-		album.setId(1234567);
-		album.setCreator(creator);
-		album.setBrand("UBN");
-		album.setCover("image/image001.png");
-		album.setType("MP3");
-		album.setCreateDate("2011/10/25");
-		album.setMusicCategory(musicCategory);
-		album.setIntroduction("This is very good album!");
-		Album album2 = new Album();
-		album2.setName("東風破");
-		album2.setId(1234567);
-		album2.setCreator(creator);
-		album2.setBrand("UBN2");
-		album2.setCover("image/image002.png");
-		album2.setType("MP3");
-		album2.setCreateDate("2011/10/25");
-		album2.setMusicCategory(musicCategory);
-		album2.setIntroduction("This is very good album!");
-		Album[] arAlbum = {album,album2};
+		Album[] arAlbum = musicService.queryAlbumsMonthRanking();
 		return new ModelAndView("queryAlbumsMonthRanking","arAlbum",arAlbum);
 	}
 	
@@ -304,33 +202,8 @@ public class AlbumProfileController {
 	//查詢歌曲排行榜(月)
 	@RequestMapping(value = "/querySongsMonthRanking")
 	public ModelAndView querySongsMonthRanking(Model model) {
-		//歌曲
-		Song song = new Song();
-		SongPrice songPrice = new SongPrice();
-		songPrice.setPrice("30");
-		songPrice.setDiscountBonus("15");
-		songPrice.setDiscountPrice("15");
-		Creator creator = new Creator();
-		creator.setAccountName("kevin");
-		creator.setAccountNO("12345678");
-		creator.setUserName("kevin");
-		Album album = new Album();
-		album.setCover("image/image001.png");	
-		album.setName("ccc");
-		album.setCreator(creator);
-		album.setCreateDate("2011.10.25");
-		album.setId(1234567);
 		
-		song.setName("淚海");
-		song.setSongPrice(songPrice);
-		song.setAlbum(album);
-		
-		
-		Song song2 = new Song();
-		song2.setName("膽小鬼");
-		song2.setSongPrice(songPrice);
-		song2.setAlbum(album);
-		Song[] arSong = {song,song2};
+		Song[] arSong = musicService.querySongsMonthRanking();
 		model.addAttribute("arSong", arSong);
 		return new ModelAndView("querySongsMonthRanking");
 		
@@ -341,48 +214,10 @@ public class AlbumProfileController {
 	@RequestMapping(value = "/queryCreatorMonthRanking")
 	public ModelAndView queryCreatorMonthRanking(Model model) {
 		
-		Creator creator = new Creator();
-		creator.setAccountName("kevin");
-		creator.setAccountNO("12345678");
-		creator.setUserName("kevin1");
-		creator.setPicture("images/title_01.gif");
-		
-		Creator creator2 = new Creator();
-		creator2.setAccountName("kevin");
-		creator2.setAccountNO("12345678");
-		creator2.setUserName("rose1");
-		creator2.setPicture("images/title_01.gif");
-		
-		Album album = new Album();
-		album.setCover("image/image001.png");	
-		album.setName("ccc");
-		album.setCreator(creator);
-		album.setCreateDate("2011.10.25");
-		album.setId(1234567);
-		Album album2 = new Album();
-		album.setCover("image/image001.png");	
-		album.setName("ccc");
-		album.setCreator(creator);
-		album.setCreateDate("2011.10.25");
-		album.setId(1234567);
-		Set<Album> set = new HashSet();
-		set.add(album);
-		set.add(album2);
-		creator.setAlbum(set);
-		creator2.setAlbum(set);
-		
-		//model.addAttribute(arg0, "2");
-		Creator[] arCreator = {creator,creator2};
+		ArrayList arCreator = musicService.queryCreatorMonthRanking();
 		model.addAttribute("arCreator", arCreator);
 		return new ModelAndView("queryCreatorMonthRanking");
 		
 	}
-	
-	
-	
-	
-	
-	
-	
 	
 }

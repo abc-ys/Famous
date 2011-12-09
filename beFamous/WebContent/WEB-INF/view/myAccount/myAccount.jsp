@@ -10,18 +10,18 @@
 	<table width="800" height="200" border="0" cellspacing="2" frame="border" > 
 	<td width="200" height="200" >
 		<h4>通知</h4>
-		<a href="${pageContext.request.contextPath}/myDownload.do?memberID=${account[0]}">${account[1]}</a>首歌曲未下載<br><p>
-		<a href="${pageContext.request.contextPath}/myShoppingCart.do?memberID=${account[0]}">${account[2]}</a>個項目在購物車<br><p>
-		<a href="${pageContext.request.contextPath}/myFriend.do?memberID=${account[0]}">${account[3]}</a>個好友邀請<br><p>
+		${account[1]}首歌曲未下載<br><p>
+		${account[2]}個項目在購物車<br><p>
+		<a href="${pageContext.request.contextPath}/myFriendList/${account[0]}.do">${account[3]}</a>個好友邀請<br><p>
 	</td>
 	<td width="300" height="200" >
 		<form name="form">	
 			<h4>GSiMoney/GSiBonus</h4>			
-			GSiMoney餘額:<a href="${pageContext.request.contextPath}/myGSiMoney.do?memberID=${account[0]}">${account[4]}</a><br><p>
-			GSiBonus餘額:<a href="${pageContext.request.contextPath}/myGSiBonus.do?memberID=${account[0]}">${account[5]}</a><br><p>
+			GSiMoney餘額:<a href="${pageContext.request.contextPath}/incomeOutgo.do?userId=${account[0]}">${account[4]}</a><br><p>
+			GSiBonus餘額:<a href="${pageContext.request.contextPath}/rewardRecord.do?userId=${account[0]}">${account[5]}</a><br><p>
 				
 			<h4>作品銷售查詢</h4>
-			本月已售出歌曲:<a href="${pageContext.request.contextPath}/mySaleSong.do?memberID=${account[0]}">${account[6]}</a>首<br><p>
+			本月已售出歌曲:${account[6]}首<br><p>
 		</form>
 	</td>
 	<td width="300" height="200" >

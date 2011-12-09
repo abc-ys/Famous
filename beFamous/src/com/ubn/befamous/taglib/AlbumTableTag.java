@@ -1,8 +1,14 @@
 package com.ubn.befamous.taglib;
 
+import java.text.ParseException;
+import java.util.Date;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.TagSupport;
+
+import org.apache.commons.lang3.time.DateFormatUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.apache.log4j.Logger;
 import com.ubn.befamous.entity.Album;
 
@@ -61,11 +67,19 @@ public class AlbumTableTag extends TagSupport {
 						} else {
 							Album album=albums[j* MAX_COLUMN + i];
 							String strAlbumName = album.getName();
-							String strAlbumId = String.valueOf(album.getId());
+							String strAlbumId = String.valueOf(album.getPid());
 							String strAlbumCreator = album.getCreator().getUserName();
 							String strCreatorId = String.valueOf(album.getCreator().getId());
-							String strAlbumDate = album.getCreateDate();
+							String strAlbumDate = "";
 							String strCoverImage = album.getCover();
+							
+							//將日期轉成yyyy-MM-dd格式
+							try {
+								Date d3 =DateUtils.parseDate(album.getCreateDate(), "yyyyMMddHHmmss");
+								strAlbumDate =DateFormatUtils.format(d3, "yyyy-MM-dd");
+							} catch (ParseException e) {
+								e.printStackTrace();
+							}
 
 							sb.append("          			<td>");
 							sb.append("<div>");
@@ -75,8 +89,8 @@ public class AlbumTableTag extends TagSupport {
 							sb.append("<p><a class=\"p1\" href=\"#\" target=\"_BLANK\">試聽</a><a class=\"p2\" href=\"#\" target=\"_BLANK\">購買</a></p>");
 							sb.append("</div>");
 							sb.append("</div>");
-							sb.append("<div class=\"labeltext\">album:<a href=\"#\" onclick=\"javaScript:top.location.href='queryAlbumData.do?albumid="+strAlbumId+"'\">"+ strAlbumName + "</a></div>");
-							sb.append("<div class=\"labeltext\">artist:<a href=\"#\" onclick=\"javaScript:top.location.href='creatorProfile.do?creatorId="+strCreatorId+"'\">"+ strAlbumCreator + "</a></div>");
+							sb.append("<div class=\"labeltext\">album:<a href=\"#\" onclick=\"javaScript:top.location.href='queryAlbumData.do?albumid="+strAlbumId+"&userId=1'\">"+ strAlbumName + "</a></div>");
+							sb.append("<div class=\"labeltext\">artist:<a href=\"#\" onclick=\"javaScript:top.location.href='creatorProfile.do?creatorID="+strCreatorId+"'\">"+ strAlbumCreator + "</a></div>");
 							sb.append("<div class=\"labeltext\">date:"+ strAlbumDate + "</a></div>");
 
 							sb.append("</div>");
@@ -174,7 +188,7 @@ public class AlbumTableTag extends TagSupport {
 		for (int i = start; i < end; i++) {
 			Album album=albums[i];
 //			String strAlbumName = albumMap.get("albumName");
-			String strAlbumId = String.valueOf(album.getId());
+			String strAlbumId = String.valueOf(album.getPid());
 //			String strCoverImage = albumMap.get("coverImage");
 			if(i!=start){
 				sb.append(",");

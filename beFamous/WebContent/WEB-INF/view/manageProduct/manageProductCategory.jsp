@@ -14,7 +14,8 @@
 <p>
 <font size="2">&nbsp新增商品類別:</font>&nbsp
 <input type="text" name="productionClassificationName" size="15">
-<input type="submit" value="新增" onclick="add()"/>
+<input type="hidden" name="adminId" size="15" value="${adminId}" >
+<input type="button" value="新增" onclick="add()"/>
 <p>
 <table border="1" BorderColor="#000000" cellpadding="0" cellspacing="0">
 <tr><td Width="50" Height="35" valign="top"><font size="2">編號</font></td>
@@ -27,8 +28,8 @@
 <tr><td Height="30" valign="top"><font size="2">${status.index+1}</font></td>
 	<td valign="top"><font size="2">${pc.name}</font></td>
 	<td valign="top"><font size="2"><a href="javascript:void(0)">子目錄</a></font></td>
-	<td valign="top"><font size="2"><a href="javascript:void(0)" onclick="edit(${pc.id})">編輯</a></font></td>
-	<td valign="top"><font size="2"><a href="javascript:void(0)" onclick="deleteCategory(${pc.id})">刪除</a></font></td></tr>
+	<td valign="top"><font size="2"><a href="javascript:void(0)" onclick="edit('${pc.id}','${adminId}')">編輯</a></font></td>
+	<td valign="top"><font size="2"><a href="javascript:void(0)" onclick="deleteCategory('${pc.id}')">刪除</a></font></td></tr>
 	</c:forEach>
 </table>
 </form>
@@ -38,8 +39,8 @@ function add(){
      document.fm.action="${pageContext.request.contextPath}/addProductCategory.do";
      document.fm.submit();
 }
-function edit(productionClassificationId){
-	window.open("${pageContext.request.contextPath}/editProductCategory.do?productionClassificationId="+productionClassificationId,"parent","height=120,width=300,location=no,scrollbars=no,toolbar=no,directories=no,menubar=no,directories=no");
+function edit(productionClassificationId,adminId){
+	window.open("${pageContext.request.contextPath}/editProductCategory.do?productionClassificationId="+productionClassificationId+"&adminId="+adminId,"parent","height=120,width=300,location=no,scrollbars=no,toolbar=no,directories=no,menubar=no,directories=no");
 }
 function deleteCategory(productionClassificationId){
 	document.fm.action="${pageContext.request.contextPath}/deleteProductCategory.do?productionClassificationId="+productionClassificationId;
