@@ -51,13 +51,14 @@ public class ManageProductDataController {
 		//商品管理-新增商品資料-上傳檔案
 		@RequestMapping("/handleUploadFile")
 		public String handleUploadFile(HttpServletRequest request) throws Exception {
-			
 			int yourMaxMemorySize = 500 * 500* 1024;
 			File yourTempDirectory = new File("/tmp");
 			int yourMaxRequestSize = 500 * 500* 1024;
 			boolean writeToFile = true;
 			String allowedFileTypes = ".xls .xlsx";
-
+			String userID= "1";
+			//long userID = (Long)request.getSession().getAttribute("userID");  從session取得userID
+			
 			// Check that we have a file upload request
 			boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 			System.out.println("isMultipart=" + isMultipart + "<br>");
@@ -140,7 +141,7 @@ public class ManageProductDataController {
 					        			prepaidPrice.setPrice(price);
 					        		}
 		
-					        		personService.saveProduction(classification, sdcard, sdcardPrice,prepaid,prepaidPrice);
+					        		personService.saveProduction(userID,classification, sdcard, sdcardPrice,prepaid,prepaidPrice);
 					        } 
 					        
 					        System.out.println("=======匯入Excel結束=========");

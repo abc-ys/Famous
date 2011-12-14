@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.ubn.befamous.constant.SessionAttribute;
 import com.ubn.befamous.entity.Friend;
 import com.ubn.befamous.entity.GeneralMember;
 import com.ubn.befamous.entity.LikeCreator;
@@ -29,8 +30,8 @@ public class FriendsController {
 	
 	@RequestMapping("/addFriend")
 	public @ResponseBody int addFriend(long memberID,HttpServletRequest request,Model model) {
-		long userID=3;
-		//long userID = (Long)request.getSession().getAttribute("userID");  從session取得userID
+		//long userID=4;
+		long userID = (Long)request.getSession().getAttribute(SessionAttribute.USER_ID);  //從session取得userID
 		
 		personService.addFriend(memberID, userID, "");
 		GeneralMember member = personService.queryMemberData(memberID);
@@ -39,16 +40,16 @@ public class FriendsController {
 	}
 	
 	@RequestMapping("/addCreatorFriend")
-	public @ResponseBody void addCreatorFriend(long memberID,Model model) {
-		long userID=3;
-		//long userID = (Long)request.getSession().getAttribute("userID"); 從session取得userID
+	public @ResponseBody void addCreatorFriend(long memberID,Model model,HttpServletRequest request) {
+		//long userID=3;
+		long userID = (Long)request.getSession().getAttribute(SessionAttribute.USER_ID); //從session取得userID
 		personService.addFriend(memberID, userID, "");
 	}
 	
 	@RequestMapping("/addFan")
-	public @ResponseBody void addFan(long memberID,Model model) {
-		long userID=2;
-		//long userID = (Long)request.getSession().getAttribute("userID"); 從session取得userID
+	public @ResponseBody void addFan(long memberID,Model model,HttpServletRequest request) {
+		//long userID=2;
+		long userID = (Long)request.getSession().getAttribute(SessionAttribute.USER_ID); //從session取得userID
 		
 		personService.addFan(memberID, userID);
 	}
@@ -68,6 +69,7 @@ public class FriendsController {
 			*/
 			Friend[] arFriend = personService.queryUnCheckFriend(userID);
 			model.addAttribute("userID", userID);	
+			model.addAttribute("unfriends", arFriend);	
 			
 			return new ModelAndView("queryFriend");
 		}

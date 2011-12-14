@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.ubn.befamous.constant.SessionAttribute;
 import com.ubn.befamous.entity.Member;
 import com.ubn.befamous.service.PersonService;
 
@@ -179,12 +180,15 @@ public class MemberRegisterLoginController {
 	
 	//登入
 	@RequestMapping("/login")
-	public ModelAndView login(String email,String password,Model model)
+	public ModelAndView login(HttpServletRequest request,String email,String password,Model model)
 	{
+		
 		Member member = new Member();
 		member.setEmail("kevin@ubn.net");
 		member.setPassword("6yhn6yhn");
 		if( email !=null && !"".equals(email)){
+			long userID = Long.parseLong(email); //暫時拿email來當userID
+			request.getSession().setAttribute(SessionAttribute.USER_ID, userID);
 			if(!password.equals(member.getPassword()) || !email.equals(member.getEmail())){
 				model.addAttribute("errorLogin", "帳號或密碼錯誤!");
 				return new ModelAndView("login");

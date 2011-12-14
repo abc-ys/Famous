@@ -23,6 +23,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.ubn.befamous.constant.SessionAttribute;
 import com.ubn.befamous.entity.Admin;
 import com.ubn.befamous.entity.Album;
 import com.ubn.befamous.entity.Creator;
@@ -53,131 +54,131 @@ public class MemberController {
 	private TransactionRecordService transactionRecordService;
 	
 	//創作人頁面
-			@RequestMapping("/creatorProfile")
-			public ModelAndView creatorProfile(long creatorID,Model model) {
-				System.out.println("creatorProfile---"+creatorID);
-				long userID =3;
-				//long userID = (Long)request.getSession().getAttribute("userID");  從session取得userID
-				
-				ArrayList list = personService.queryCreatorData(creatorID);
-				Creator creator = (Creator)list.get(0);
-				
-				//GeneralMember user = personService.queryMemberData(userID);  //user
-				Friend[] arFriend = personService.queryFriend(userID);//user
-				Fan[] arFan = personService.queryFans(userID,creatorID);//user
-				//Fan[] arFan =  (Fan[])FansList.get(1);
-				boolean isFan = false;
-				//判斷是否已加入粉絲
-				for(Fan f : arFan){
-					if(f.getMember().getId() == userID){
-						isFan = true;
-						break;
-					}
-				}
-			
-				boolean isFriend = false;
-				//判斷是否已加入好友
-				for(Friend f : arFriend){
-					System.out.println("1111111111111===>"+f.getInviter().getId());
-					System.out.println("2222222222222===>"+creator.getId());
-					if(f.getFriend().getId() == creator.getId()){
-						isFriend = true;
-						break;
-					}
-				}
-				model.addAttribute("isFan", isFan);
-				model.addAttribute("isFriend", isFriend);	
-				model.addAttribute("creator", creator);
-				model.addAttribute("newAlbum", list.get(2));
-				
-				return new ModelAndView("creatorProfile");		
-			}		
-			
-			//創作人頁面的所有專輯tab(iframe)
-			@RequestMapping("/creatorAllAlbums")
-			public ModelAndView queryAllAlbums(long creatorID,Model model) {		
-					
-				System.out.println("AllAlbums---"+creatorID);
-				ArrayList list = personService.queryAllCreatorAlbum(creatorID);
-				model.addAttribute("albumList", list.get(0));
-				model.addAttribute("songList", list.get(1));
-				return new ModelAndView("queryAllAlbums");
+	@RequestMapping("/creatorProfile")
+	public ModelAndView creatorProfile(long creatorID,Model model,HttpServletRequest request) {
+		System.out.println("creatorProfile---"+creatorID);
+		//long userID =2;
+		long userID = (Long)request.getSession().getAttribute(SessionAttribute.USER_ID);  //從session取得userID
+		
+		ArrayList list = personService.queryCreatorData(creatorID);
+		Creator creator = (Creator)list.get(0);
+		
+		//GeneralMember user = personService.queryMemberData(userID);  //user
+		Friend[] arFriend = personService.queryFriend(userID);//user
+		Fan[] arFan = personService.queryFans(userID,creatorID);//user
+		//Fan[] arFan =  (Fan[])FansList.get(1);
+		boolean isFan = false;
+		//判斷是否已加入粉絲
+		for(Fan f : arFan){
+			if(f.getMember().getId() == userID){
+				isFan = true;
+				break;
 			}
-			
-			//創作人頁面的最新動態tab(iframe)
-			@RequestMapping("/creatorNewActivity")
-			public ModelAndView queryCreatorRecentAction(long creatorID, Model model) {		
-				System.out.println("CreatorRecentAction---"+creatorID);
-				
-				ArrayList list = personService.queryRecentActivity(creatorID);
-				
-				model.addAttribute("albumList", list.get(0));
-				model.addAttribute("likeSongList", list.get(1));
-				model.addAttribute("listenSongList", list.get(2));
-				return new ModelAndView("queryCreatorRecentAction");
+		}
+	
+		boolean isFriend = false;
+		//判斷是否已加入好友
+		for(Friend f : arFriend){
+			System.out.println("1111111111111===>"+f.getInviter().getId());
+			System.out.println("2222222222222===>"+creator.getId());
+			if(f.getFriend().getId() == creator.getId()){
+				isFriend = true;
+				break;
 			}
+		}
+		model.addAttribute("isFan", isFan);
+		model.addAttribute("isFriend", isFriend);	
+		model.addAttribute("creator", creator);
+		model.addAttribute("newAlbum", list.get(2));
+		
+		return new ModelAndView("creatorProfile");		
+	}		
+	
+	//創作人頁面的所有專輯tab(iframe)
+	@RequestMapping("/creatorAllAlbums")
+	public ModelAndView queryAllAlbums(long creatorID,Model model) {		
 			
-			//創作人頁面的好友與粉絲tab(iframe)
-			@RequestMapping("/creatorAllFriendsFans")
-			public ModelAndView queryFriendsFans(long creatorID,Model model) {		
-				
-				System.out.println("FriendsFans---"+creatorID);
-				
-				ArrayList list = personService.queryFriendFans(creatorID);
-				model.addAttribute("friendList", list.get(0));
-				model.addAttribute("fanList", list.get(1));
-					
-				return new ModelAndView("queryFriendsFans");
-			}
+		System.out.println("AllAlbums---"+creatorID);
+		ArrayList list = personService.queryAllCreatorAlbum(creatorID);
+		model.addAttribute("albumList", list.get(0));
+		model.addAttribute("songList", list.get(1));
+		return new ModelAndView("queryAllAlbums");
+	}
+	
+	//創作人頁面的最新動態tab(iframe)
+	@RequestMapping("/creatorNewActivity")
+	public ModelAndView queryCreatorRecentAction(long creatorID, Model model) {		
+		System.out.println("CreatorRecentAction---"+creatorID);
+		
+		ArrayList list = personService.queryRecentActivity(creatorID);
+		
+		model.addAttribute("albumList", list.get(0));
+		model.addAttribute("likeSongList", list.get(1));
+		model.addAttribute("listenSongList", list.get(2));
+		return new ModelAndView("queryCreatorRecentAction");
+	}
+	
+	//創作人頁面的好友與粉絲tab(iframe)
+	@RequestMapping("/creatorAllFriendsFans")
+	public ModelAndView queryFriendsFans(long creatorID,Model model) {		
+		
+		System.out.println("FriendsFans---"+creatorID);
+		
+		ArrayList list = personService.queryFriendFans(creatorID);
+		model.addAttribute("friendList", list.get(0));
+		model.addAttribute("fanList", list.get(1));
+			
+		return new ModelAndView("queryFriendsFans");
+	}
 
-			//一般會員頁面
-			@RequestMapping("/memberProfile")
-			public ModelAndView memberProfile(long memberID,Model model) {
-				System.out.println("memberProfile==>"+memberID);
-				long userID =3;
-				//long userID = (Long)request.getSession().getAttribute("userID");  從session取得userID
-				
-				GeneralMember member = personService.queryMemberData(memberID); //會員
-				GeneralMember member2 = personService.queryMemberData(userID);  //user
-				Set<Friend> FriendSet = member.getFriend();
-				Friend[] arFriend = personService.queryFriend(userID);
-				boolean isFriend = false;
-				//判斷是否已加入好友
-				for(Friend f : arFriend){
-					if(f.getFriend().getId() == member.getId()){
-						isFriend = true;
-						break;
-					}
-				}
-				model.addAttribute("isFriend", isFriend);	
-				model.addAttribute("GeneralMember", member);	
-				model.addAttribute("FriendSet", FriendSet);	
-				return new ModelAndView("memberProfile");			
+	//一般會員頁面
+	@RequestMapping("/memberProfile")
+	public ModelAndView memberProfile(long memberID,Model model,HttpServletRequest request) {
+		System.out.println("memberProfile==>"+memberID);
+		//long userID =4;
+		long userID = (Long)request.getSession().getAttribute(SessionAttribute.USER_ID);  //從session取得userID
+		
+		GeneralMember member = personService.queryMemberData(memberID); //會員
+		//GeneralMember member2 = personService.queryMemberData(userID);  //user
+		Set<Friend> FriendSet = member.getFriend();
+		Friend[] arFriend = personService.queryFriend(userID);
+		boolean isFriend = false;
+		//判斷是否已加入好友
+		for(Friend f : arFriend){
+			if(f.getFriend().getId() == member.getId()){
+				isFriend = true;
+				break;
 			}
-			
-			//一般會員頁面的最新動態tab(iframe)
-			@RequestMapping("/memberNewActivity")
-			public ModelAndView queryMemberRecentAction(long memberID,Model model) {		
-				System.out.println("MemberRecentAction---"+memberID);
-				
-				ArrayList list = personService.queryMemberRecentAction(memberID);
-				model.addAttribute("albumList", list.get(0));
-				model.addAttribute("likeSongList", list.get(1));
-				model.addAttribute("listenSongList", list.get(2));
-				return new ModelAndView("queryMemberRecentAction");
-			}
+		}
+		model.addAttribute("isFriend", isFriend);	
+		model.addAttribute("GeneralMember", member);	
+		model.addAttribute("FriendSet", FriendSet);	
+		return new ModelAndView("memberProfile");			
+	}
+	
+	//一般會員頁面的最新動態tab(iframe)
+	@RequestMapping("/memberNewActivity")
+	public ModelAndView queryMemberRecentAction(long memberID,Model model) {		
+		System.out.println("MemberRecentAction---"+memberID);
 
-			//一般會員頁面的好友與喜愛創作人tab(iframe)
-			@RequestMapping("/memberAllFriendsCreators")
-			public ModelAndView queryFriendsCreators(String memberID,Model model) {		
-				System.out.println("AllFriendsCreators---"+memberID);
-				
-				ArrayList list= personService.queryFriendsCreators(Long.parseLong(memberID));  //member
-				
-				model.addAttribute("friendList", list.get(0));
-				model.addAttribute("creatorList", list.get(1));
-				return new ModelAndView("queryFriendsCreators");
-			}
+		ArrayList list = personService.queryMemberRecentAction(memberID);
+		model.addAttribute("albumList", list.get(0));
+		model.addAttribute("likeSongList", list.get(1));
+		model.addAttribute("listenSongList", list.get(2));
+		return new ModelAndView("queryMemberRecentAction");
+	}
+
+	//一般會員頁面的好友與喜愛創作人tab(iframe)
+	@RequestMapping("/memberAllFriendsCreators")
+	public ModelAndView queryFriendsCreators(long memberID,Model model) {		
+		System.out.println("AllFriendsCreators---"+memberID);
+		
+		ArrayList list= personService.queryFriendsCreators(memberID);  //member
+		
+		model.addAttribute("friendList", list.get(0));
+		model.addAttribute("creatorList", list.get(1));
+		return new ModelAndView("queryFriendsCreators");
+	}
 
 			//個人資料編輯-個人資料編輯頁
 			@RequestMapping("/editMemberData")
