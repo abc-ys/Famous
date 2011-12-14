@@ -29,7 +29,7 @@
 <font size="2">${SDCard.name}點</font>
 </td>
 <td valign="top" Width="100">
-<font size="2">${SDCard.sdCardPrice.price}</font>
+<font size="2">${sdPrice}元 + ${sdBonus}點</font>
 </td>
 <td valign="top" Width="100">
 <font size="2">${amount}</font>
@@ -39,8 +39,8 @@
 </td>
 </tr>
 <%--  <tr><td Width="140" Height="50" valign="top"><font size="2">${sdName}</font></td><td valign="top" Width="100"><font size="2">${price}</font></td><td valign="top" Width="100"><font size="2">${discountBonus}</font></td></tr> --%>
-<tr><td colspan="4" align="right" valign="top" Height="35"><font size="2">處理費/郵資  NT$ 元</font></td></tr>
-<tr><td colspan="4" align="right" valign="top" Height="35"><font size="2">本筆訂單需付款金額  NT$ ${SDCard.sdCardPrice.price*amount}元</font></td></tr>
+<tr><td colspan="4" align="right" valign="top" Height="35"><font size="2">處理費/郵資  NT$ ${shipPrice}元</font></td></tr>
+<tr><td colspan="4" align="right" valign="top" Height="35"><font size="2">本筆訂單需付款金額  NT$ ${totalPrice}元 + ${totalBonus}點</font></td></tr>
 </table>
 <p>
 <table border="1" BorderColor="#000000" cellpadding="0" cellspacing="0" Width="200" Height="35"><td><font size="2" color="#880000"><b>付款方式與寄送資訊</b></font></font></td></table>

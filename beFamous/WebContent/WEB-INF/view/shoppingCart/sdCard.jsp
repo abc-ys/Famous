@@ -35,7 +35,7 @@
 	<tr>
 </c:forEach>
 </table><p>
-	數量:&nbsp; <input type="text" name="amount" size="5" onchange="document.fm.amount.value=this.value;">
+	數量:&nbsp; <input type="text" id="amount" name="amount" size="5" onchange="document.fm.amount.value=this.value;">
 
 <p>
 <b>購買GSiSD卡我們送您GSiBonus，可用來折抵日後的消費!</b>
@@ -43,6 +43,18 @@
 </body>
 <script>
 function addShoppingCart(){
+	
+	 var price = $("input[name='price']:checked").val();
+	 if(price == undefined ){
+		 alert('請選擇欲購買的品項!');
+		 return false;
+	 }
+	 var amount = $("#amount").val();
+	 if(amount == ''){
+		 alert('請選擇欲購買的數量!');
+		 return false;
+	 }
+	 
 	 document.fm.action="${pageContext.request.contextPath}/sdCardTwo.do";
 	 document.fm.submit();
 }

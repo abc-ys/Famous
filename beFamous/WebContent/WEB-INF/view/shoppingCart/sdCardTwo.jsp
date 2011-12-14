@@ -101,10 +101,10 @@
 <tr>
 <td><font size="2">&nbsp;配送時間: </font></td>
 <td><font size="2">
-<INPUT type=radio name=time value="1">不限時
-<INPUT type=radio name=time value="2">上午8-12時
-<INPUT type=radio name=time value="3">下午12-17時
-<INPUT type=radio name=time value="4">晚上17時以後
+<INPUT type=radio name="shipTime" value="1">不限時
+<INPUT type=radio name="shipTime" value="2">上午8-12時
+<INPUT type=radio name="shipTime" value="3">下午12-17時
+<INPUT type=radio name="shipTime" value="4">晚上17時以後
 </font></td>
 </tr>
 </table>
@@ -113,34 +113,55 @@
 <p>
 <table border="0" BorderColor="#000000" cellpadding="0" cellspacing="0">
 <tr><td Width="135" Height="60" rowspan="2" valign="top">
-<font size="2"><INPUT type=radio name="bill" id="bill" value="二聯式電子發票">二聯式電子發票</font></td>
-<td><font size="2">&nbsp;買受人: <input type="text" name="msg1"> 可不填寫</font></td></tr>
+<font size="2"><INPUT type=radio name="bill" id="bill" value="eleCheck" onclick="onBill('1');">二聯式電子發票</font></td>
+<td><font size="2">&nbsp;買受人: <input type="text" id="msg1" name="elecBillPerson"> 可不填寫</font></td></tr>
 <tr><td><font size="2">&nbsp;電子發票不隨或寄出，我們幫您兌換，核准文號:財北國稅松山營業字第0960211565號</font></td>
 </tr>
 <tr>
 <td Width="135" Height="35" valign="top">
-<font size="2"><INPUT type=radio name=bill id="bill" value="二聯式紙本發票">二聯式紙本發票</font></td>
-<td><font size="2">&nbsp;買受人: <input type="text" name="msg2"> 可不填寫</font></td>
+<font size="2"><INPUT type=radio name=bill id="bill" value="paperCheck" onclick="onBill('2');">二聯式紙本發票</font></td>
+<td><font size="2">&nbsp;買受人: <input type="text" id="msg2" name="peperBillPerson"> 可不填寫</font></td>
 </tr>
 <tr>
 <td Width="135" Height="95" rowspan="3" valign="top">
-<font size="2"><INPUT type=radio name=bill id="bill" value="三聯式發票">三聯式發票</font></td>
-<td><font size="2">&nbsp;統一編號: <input type="text" name="msg3"></font></td></tr>
-<tr><td><font size="2">&nbsp;發票抬頭: <input type="text" name="msg4"> 限22個文字，若超過請電洽客服人員處理</font></td></tr>
+<font size="2"><INPUT type=radio name=bill id="bill" value="commonCheck" onclick="onBill('3');">三聯式發票</font></td>
+<td><font size="2">&nbsp;統一編號: <input type="text" id="msg3" name="threeBillNo"></font></td></tr>
+<tr><td><font size="2">&nbsp;發票抬頭: <input type="text" id="msg4" name="threeBillTitle"> 限22個文字，若超過請電洽客服人員處理</font></td></tr>
 <tr><td><font size="2">&nbsp;依統一發票使用辦法規定；個人戶(二聯式)發票一經開立，不得任意更改或改開公司戶(三聯式)發票。</font></td></tr>
 </table>
 <br>
 <p>
-<center><input type=submit value="下一步" onclick="add()"/></center>
+<center><input type="button" value="下一步" onclick="add()"/></center>
 
 <INPUT type=hidden name=billData value="">
 <INPUT type=hidden name="amount" value="${amount}">
+<INPUT type=hidden name="priceType" value="${priceType}">
 </form>
 </body>
 <script>
+
+function onBill(id){
+	if(id=='1'){
+		$("#msg1").attr("disabled",false);
+		$("#msg2").attr("disabled",true); 
+		$("#msg3").attr("disabled",true); 
+		$("#msg4").attr("disabled",true); 
+	}else if(id=='2'){
+		$("#msg1").attr("disabled",true);
+		$("#msg2").attr("disabled",false); 
+		$("#msg3").attr("disabled",true); 
+		$("#msg4").attr("disabled",true); 
+	}else if(id=='3'){
+		$("#msg1").attr("disabled",true);
+		$("#msg2").attr("disabled",true); 
+		$("#msg3").attr("disabled",false); 
+		$("#msg4").attr("disabled",false); 
+	}
+}
+
 function add(){	
-	var billData;
-	if($('input[name=bill]').get(0).checked == true){
+	//var billData;
+	/*if($('input[name=bill]').get(0).checked == true){
 		billData=document.fm.bill[0].value+'  買受人: '+document.fm.msg1.value;
 	}
 	if($('input[name=bill]').get(1).checked == true){
@@ -148,8 +169,10 @@ function add(){
 	}
 	if($('input[name=bill]').get(2).checked == true){
 		billData=document.fm.bill[2].value+'  統一編號: '+document.fm.msg3.value+'  發票抬頭: '+document.fm.msg4.value;
-	}
-	document.fm.billData.value=billData;	
+	}*/
+	 var bill = $("input[name='bill']:checked").val();
+	alert(bill);
+	document.fm.billData.value=bill;	
     document.fm.action="${pageContext.request.contextPath}/sdCardThree.do";
     document.fm.submit();
 }
