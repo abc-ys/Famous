@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.ubn.befamous.constant.ConfingConstants;
+import com.ubn.befamous.constant.SessionAttribute;
 import com.ubn.befamous.entity.Album;
 import com.ubn.befamous.entity.Creator;
 import com.ubn.befamous.entity.Member;
@@ -25,6 +27,7 @@ import com.ubn.befamous.entity.Song;
 import com.ubn.befamous.entity.SongPrice;
 import com.ubn.befamous.entity.PrePaid;
 import com.ubn.befamous.service.TransactionRecordService;
+import com.ubn.befamous.util.CheckPriceUtil;
 
 @Controller
 @SessionAttributes
@@ -62,8 +65,8 @@ public class ShoppingCartController {
 			String sdName, HttpServletRequest request) {
 		ModelAndView mav = new ModelAndView("prepayThree");
 		System.out.println("pay==>"+pay);
-		long userID=1;
-		//long userID = (Long)request.getSession().getAttribute("userID");  從session取得userID
+		//long userID=1;
+		long userID = (Long)request.getSession().getAttribute(SessionAttribute.USER_ID);  //從session取得userID
 		Member memberUser = transactionRecordService.addMemberData(userID,member);
 		
 		PrePaid paid = (PrePaid)request.getSession().getAttribute("PRE_PAID");
@@ -104,9 +107,11 @@ public class ShoppingCartController {
 		//long orderNo = 1109211303;
 		//order.setId(orderNo);
 		//mav.addObject("orDer",order);
+		//long userID=1;
+		long userID = (Long)request.getSession().getAttribute(SessionAttribute.USER_ID);  //從session取得userID
 		PrePaid paid = (PrePaid)request.getSession().getAttribute("PRE_PAID");
 		Order order = (Order)request.getSession().getAttribute("ORDER");
-		order = transactionRecordService.purchasePrepaid(paid,order);
+		order = transactionRecordService.purchasePrepaid(userID,paid,order);
 		mav.addObject("discountBonus",discountBonus);
 		mav.addObject("order",order);
 		return mav;
@@ -120,7 +125,7 @@ public class ShoppingCartController {
 	
 	//SD卡-購物車-步驟二
 	@RequestMapping("/sdCardTwo")
-	public ModelAndView sdCardTwo(HttpServletRequest request,@RequestParam long userId, String price, String amount, Model model) {
+	public ModelAndView sdCardTwo(HttpServletRequest request, String price, String amount, Model model) {
 		System.out.println("sdCardTwo====>");
 		String []splits = price.split("_");
 		long productId =Long.valueOf(splits[0]);
@@ -130,11 +135,11 @@ public class ShoppingCartController {
 		//ArrayList list = this.transactionRecordService.addShoppingCart(userId, productId, amount);
 		ArrayList list = transactionRecordService.queryProductDetail(productId);
 		SDCard sdCard = (SDCard)list.get(0);
-		request.getSession().setAttribute("SDCARD", sdCard);
+		request.getSession().setAttribute(SessionAttribute.SDCARD, sdCard);
 		
-		//Member member = (Member) list.get(0);
-		ArrayList list2 = new ArrayList();
-		Member member = transactionRecordService.queryMember(userId);
+		long userID = (Long)request.getSession().getAttribute(SessionAttribute.USER_ID);  //從session取得userID
+		System.out.println("userID====>"+userID);
+		Member member = transactionRecordService.queryMember(userID);
 		
 		//ShoppingCart shoppingCart = (ShoppingCart) list.get(1);
 		model.addAttribute("priceType", priceType);
@@ -147,21 +152,49 @@ public class ShoppingCartController {
 	
 	//SD卡-購物車-步驟三
 		@RequestMapping("/sdCardThree")
-		public ModelAndView sdCardThree(String amount,String pay, String price, Member member,
-				String time, String billData, String discountBonus,
-				String sdName, HttpServletRequest request) {
+		public ModelAndView sdCardThree(String priceType,String amount,String pay, String price, Member member,
+				String discountBonus,String sdName, HttpServletRequest request,Order order) {
 			ModelAndView mav = new ModelAndView("sdCardThree");
 			System.out.println("pay==>"+pay);
-			long userID=1;
-			//long userID = (Long)request.getSession().getAttribute("userID");  從session取得userID
+			System.out.println("order.getBillNo()==>"+order.getBillNo());
+			
+			//long userID=1;
+			long userID = (Long)request.getSession().getAttribute(SessionAttribute.USER_ID);  //從session取得userID
 			Member memberUser = transactionRecordService.addMemberData(userID,member);
 			
-			SDCard sdCard = (SDCard)request.getSession().getAttribute("SDCARD");
+			SDCard sdCard = (SDCard)request.getSession().getAttribute(SessionAttribute.SDCARD);
 			System.out.println("sdCard222222==>"+sdCard);
+			request.getSession().setAttribute(SessionAttribute.ORDER, order);
+			//sdCard.getSdCardPrice().g
+			
+			int totalPrice = 0;
+			int totalBonus = 0;
+			int shipPrice = 0;
+			String sdPrice = "";
+			String sdBonus = "";
+			if("1".equals(priceType)){ //一般售價
+				sdPrice = sdCard.getSdCardPrice().getPrice();
+				totalPrice = Integer.valueOf(sdPrice) * Integer.valueOf(amount);
+			}else{ //優惠價+Bonus
+				sdPrice = sdCard.getSdCardPrice().getDiscountPrice();
+				sdBonus = sdCard.getSdCardPrice().getDiscountBonus();
+				totalPrice = Integer.valueOf(sdPrice) * Integer.valueOf(amount);
+				totalBonus = Integer.valueOf(sdBonus) * Integer.valueOf(amount);
+			}
+			
+			//購買價格低於600,需加運費50元
+			if(totalPrice < ConfingConstants.LEAST_PRICE){
+				shipPrice = ConfingConstants.SHIP_PRICE;
+			}
 			
 			mav.addObject("sdName",sdName);
 			mav.addObject("SDCard",sdCard);
 			mav.addObject("pay",pay);
+			mav.addObject("sdPrice",sdPrice);
+			mav.addObject("sdBonus",sdBonus);
+			mav.addObject("totalPrice",totalPrice);
+			mav.addObject("totalBonus",totalBonus);
+			mav.addObject("shipPrice",shipPrice);
 			mav.addObject("amount",amount);
 			mav.addObject("memberUser",memberUser);
 			return mav;
@@ -171,12 +204,12 @@ public class ShoppingCartController {
 		@RequestMapping("/sdCardFinal")
 		public ModelAndView sdCardFinal(@RequestParam String discountBonus,HttpServletRequest request,String amount) {
 			ModelAndView mav = new ModelAndView("prepayFinal");
-			//Order order = new Order();
-			//long orderNo = 1109211303;
-			//order.setId(orderNo);
-			//mav.addObject("orDer",order);
-			SDCard sdCard = (SDCard)request.getSession().getAttribute("SDCARD");
-			Order order = (Order)request.getSession().getAttribute("ORDER");
+
+			//long userID=1;
+			long userID = (Long)request.getSession().getAttribute(SessionAttribute.USER_ID);  //從session取得userID
+			
+			SDCard sdCard = (SDCard)request.getSession().getAttribute(SessionAttribute.SDCARD);
+			Order order = (Order)request.getSession().getAttribute(SessionAttribute.ORDER);
 			order = transactionRecordService.purchaseSDCard(sdCard,order,amount);
 			
 			mav.addObject("discountBonus",discountBonus);
@@ -188,70 +221,183 @@ public class ShoppingCartController {
 		
 	//音樂-購物車-步驟一
 	@RequestMapping("/shoppingCartOne")
-	public ModelAndView shoppingcartone() {
-		/*
-		String albumPrice = "300";
-		String albumDiscountPrice = "250";
-		String albumDiscountBonus = "50";
-		Creator creator = new Creator();
-		creator.setUserName("盧廣仲");
-		Album album = new Album();
-		album.setCover("images/album.jpg");
-		album.setName("慢靈魂");
-		album.setCreator(creator);
-		Creator creator2 = new Creator();
-		creator2.setUserName("蕭敬騰");
-		Album album2 = new Album();
-		album2.setCreator(creator2);
-		album2.setName("狂想曲");
-		Song song = new Song();
-		song.setName("敷衍");
-		SongPrice sp = new SongPrice();
-		sp.setPrice("100");
-		sp.setDiscountPrice("80");
-		sp.setDiscountBonus("20");
-		song.setSongPrice(sp);
-		song.setAlbum(album2);
-		Album[] alBum = {album};
-		Song[] soNg = {song};
-		ArrayList list = new ArrayList();
-		list.add(alBum);
-		list.add(soNg);
-		list.add(albumPrice);
-		list.add(albumDiscountPrice);
-		list.add(albumDiscountBonus);
-		*/
-		long userID = 2;
-		ShoppingCartDetail[] arDetail = transactionRecordService.queryMusicShoppingCart(userID);
+	public ModelAndView shoppingcartone(HttpServletRequest request) {
 		
-		return new ModelAndView("shoppingCartOne","albumSong",arDetail);
+		//long userID = 4;
+		long userID = (Long)request.getSession().getAttribute(SessionAttribute.USER_ID);  //從session取得userID
+		ArrayList list = transactionRecordService.queryMusicShoppingCart(userID);
+		
+		System.out.println("list=====>"+list);
+		ShoppingCartDetail[] songDetail = (ShoppingCartDetail[])list.get(0);
+		ShoppingCartDetail[] albumDetail = (ShoppingCartDetail[])list.get(1);
+		ArrayList<Integer> listPrice = CheckPriceUtil.checkPrice(songDetail, albumDetail);
+		/*int tPrice = 0;
+		int tBonus = 0;
+		for(ShoppingCartDetail d : songDetail){
+			if(d.getProductionCategory() instanceof Song){
+				Song s = (Song)d.getProductionCategory();
+				String price = "0";
+				String bonus = "0";
+				if("N".equals(d.getUseBonus())){
+				      price = s.getSongPrice().getPrice();
+				}else{
+					  price = s.getSongPrice().getDiscountPrice();
+					  bonus = s.getSongPrice().getDiscountBonus();
+				}
+				tPrice += Integer.parseInt(price);
+				tBonus += Integer.parseInt(bonus);
+			}else{
+				
+			}
+			
+		}*/
+		ModelAndView mav = new ModelAndView("shoppingCartOne");
+		mav.addObject("tPrice",listPrice.get(0));
+		mav.addObject("tBonus",listPrice.get(1));
+		mav.addObject("tAlbumPrice",listPrice.get(2));
+		mav.addObject("tAlbumBonus",listPrice.get(3));
+		mav.addObject("SongDetail",songDetail);
+		mav.addObject("AlbumDetail",albumDetail);
+		return mav;
+	}
+	
+	//音樂-購物車-選擇定價或用Bonus折抵
+	@RequestMapping("/shoppingCartChangePrice")
+	public ModelAndView shoppingCartChangePrice(HttpServletRequest request,String useBonus,long id){
+		
+		ModelAndView mav = new ModelAndView("shoppingCartChangePrice");
+		//long userID = 4;
+		long userID = (Long)request.getSession().getAttribute(SessionAttribute.USER_ID);  //從session取得userID
+		ArrayList list = transactionRecordService.updateUseBonus(userID,id, useBonus);
+		ShoppingCartDetail[] songDetail = (ShoppingCartDetail[])list.get(0);
+		ShoppingCartDetail[] albumDetail = (ShoppingCartDetail[])list.get(1);
+		ArrayList<Integer> listPrice = CheckPriceUtil.checkPrice(songDetail, albumDetail);
+		/*
+		int tPrice = 0;
+		int tBonus = 0;
+		
+		for(ShoppingCartDetail d : songDetail){
+			
+			if(d.getProductionCategory() instanceof Song){
+				Song s = (Song)d.getProductionCategory();
+				String price = "0";
+				String bonus = "0";
+				if("N".equals(d.getUseBonus())){
+				      price = s.getSongPrice().getPrice();
+				}else{
+					  price = s.getSongPrice().getDiscountPrice();
+					  bonus = s.getSongPrice().getDiscountBonus();
+				}
+				tPrice += Integer.parseInt(price);
+				tBonus += Integer.parseInt(bonus);
+			}
+			
+		}*/
+		mav.addObject("tPrice",listPrice.get(0));
+		mav.addObject("tBonus",listPrice.get(1));
+		mav.addObject("tAlbumPrice",listPrice.get(2));
+		mav.addObject("tAlbumBonus",listPrice.get(3));
+		mav.addObject("SongDetail",songDetail);
+		mav.addObject("AlbumDetail",albumDetail);
+		return mav;
+
+	}
+	
+	//刪除購物車品項
+	@RequestMapping("/deleteShoppingCart")
+	public ModelAndView deleteShoppingCart(HttpServletRequest request,long id){
+		
+		ModelAndView mav = new ModelAndView("shoppingCartChangePrice");
+		
+		long userID = (Long)request.getSession().getAttribute(SessionAttribute.USER_ID);  //從session取得userID
+		System.out.println("deleteuserID====>"+userID);
+		System.out.println("deleteid====>"+id);
+		ArrayList list = transactionRecordService.deleteShoppingCart(userID, id);
+		ShoppingCartDetail[] songDetail = (ShoppingCartDetail[])list.get(0);
+		ShoppingCartDetail[] albumDetail = (ShoppingCartDetail[])list.get(1);
+		ArrayList<Integer> listPrice = CheckPriceUtil.checkPrice(songDetail, albumDetail);
+		/*
+		int tPrice = 0;
+		int tBonus = 0;
+		
+		for(ShoppingCartDetail d : songDetail){
+			
+			if(d.getProductionCategory() instanceof Song){
+				Song s = (Song)d.getProductionCategory();
+				String price = "0";
+				String bonus = "0";
+				if("N".equals(d.getUseBonus())){
+				      price = s.getSongPrice().getPrice();
+				}else{
+					  price = s.getSongPrice().getDiscountPrice();
+					  bonus = s.getSongPrice().getDiscountBonus();
+				}
+				tPrice += Integer.parseInt(price);
+				tBonus += Integer.parseInt(bonus);
+			}
+			
+		}*/
+		mav.addObject("tPrice",listPrice.get(0));
+		mav.addObject("tBonus",listPrice.get(1));
+		mav.addObject("tAlbumPrice",listPrice.get(2));
+		mav.addObject("tAlbumBonus",listPrice.get(3));
+		mav.addObject("SongDetail",songDetail);
+		mav.addObject("AlbumDetail",albumDetail);
+		return mav;
 	}
 	
 	//音樂-購物車-步驟二
 	@RequestMapping("/shoppingCartTwo")
-	public ModelAndView shoppingcarttwo(@RequestParam String cover, String aName, String aUserName, String aprice, String sName, String aName2, String sUserName, String sprice, String tPrice, String tBonus) {
+	public ModelAndView shoppingcarttwo(HttpServletRequest request,String sName, String aName2, String sUserName, String sprice) {
 		ModelAndView mav = new ModelAndView("shoppingCartTwo");
-		mav.addObject("cover",cover);
-		mav.addObject("aName",aName);
-		mav.addObject("aUserName",aUserName);
-		mav.addObject("aprice",aprice);
-		mav.addObject("sName",sName);
-		mav.addObject("aName2",aName2);
-		mav.addObject("sUserName",sUserName);
-		mav.addObject("sprice",sprice);
-		mav.addObject("tPrice",tPrice);
-		mav.addObject("tBonus",tBonus);
-		System.out.println(tPrice);
-		System.out.println(tBonus);
+	
+		//long userID = 4;
+		long userID = (Long)request.getSession().getAttribute(SessionAttribute.USER_ID);  //從session取得userID
+		ArrayList list = transactionRecordService.queryMusicShoppingCart(userID);
+		ShoppingCartDetail[] songDetail = (ShoppingCartDetail[])list.get(0);
+		ShoppingCartDetail[] albumDetail = (ShoppingCartDetail[])list.get(1);
+		ArrayList<Integer> listPrice = CheckPriceUtil.checkPrice(songDetail, albumDetail);
+		if(songDetail.length>0){	
+			mav.addObject("shoppingCartId",songDetail[0].getShoppingCart().getId());
+		}
+		
+		/*
+		int tPrice = 0;
+		int tBonus = 0;
+		
+		for(ShoppingCartDetail d : songDetail){
+			
+			if(d.getProductionCategory() instanceof Song){
+				Song s = (Song)d.getProductionCategory();
+				String price = "0";
+				String bonus = "0";
+				if("N".equals(d.getUseBonus())){
+				      price = s.getSongPrice().getPrice();
+				}else{
+					  price = s.getSongPrice().getDiscountPrice();
+					  bonus = s.getSongPrice().getDiscountBonus();
+				}
+				tPrice += Integer.parseInt(price);
+				tBonus += Integer.parseInt(bonus);
+			}
+			
+		}*/
+		mav.addObject("tPrice",listPrice.get(0));
+		mav.addObject("tBonus",listPrice.get(1));
+		mav.addObject("tAlbumPrice",listPrice.get(2));
+		mav.addObject("tAlbumBonus",listPrice.get(3));
+		mav.addObject("SongDetail",songDetail);
+		mav.addObject("AlbumDetail",albumDetail);
 		return mav;
 	}
 	
 	//音樂-購物車-步驟三
 	@RequestMapping("/shoppingCartThree")
-	public ModelAndView shoppingcartthree(@RequestParam  String tBonus) {
+	public ModelAndView shoppingcartthree(@RequestParam  String totalBonus,long shoppingCartId,String totalPrice) {
 		ModelAndView mav = new ModelAndView("shoppingCartThree");
-		mav.addObject("tBonus",tBonus);
-		System.out.println("2"+tBonus);
+		int tReward = transactionRecordService.purchaseConfirm(shoppingCartId,totalPrice,totalBonus);
+		mav.addObject("tReward",tReward);
+		System.out.println("2"+tReward);
 		return mav;
 	}
 	
@@ -284,4 +430,15 @@ public class ShoppingCartController {
 		list.add(tBonus);
 		return new ModelAndView("tempShoppingCart","albumSong",list);
 	}
+	
+	//加入購物車(音樂)
+	@RequestMapping("/addMusicShoppingCart")
+	public String addMusicShoppingCart(HttpServletRequest request, long productId,String useBonus) {
+		//long userId=4; 
+		long userID = (Long)request.getSession().getAttribute(SessionAttribute.USER_ID);  //從session取得userID
+		transactionRecordService.addMusicShoppingCart(userID,productId,useBonus);
+		return "redirect:shoppingCartOne.do";
+	}
+	
+	
 }
