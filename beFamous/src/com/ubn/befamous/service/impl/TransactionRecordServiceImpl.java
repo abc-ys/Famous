@@ -126,93 +126,93 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 	
 	//購買SD卡與儲值
 	
-		/**
-		 *購買SD卡第一步:查詢SDCard清單 */
-		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-		public SDCard[] querySDCard() {	
-			SDCard[] sdList = this.sdCardDAO.findAll();		
-			return sdList;		
-		}
+	/**
+	 *購買SD卡第一步:查詢SDCard清單 */
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public SDCard[] querySDCard() {	
+		SDCard[] sdList = this.sdCardDAO.findAll();		
+		return sdList;		
+	}
 
-		/**
-		 *儲值第一步:查詢PrePaid清單 */
-		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-		public PrePaid[] queryPrePaid() {		
-			PrePaid[] pdList = this.prePaidDAO.findAll();
-			return pdList;
-		}
+	/**
+	 *儲值第一步:查詢PrePaid清單 */
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public PrePaid[] queryPrePaid() {		
+		PrePaid[] pdList = this.prePaidDAO.findAll();
+		return pdList;
+	}
 
-		/**
-		 * 第二步:加入購物車*/
-		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-		public ArrayList addShoppingCart(long userId, long productId, String amount) {
-			
-			Member member = this.memberDAO.find(userId);	
-			ProductionCategory productionCategory = this.productionCategoryDAO.find(productId);
-			Set<ShoppingCartDetail> shoppingCartList = new HashSet();
-			ShoppingCartDetail cartDetail = new ShoppingCartDetail();		
-			
-			ShoppingCart cart = new ShoppingCart();
-			cart.setMember(member);
-			cart.setCreateDate(DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"));
-			cart.setShoppingCartDetail(shoppingCartList);
-			
-			cartDetail.setShoppingCart(cart);
-			cartDetail.setAmount(amount);
-			cartDetail.setProductionCategory(productionCategory);
-			
-			shoppingCartList.add(cartDetail);
-			this.shoppingCartDetailDAO.save(cartDetail);
-			this.shoppingCartDAO.save(cart);
-			
-			ArrayList list = new ArrayList();
-			list.add(member);
-			list.add(cart);	
-			
-			return list;
-		}
-
-		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-		public ArrayList purchaseConfirmShoppingCart(long userId, ShoppingCart shoppingCart) {
-			Member member = this.memberDAO.find(userId);		
-			ArrayList list = new ArrayList();
-			list.add(member);
-			list.add(shoppingCart);
-			
-			return list;
-		}
+	/**
+	 * 第二步:加入購物車*/
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public ArrayList addShoppingCart(long userId, long productId, String amount) {
 		
-		//實體幣-購物車變為訂單。
-		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-		public Order addOrder(long shoppingCartId) {
-			
-			
-			return null;
-		}
+		Member member = this.memberDAO.find(userId);	
+		ProductionCategory productionCategory = this.productionCategoryDAO.find(productId);
+		Set<ShoppingCartDetail> shoppingCartList = new HashSet();
+		ShoppingCartDetail cartDetail = new ShoppingCartDetail();		
+		
+		ShoppingCart cart = new ShoppingCart();
+		cart.setMember(member);
+		cart.setCreateDate(DateFormatUtils.format(new Date(), "yyyyMMddHHmmss"));
+		cart.setShoppingCartDetail(shoppingCartList);
+		
+		cartDetail.setShoppingCart(cart);
+		cartDetail.setAmount(amount);
+		cartDetail.setProductionCategory(productionCategory);
+		
+		shoppingCartList.add(cartDetail);
+		this.shoppingCartDetailDAO.save(cartDetail);
+		this.shoppingCartDAO.save(cart);
+		
+		ArrayList list = new ArrayList();
+		list.add(member);
+		list.add(cart);	
+		
+		return list;
+	}
 
-		//購買專輯或歌曲
-		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-		public ShoppingCartDetail[] queryShoppingCart(long userId) {
-			
-			Query query = this.sessionFactory.getCurrentSession().createQuery("from ShoppingCart s where s.member.id =:v1 order by s.id desc");
-			query.setParameter("v1", userId);
-			
-			List<ShoppingCart> shoppingCart = (List<ShoppingCart>)query.list();		
-			ShoppingCart newShoppingCart = shoppingCart.get(0);
-			
-			Set<ShoppingCartDetail> detailSet = newShoppingCart.getShoppingCartDetail();
-			
-			ShoppingCartDetail[] shoppingCartDetail = detailSet.toArray(new ShoppingCartDetail[detailSet.size()]);
-			
-			return shoppingCartDetail;
-		}
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public ArrayList purchaseConfirmShoppingCart(long userId, ShoppingCart shoppingCart) {
+		Member member = this.memberDAO.find(userId);		
+		ArrayList list = new ArrayList();
+		list.add(member);
+		list.add(shoppingCart);
+		
+		return list;
+	}
+	
+	//實體幣-購物車變為訂單。
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public Order addOrder(long shoppingCartId) {
+		
+		
+		return null;
+	}
+
+	//購買專輯或歌曲
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public ShoppingCartDetail[] queryShoppingCart(long userId) {
+		
+		Query query = this.sessionFactory.getCurrentSession().createQuery("from ShoppingCart s where s.member.id =:v1 order by s.id desc");
+		query.setParameter("v1", userId);
+		
+		List<ShoppingCart> shoppingCart = (List<ShoppingCart>)query.list();		
+		ShoppingCart newShoppingCart = shoppingCart.get(0);
+		
+		Set<ShoppingCartDetail> detailSet = newShoppingCart.getShoppingCartDetail();
+		
+		ShoppingCartDetail[] shoppingCartDetail = detailSet.toArray(new ShoppingCartDetail[detailSet.size()]);
+		
+		return shoppingCartDetail;
+	}
 
 
-		@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-		public ShoppingCartDetail[] forwardPurchase(long userId) {
-			ShoppingCartDetail[] shoppingCartDetail = this.queryShoppingCart(userId); 		 
-			return shoppingCartDetail;
-		}
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+	public ShoppingCartDetail[] forwardPurchase(long userId) {
+		ShoppingCartDetail[] shoppingCartDetail = this.queryShoppingCart(userId); 		 
+		return shoppingCartDetail;
+	}
 
 
 		//訂單管理-實體幣訂單-搜尋實體幣訂單
@@ -1874,5 +1874,4 @@ public class TransactionRecordServiceImpl implements TransactionRecordService{
 			ArrayList list =  this.queryMusicShoppingCart(userId);
 			return list;
 		}
-		
 }

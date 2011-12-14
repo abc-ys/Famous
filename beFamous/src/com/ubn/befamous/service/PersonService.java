@@ -118,7 +118,7 @@ public interface PersonService {
 		
 		public AdType[] getAdType();
 		
-		public void saveProduction(String classification , SDCard sdcard, SDCardPrice sdcardPrice,
+		public void saveProduction(String userID,String classification , SDCard sdcard, SDCardPrice sdcardPrice,
 				PrePaid prepaid,PrePaidPrice prePaidPrice);
 	
 		//Lucy寫的

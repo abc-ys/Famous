@@ -24,16 +24,15 @@ import com.ubn.befamous.entity.ShoppingCartDetail;
 public interface TransactionRecordService{
 	
 	//SD卡與儲值service
-		public SDCard[] querySDCard();
-		public PrePaid[] queryPrePaid();
-		public ArrayList addShoppingCart(long userId, long productId, String amount);
-		public ArrayList purchaseConfirmShoppingCart(long userId, ShoppingCart shoppingCart);
-		public Order addOrder(long shoppingCartId);
-		
-		//購物車service
-		public ShoppingCartDetail[] queryShoppingCart(long userId);
-		public ShoppingCartDetail[] forwardPurchase(long userId);
-		
+	public SDCard[] querySDCard();
+	public PrePaid[] queryPrePaid();
+	public ArrayList addShoppingCart(long userId, long productId, String amount);
+	public ArrayList purchaseConfirmShoppingCart(long userId, ShoppingCart shoppingCart);
+	public Order addOrder(long shoppingCartId);
+	
+	//購物車service
+	public ShoppingCartDetail[] queryShoppingCart(long userId);
+	public ShoppingCartDetail[] forwardPurchase(long userId);
 		
 		
 		//訂單管理-實體幣訂單-搜尋實體幣訂單
